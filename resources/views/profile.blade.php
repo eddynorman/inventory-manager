@@ -1,27 +1,44 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="h4 mb-0">
             {{ __('Profile') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-profile-information-form />
+    <div class="row g-3">
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Profile Information</div>
+                <div class="card-body">
+                    @if(auth()->user()->hasAnyRole(['super','admin']))
+                        <livewire:profile.update-profile-information-form />
+                    @else
+                        <div class="mb-2"><strong>Name:</strong> {{ auth()->user()->name }}</div>
+                        <div class="mb-2"><strong>Email:</strong> {{ auth()->user()->email }}</div>
+                        <div class="text-muted small">Only administrators can edit profile information.</div>
+                    @endif
                 </div>
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Update Password</div>
+                <div class="card-body">
                     <livewire:profile.update-password-form />
                 </div>
             </div>
+        </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
+        <div class="col-12">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">Danger Zone</div>
+                <div class="card-body">
+                    @if(auth()->user()->hasAnyRole(['super','admin']))
+                        <livewire:profile.delete-user-form />
+                    @else
+                        <div class="text-muted small">Only administrators can delete accounts.</div>
+                    @endif
                 </div>
             </div>
         </div>
