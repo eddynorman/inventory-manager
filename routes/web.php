@@ -7,6 +7,8 @@ use App\Livewire\SupplierManager;
 use App\Livewire\CustomerManager;
 use App\Livewire\LocationManager;
 use App\Livewire\UnitManager;
+use App\Livewire\ItemKitManager;
+use App\Livewire\RequisitionManager;
 
 Route::view('/', 'welcome');
 
@@ -25,6 +27,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/customers', CustomerManager::class)->name('customers');
     Route::get('/locations', LocationManager::class)->name('locations');
     Route::get('/units', UnitManager::class)->name('units');
+    Route::get('/item-kits', ItemKitManager::class)->name('item-kits');
+    Route::get('/requisitions', RequisitionManager::class)->name('requisitions');
 });
 
 require __DIR__.'/auth.php';

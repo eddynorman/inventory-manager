@@ -61,7 +61,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Receivings</a>
                             <a href="#" class="list-group-item list-group-item-action">Transfers</a>
                             <a href="#" class="list-group-item list-group-item-action">Issues</a>
-                            <a href="#" class="list-group-item list-group-item-action">Requisitions</a>
+                            <a href="{{ route('requisitions') }}" class="list-group-item list-group-item-action {{ request()->routeIs('requisitions') ? 'active' : '' }}">Requisitions</a>
                             <a href="{{ route('locations') }}" class="list-group-item list-group-item-action {{ request()->routeIs('locations') ? 'active' : '' }}">Locations</a>
                             <a href="{{ route('units') }}" class="list-group-item list-group-item-action {{ request()->routeIs('units') ? 'active' : '' }}">Units</a>
                             <a href="{{ route('suppliers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('suppliers') ? 'active' : '' }}">Suppliers</a>
@@ -69,6 +69,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Stock Adjustments</a>
                             <a href="{{ route('categories') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories') ? 'active' : '' }}">Categories</a>
                             <a href="#" class="list-group-item list-group-item-action">Notifications</a>
+                            <a href="{{ route('item-kits') }}" class="list-group-item list-group-item-action {{ request()->routeIs('item-kits') ? 'active' : '' }}">Item Kits</a>
                             <a href="#" class="list-group-item list-group-item-action">Settings</a>
                         </div>
                     </aside>
