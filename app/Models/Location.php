@@ -22,4 +22,29 @@ class Location extends Model
     {
         return $this->hasMany(DisposeItem::class);
     }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
+    public function transfersFrom()
+    {
+        return $this->hasMany(Transfer::class, 'from_location_id');
+    }
+
+    public function transfersTo()
+    {
+        return $this->hasMany(Transfer::class, 'to_location_id');
+    }
+
+    public function issuesFrom()
+    {
+        return $this->hasMany(Issue::class, 'from_location_id');
+    }
+
+    public function issuesTo()
+    {
+        return $this->hasMany(Issue::class, 'to_location_id');
+    }
 }

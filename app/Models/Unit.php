@@ -37,4 +37,19 @@ class Unit extends Model
     {
         return $this->hasMany(StockAdjustmentItem::class);
     }
+
+    public function saleItems()
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+
+    public function transferItems()
+    {
+        return $this->hasMany(TransferItem::class);
+    }
+
+    public function issueItems()
+    {
+        return $this->hasMany(IssueItem::class);
+    }
 }
