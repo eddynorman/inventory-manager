@@ -57,8 +57,8 @@
                             <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                             <a href="{{ route('items') }}" class="list-group-item list-group-item-action {{ request()->routeIs('items') ? 'active' : '' }}">Items</a>
                             <a href="#" class="list-group-item list-group-item-action">Sales</a>
-                            <a href="#" class="list-group-item list-group-item-action">Purchases</a>
-                            <a href="#" class="list-group-item list-group-item-action">Receivings</a>
+                            <a href="{{ route('purchases') }}" class="list-group-item list-group-item-action {{ request()->routeIs('purchases') ? 'active' : '' }}">Purchases</a>
+                            <a href="{{ route('receivings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('receivings') ? 'active' : '' }}">Receivings</a>
                             <a href="#" class="list-group-item list-group-item-action">Transfers</a>
                             <a href="#" class="list-group-item list-group-item-action">Issues</a>
                             <a href="{{ route('requisitions') }}" class="list-group-item list-group-item-action {{ request()->routeIs('requisitions') ? 'active' : '' }}">Requisitions</a>

@@ -9,6 +9,8 @@ use App\Livewire\LocationManager;
 use App\Livewire\UnitManager;
 use App\Livewire\ItemKitManager;
 use App\Livewire\RequisitionManager;
+use App\Livewire\PurchaseManager;
+use App\Livewire\ReceivingManager;
 
 Route::view('/', 'welcome');
 
@@ -29,6 +31,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/units', UnitManager::class)->name('units');
     Route::get('/item-kits', ItemKitManager::class)->name('item-kits');
     Route::get('/requisitions', RequisitionManager::class)->name('requisitions');
+    Route::get('/purchases', PurchaseManager::class)->name('purchases');
+    Route::get('/receivings', ReceivingManager::class)->name('receivings');
 });
 
 require __DIR__.'/auth.php';
