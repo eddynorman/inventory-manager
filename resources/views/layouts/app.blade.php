@@ -62,6 +62,8 @@
                             <a href="#" class="list-group-item list-group-item-action">Transfers</a>
                             <a href="#" class="list-group-item list-group-item-action">Issues</a>
                             <a href="#" class="list-group-item list-group-item-action">Requisitions</a>
+                            <a href="{{ route('locations') }}" class="list-group-item list-group-item-action {{ request()->routeIs('locations') ? 'active' : '' }}">Locations</a>
+                            <a href="{{ route('units') }}" class="list-group-item list-group-item-action {{ request()->routeIs('units') ? 'active' : '' }}">Units</a>
                             <a href="{{ route('suppliers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('suppliers') ? 'active' : '' }}">Suppliers</a>
                             <a href="{{ route('customers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('customers') ? 'active' : '' }}">Customers</a>
                             <a href="#" class="list-group-item list-group-item-action">Stock Adjustments</a>
