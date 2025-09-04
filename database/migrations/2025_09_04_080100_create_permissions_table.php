@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('action');   // e.g., add, edit, delete, view
             $table->string('name')->unique(); // category.action unique key
             $table->string('description')->nullable();
+            $table->enum('status', ['pending','active','disabled'])->default('pending');
             $table->timestamps();
         });
     }
