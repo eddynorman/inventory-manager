@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemUnit extends Model
 {
-    //
+    protected $fillable = ['item_id', 'unit_id'];
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }

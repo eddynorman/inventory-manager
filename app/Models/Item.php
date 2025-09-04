@@ -6,5 +6,57 @@ use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    //
+    protected $fillable = ['name', 'barcode', 'category_id', 'supplier_id', 'initial_stock', 'current_stock', 'reorder_level', 'smallest_unit_id', 'is_active', 'is_sale_item'];
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function disposed(){
+        return $this->hasMany(DisposeItem::class);
+    }
+
+    public function smallestUnit(){
+        return $this->belongsTo(Unit::class, 'smallest_unit_id');
+    }
+
+    public function supplier(){
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function expiries(){
+        return $this->hasMany(ItemExpiryDate::class);
+    }
+    public function itemKits(){
+        return $this->belongsToMany(ItemKit::class, 'item_kit_items')->withPivot('quantity', 'unit_id')->withTimestamps();
+    }
+    public function stockAdjustments(){
+        return $this->hasMany(StockAdjustmentItem::class);
+    }
+
+    public function locations()
+    {
+        return $this->hasMany(ItemLocation::class);
+    }
+
+    public function units()
+    {
+        return $this->belongsToMany(Unit::class, 'item_units')->withTimestamps();
+    }
+
+    public function requisitionItems()
+    {
+        return $this->hasMany(RequisitionItem::class);
+    }
+
+    public function purchaseItems()
+    {
+        return $this->hasMany(PurchaseItem::class);
+    }
+
+    public function receivingItems()
+    {
+        return $this->hasMany(ReceivingItem::class);
+    }
+
 }
