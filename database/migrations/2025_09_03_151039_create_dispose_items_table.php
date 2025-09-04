@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('dispose_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('location_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->string('reason')->nullable();
             $table->timestamps();
