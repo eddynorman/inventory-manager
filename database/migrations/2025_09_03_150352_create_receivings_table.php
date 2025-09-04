@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('receivings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
-            $table->foreignId('received_by_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('location_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('received_by_id')->constrained('users','id')->onDelete('cascade');
+            $table->foreignId('location_id')->nullable()->constrained('locations','id')->onDelete('set null');
             $table->timestamps();
         });
     }

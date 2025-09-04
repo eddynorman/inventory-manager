@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('initial_stock')->default(0);
             $table->integer('current_stock')->default(0);
             $table->integer('reorder_level')->default(0);
-            $table->foreignId('smallest_unit_id')->constrained()->onDelete('cascade');
+            $table->foreignId('smallest_unit_id')->constrained('units','id')->onDelete('cascade');
             $table->boolean('is_active')->default(true);
             $table->boolean('is_sale_item')->default(true);
             $table->timestamps();

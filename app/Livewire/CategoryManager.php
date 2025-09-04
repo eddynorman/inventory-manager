@@ -88,7 +88,7 @@ class CategoryManager extends Component
 
         return view('livewire.category-manager', [
             'categories' => $query->paginate($this->perPage),
-        ])->title('Categories');
+        ])->with('title', 'Categories');
     }
 }
 

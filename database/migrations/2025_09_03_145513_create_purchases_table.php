@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('purchase_date');
             $table->foreignId('requisition_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('purchased_by_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('purchased_by_id')->constrained('users','id')->onDelete('cascade');
+            $table->foreignId('supplier_id')->nullable()->constrained('suppliers','id')->onDelete('set null');
             $table->decimal('total_amount', 10, 2);
             $table->enum('payment_status', ['pending', 'paid', 'partial']);
             $table->timestamps();
