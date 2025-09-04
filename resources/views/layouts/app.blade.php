@@ -55,7 +55,7 @@
                     <aside class="col-12 col-md-3 col-lg-2 bg-white border-end min-vh-100 p-0">
                         <div class="list-group list-group-flush">
                             <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-                            <a href="#" class="list-group-item list-group-item-action">Items</a>
+                            <a href="{{ route('items') }}" class="list-group-item list-group-item-action {{ request()->routeIs('items') ? 'active' : '' }}">Items</a>
                             <a href="#" class="list-group-item list-group-item-action">Sales</a>
                             <a href="#" class="list-group-item list-group-item-action">Purchases</a>
                             <a href="#" class="list-group-item list-group-item-action">Receivings</a>
@@ -65,6 +65,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Suppliers</a>
                             <a href="#" class="list-group-item list-group-item-action">Customers</a>
                             <a href="#" class="list-group-item list-group-item-action">Stock Adjustments</a>
+                            <a href="{{ route('categories') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories') ? 'active' : '' }}">Categories</a>
                             <a href="#" class="list-group-item list-group-item-action">Notifications</a>
                             <a href="#" class="list-group-item list-group-item-action">Settings</a>
                         </div>
