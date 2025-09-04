@@ -1,3 +1,5 @@
+/*resources/css/app.css*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './../../vendor/power-components/livewire-powergrid/dist/bootstrap5.css';
