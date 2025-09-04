@@ -10,7 +10,7 @@
         <div class="card-body">
             <div class="row g-2 align-items-center">
                 <div class="col-auto">
-                    <input type="text" wire:model.debounce.500ms="search" class="form-control" placeholder="Search...">
+                    <input type="text" wire:model.live.debounce.500ms="search" class="form-control" placeholder="Search...">
                 </div>
                 <div class="col-auto">
                     <select wire:model="perPage" class="form-select">

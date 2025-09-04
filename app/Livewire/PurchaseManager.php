@@ -107,7 +107,7 @@ class PurchaseManager extends Component
             'requisitions' => Requisition::orderByDesc('id')->get(),
             'users' => User::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
-        ])->title('Purchases');
+        ])->title('Purchases')->layout('layouts.app');
     }
 }
 

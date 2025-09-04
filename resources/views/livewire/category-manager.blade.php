@@ -6,7 +6,7 @@
         @endif
     </div>
 
-    <div class="card mb-3">
+    {{-- <div class="card mb-3">
         <div class="card-body">
             <div class="row g-2 align-items-center">
                 <div class="col-auto">
@@ -21,12 +21,12 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="card">
-        <div class="table-responsive">
-            <table class="table table-striped datatable mb-0">
-                <thead>
+        <div class=" card-body table-responsive px-2">
+            <table class="table table-striped table-bordered datatable mb-0">
+                <thead class="table-dark">
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
@@ -39,9 +39,10 @@
                             <td>{{ $cat->name }}</td>
                             <td>{{ $cat->description }}</td>
                             <td class="text-end">
+                                <button class="btn btn-primary" wire:click="view({{ $cat->id }})"><i class="fas fa-eye"></i></button>
                                 @if(auth()->user()->hasAnyRole(['super','admin']))
-                                    <button class="btn btn-sm btn-outline-secondary" wire:click="edit({{ $cat->id }})">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger" wire:click="confirmDelete({{ $cat->id }})">Delete</button>
+                                    <button class="btn btn-sm btn-warning" wire:click="edit({{ $cat->id }})"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-danger" wire:click="confirmDelete({{ $cat->id }})"><i class="fas fa-trash"></i></button>
                                 @endif
                             </td>
                         </tr>
@@ -49,16 +50,46 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer">
-            {{ $categories->links() }}
+    </div>
+    <!-- View Modal -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">Category Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if($categoryId)
+                        <h5>{{ $name }}</h5>
+                        <p>{{ $description }}</p>
+                        <h6>Items in this Category:</h6>
+                        <dl class="row">
+                            <dt class="col-sm-9">Name</dt>
+                            <dd class="col-sm-3"><b>Current Stock</b></dd>
+                            @if($items)
+                                @foreach($items as $item)
+                                    <dt class="col-sm-9">{{ $item['name'] }}</dt>
+                                    <dd class="col-sm-3">{{ $item['current_stock'] }}</dd>
+                                @endforeach
+                            @endif
+                        </dl>
+                    @else
+                        <p>Loading...</p>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Create/Edit Modal -->
     <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">{{ $categoryId ? 'Edit Category' : 'New Category' }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -84,9 +115,9 @@
 
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title">Confirm Delete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -102,6 +133,7 @@
     </div>
 
     <script>
+        window.addEventListener('show-view-modal', () => new bootstrap.Modal(document.getElementById('viewModal')).show());
         window.addEventListener('show-category-modal', () => new bootstrap.Modal(document.getElementById('categoryModal')).show());
         window.addEventListener('hide-category-modal', () => bootstrap.Modal.getInstance(document.getElementById('categoryModal'))?.hide());
         window.addEventListener('show-delete-modal', () => new bootstrap.Modal(document.getElementById('deleteModal')).show());

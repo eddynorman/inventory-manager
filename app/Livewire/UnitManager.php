@@ -102,7 +102,7 @@ class UnitManager extends Component
             ->paginate($this->perPage);
 
         return view('livewire.unit-manager', compact('units'))
-            ->title('Units');
+            ->title('Units')->layout('layouts.app');
     }
 }
 

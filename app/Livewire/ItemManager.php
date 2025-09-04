@@ -112,7 +112,7 @@ class ItemManager extends Component
             'categories' => Category::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'units' => Unit::orderBy('name')->get(),
-        ])->title('Items');
+        ])->title('Items')->layout('layouts.app');
     }
 }
 

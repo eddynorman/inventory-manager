@@ -97,7 +97,7 @@ class ReceivingManager extends Component
             'purchases' => Purchase::orderByDesc('id')->get(),
             'users' => User::orderBy('name')->get(),
             'locations' => Location::orderBy('name')->get(),
-        ])->title('Receivings');
+        ])->title('Receivings')->layout('layouts.app');
     }
 }
 

@@ -22,6 +22,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Route::post('logout', \App\Livewire\Actions\Logout::class)
+    ->middleware(['auth'])
+    ->name('logout');
+
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/categories', CategoryManager::class)->name('categories');
     Route::get('/items', ItemManager::class)->name('items');

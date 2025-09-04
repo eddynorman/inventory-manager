@@ -88,7 +88,8 @@ class ItemKitManager extends Component
             ->paginate($this->perPage);
 
         return view('livewire.item-kit-manager', compact('kits'))
-            ->title('Item Kits');
+            ->title('Item Kits')
+            ->layout('layouts.app');
     }
 }
 

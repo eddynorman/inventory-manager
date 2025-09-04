@@ -6,23 +6,13 @@ use App\Models\Category;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class CategoryManager extends Component
 {
-    use WithPagination;
-
-    public string $search = '';
-    public int $perPage = 10;
-
     public ?int $categoryId = null;
     public string $name = '';
     public ?string $description = '';
-
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
-    }
+    public $items = null;
 
     public function resetForm(): void
     {
@@ -34,6 +24,20 @@ class CategoryManager extends Component
     {
         $this->resetForm();
         $this->dispatch('show-category-modal');
+    }
+
+    public function view(int $id): void
+    {
+        $cat = Category::findOrFail($id);
+
+        $items = $cat->items()
+            ->get(['name', 'current_stock'])
+            ->toArray();
+        $this->categoryId = $cat->id;
+        $this->name = $cat->name;
+        $this->items = $items;
+        $this->description = (string)($cat->description ?? '');
+        $this->dispatch('show-view-modal');
     }
 
     public function edit(int $id): void
@@ -80,15 +84,11 @@ class CategoryManager extends Component
 
     public function render()
     {
-        $query = Category::query()
-            ->when($this->search !== '', function ($q) {
-                $q->where('name', 'like', "%{$this->search}%");
-            })
-            ->orderBy('name');
+        $categories = Category::query()->orderBy('name');
 
         return view('livewire.category-manager', [
-            'categories' => $query->paginate($this->perPage),
-        ])->with('title', 'Categories');
+            'categories' => $categories->get(),
+        ])->layout('layouts.app');
     }
 }
 

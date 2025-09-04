@@ -93,7 +93,8 @@ class CustomerManager extends Component
             ->paginate($this->perPage);
 
         return view('livewire.customer-manager', compact('customers'))
-            ->title('Customers');
+            ->title('Customers')
+            ->layout('layouts.app');
     }
 }
 

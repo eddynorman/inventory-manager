@@ -94,12 +94,41 @@
         <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
         <script>
+            function initDataTables() {
+                console.log('Initializing DataTables...');
+                document.querySelectorAll('table.datatable').forEach((table) => {
+                    // Destroy existing DataTable safely
+                    if ($.fn.DataTable.isDataTable(table)) {
+                        $(table).DataTable().destroy();
+                    }
+
+                    // Reinitialize
+                    $(table).DataTable({
+                        responsive: true,
+                        pageLength: 10,
+                    });
+                    console.log('Done Initializing DataTables...');
+                });
+            }
+
+            // Initialize on page load
+            document.addEventListener('livewire:load', () => {
+                initDataTables();
+
+                // Re-initialize after every Livewire DOM update
+                Livewire.hook('message.processed', (message, component) => {
+                    initDataTables();
+                });
+            });
+
             document.addEventListener('DOMContentLoaded', function () {
                 const tables = document.querySelectorAll('table.datatable');
+                console.log('Initializing DataTables too...');
                 tables.forEach((t) => {
                     // Initialize via jQuery DataTables
                     window.jQuery && window.jQuery(t).DataTable();
                 });
+                console.log('Done Initializing DataTables tooo...');
             });
         </script>
     </body>

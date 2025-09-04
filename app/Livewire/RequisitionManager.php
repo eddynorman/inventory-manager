@@ -101,7 +101,7 @@ class RequisitionManager extends Component
         return view('livewire.requisition-manager', [
             'requisitions' => $requisitions,
             'users' => User::orderBy('name')->get(),
-        ])->title('Requisitions');
+        ])->title('Requisitions')->layout('layouts.app');
     }
 }
 

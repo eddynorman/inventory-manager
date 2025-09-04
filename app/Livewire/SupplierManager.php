@@ -93,7 +93,7 @@ class SupplierManager extends Component
             ->paginate($this->perPage);
 
         return view('livewire.supplier-manager', compact('suppliers'))
-            ->title('Suppliers');
+            ->title('Suppliers')->layout('layouts.app');
     }
 }
 

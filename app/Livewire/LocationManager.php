@@ -102,7 +102,7 @@ class LocationManager extends Component
         return view('livewire.location-manager', [
             'locations' => $locations,
             'users' => User::orderBy('name')->get(),
-        ])->title('Locations');
+        ])->title('Locations')->layout('layouts.app');
     }
 }
 
