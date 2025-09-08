@@ -26,6 +26,8 @@ class CategoryManager extends Component
         $this->dispatch('show-category-modal');
     }
 
+    // Listen for the 'view' event from the table
+    #[On('view')]
     public function view(int $id): void
     {
         $cat = Category::findOrFail($id);
@@ -40,6 +42,8 @@ class CategoryManager extends Component
         $this->dispatch('show-view-modal');
     }
 
+    // Listen for the 'edit' event from the table
+    #[On('edit')]
     public function edit(int $id): void
     {
         $cat = Category::findOrFail($id);
@@ -64,8 +68,13 @@ class CategoryManager extends Component
         $this->dispatch('hide-category-modal');
         $this->resetForm();
         session()->flash('success', 'Category saved.');
+
+        // Dispatch an event to refresh the PowerGrid table
+        $this->dispatch('refresh-table');
     }
 
+    // Listen for the 'confirmDelete' event from the table
+    #[On('confirmDelete')]
     public function confirmDelete(int $id): void
     {
         $this->categoryId = $id;
@@ -80,16 +89,14 @@ class CategoryManager extends Component
         $this->dispatch('hide-delete-modal');
         $this->resetForm();
         session()->flash('success', 'Category deleted.');
+
+        // Dispatch an event to refresh the PowerGrid table
+        $this->dispatch('refresh-table');
     }
 
     public function render()
     {
-        $categories = Category::query()->orderBy('name');
-
-        return view('livewire.category-manager', [
-            'categories' => $categories->get(),
-        ])->layout('layouts.app');
+        
+        return view('livewire.category-manager')->layout('layouts.app');
     }
 }
-
-

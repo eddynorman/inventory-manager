@@ -25,30 +25,7 @@
 
     <div class="card">
         <div class=" card-body table-responsive px-2">
-            <table class="table table-striped table-bordered datatable mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($categories as $cat)
-                        <tr>
-                            <td>{{ $cat->name }}</td>
-                            <td>{{ $cat->description }}</td>
-                            <td class="text-end">
-                                <button class="btn btn-primary" wire:click="view({{ $cat->id }})"><i class="fas fa-eye"></i></button>
-                                @if(auth()->user()->hasAnyRole(['super','admin']))
-                                    <button class="btn btn-sm btn-warning" wire:click="edit({{ $cat->id }})"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-danger" wire:click="confirmDelete({{ $cat->id }})"><i class="fas fa-trash"></i></button>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+             @livewire('tables.category-table')
         </div>
     </div>
     <!-- View Modal -->
