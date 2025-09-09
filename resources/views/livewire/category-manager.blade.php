@@ -1,27 +1,11 @@
 <div>
+    @include('layouts.flash')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Categories</h5>
         @if(auth()->user()->hasAnyRole(['super','admin','manager']))
             <button wire:click="create" class="btn btn-primary">New Category</button>
         @endif
     </div>
-
-    {{-- <div class="card mb-3">
-        <div class="card-body">
-            <div class="row g-2 align-items-center">
-                <div class="col-auto">
-                    <input type="text" wire:model.debounce.500ms="search" class="form-control" placeholder="Search...">
-                </div>
-                <div class="col-auto">
-                    <select wire:model="perPage" class="form-select">
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     <div class="card">
         <div class=" card-body table-responsive px-2">
@@ -72,13 +56,13 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" class="form-control" wire:model.defer="name">
+                        <label class="form-label" for="name">Name</label>
+                        <input type="text" id="name" class="form-control" wire:model.defer="name">
                         @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" rows="3" wire:model.defer="description"></textarea>
+                        <label class="form-label" for="description">Description</label>
+                        <textarea id="description" class="form-control" rows="3" wire:model.defer="description"></textarea>
                         @error('description')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                 </div>
@@ -143,5 +127,4 @@
         });
     </script>
 </div>
-
 

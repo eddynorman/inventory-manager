@@ -15,6 +15,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
         <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
@@ -128,6 +131,7 @@
                         </div>
                     </aside>
                     <main class="col-12 col-md-9 col-lg-10 py-3">
+                        @include('layouts.flash')
                         @if (isset($header))
                             <div class="mb-3">
                                 {{ $header }}
@@ -144,10 +148,14 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-
+        @yield('scripts')
+        <script>
+            $(document).ready(function() {
+                $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                    $(this).remove();
+                });
+            });
+        </script>
         <script>
             function initDataTables() {
                 console.log('Initializing DataTables...');
@@ -169,9 +177,27 @@
             // Initialize on page load
             document.addEventListener('livewire:load', () => {
                 initDataTables();
-
+                        $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                            $(this).remove();
+                        });
                 // Re-initialize after every Livewire DOM update
                 Livewire.hook('message.processed', (message, component) => {
+                    $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                            $(this).remove();
+                        });
+                    initDataTables();
+                });
+            });
+            window.addEventListener('livewire:load', () => {
+                initDataTables();
+                        $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                            $(this).remove();
+                        });
+                // Re-initialize after every Livewire DOM update
+                Livewire.hook('message.processed', (message, component) => {
+                    $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                            $(this).remove();
+                        });
                     initDataTables();
                 });
             });

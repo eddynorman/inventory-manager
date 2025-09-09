@@ -11,8 +11,8 @@ class CategoryManager extends Component
     public ?int $categoryId = null;
     public string $name = '';
     public ?string $description = '';
-    public $items = null;
-    public $bulkIds = [];
+    public ?array $items = null;
+    public array $bulkIds = [];
 
     protected $listeners = [
         'bulkDeleteConfirmWithIds' => 'bulkDeleteConfirm'
@@ -71,6 +71,7 @@ class CategoryManager extends Component
         $this->dispatch('hide-category-modal');
         $this->resetForm();
         session()->flash('success', 'Category saved.');
+        $this->dispatch('flash');
         $this->dispatch('refresh-table');
     }
 
@@ -118,6 +119,6 @@ class CategoryManager extends Component
 
     public function render()
     {
-        return view('livewire.category-manager')->layout('layouts.app');
+        return view('livewire.category-manager');
     }
 }
