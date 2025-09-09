@@ -120,9 +120,7 @@
         window.addEventListener('hide-bulk-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal'))?.hide());
 
         window.addEventListener('bulkDelete.category-table-1uitsn-table', ( event ) => {
-            alert("Bulk delete triggered for table: " + event.detail.table);
             const selectedIds = window.pgBulkActions.get(event.detail.table) || [];
-            alert("Selected IDs: " + selectedIds.join(", "));
             window.dispatchEvent(new CustomEvent('bulkDeleteConfirmWithIds', { detail: { ids: selectedIds } }));
         });
     </script>
