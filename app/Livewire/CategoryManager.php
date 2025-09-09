@@ -2,8 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Category;
-use Illuminate\Validation\Rule;
+use App\Services\CategoryService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -14,9 +13,17 @@ class CategoryManager extends Component
     public ?string $description = '';
     public $items = null;
     public $bulkIds = [];
+
     protected $listeners = [
         'bulkDeleteConfirmWithIds' => 'bulkDeleteConfirm'
     ];
+
+    protected CategoryService $service;
+
+    public function boot(CategoryService $service): void
+    {
+        $this->service = $service;
+    }
 
     public function resetForm(): void
     {
@@ -30,27 +37,22 @@ class CategoryManager extends Component
         $this->dispatch('show-category-modal');
     }
 
-    // Listen for the 'view' event from the table
     #[On('view')]
     public function view(int $id): void
     {
-        $cat = Category::findOrFail($id);
-
-        $items = $cat->items()
-            ->get(['name', 'current_stock'])
-            ->toArray();
+        $cat = $this->service->getById($id);
         $this->categoryId = $cat->id;
         $this->name = $cat->name;
-        $this->items = $items;
         $this->description = (string)($cat->description ?? '');
+        $this->items = $this->service->getItems($id);
+
         $this->dispatch('show-view-modal');
     }
 
-    // Listen for the 'edit' event from the table
     #[On('edit')]
     public function edit(int $id): void
     {
-        $cat = Category::findOrFail($id);
+        $cat = $this->service->getById($id);
         $this->categoryId = $cat->id;
         $this->name = $cat->name;
         $this->description = (string)($cat->description ?? '');
@@ -59,25 +61,19 @@ class CategoryManager extends Component
 
     public function save(): void
     {
-        $data = $this->validate([
-            'name' => ['required','string','max:255', Rule::unique(Category::class, 'name')->ignore($this->categoryId)],
-            'description' => ['nullable','string'],
-        ]);
+        $data = [
+            'name' => $this->name,
+            'description' => $this->description
+        ];
 
-        Category::updateOrCreate(
-            ['id' => $this->categoryId],
-            $data
-        );
+        $this->service->createOrUpdate($data, $this->categoryId);
 
         $this->dispatch('hide-category-modal');
         $this->resetForm();
         session()->flash('success', 'Category saved.');
-
-        // Dispatch an event to refresh the PowerGrid table
         $this->dispatch('refresh-table');
     }
 
-    // Listen for the 'confirmDelete' event from the table
     #[On('confirmDelete')]
     public function confirmDelete(int $id): void
     {
@@ -85,53 +81,43 @@ class CategoryManager extends Component
         $this->dispatch('show-delete-modal');
     }
 
+    public function delete(): void
+    {
+        if ($this->categoryId) {
+            $this->service->delete($this->categoryId);
+        }
+        $this->dispatch('hide-delete-modal');
+        $this->resetForm();
+        session()->flash('success', 'Category deleted.');
+        $this->dispatch('refresh-table');
+    }
+
     public function bulkDeleteConfirm(array $ids): void
     {
         $this->bulkIds = $ids;
 
         if (empty($this->bulkIds)) {
-            session()->flash('error', 'No categories selected for deletion.');
+            session()->flash('error', 'No categories selected.');
             return;
         }
 
-        // Show your bulk delete confirmation modal
         $this->dispatch('show-bulk-delete-modal');
     }
 
     public function bulkDelete(): void
     {
-        if (empty($this->bulkIds)) {
-            session()->flash('error', 'No categories selected.');
-            return;
+        if (!empty($this->bulkIds)) {
+            $this->service->bulkDelete($this->bulkIds);
+            session()->flash('success', 'Selected categories deleted.');
         }
 
-        // Delete selected categories
-        Category::whereIn('id', $this->bulkIds)->delete();
-
-        session()->flash('success', 'Selected categories deleted.');
         $this->dispatch('hide-bulk-delete-modal');
-        // Refresh the PowerGrid table
-        $this->dispatch('refresh-table');
-
-        // Clear selection
         $this->bulkIds = [];
-    }
-    public function delete(): void
-    {
-        if ($this->categoryId) {
-            Category::where('id', $this->categoryId)->delete();
-        }
-        $this->dispatch('hide-delete-modal');
-        $this->resetForm();
-        session()->flash('success', 'Category deleted.');
-
-        // Dispatch an event to refresh the PowerGrid table
         $this->dispatch('refresh-table');
     }
 
     public function render()
     {
-
         return view('livewire.category-manager')->layout('layouts.app');
     }
 }
