@@ -23,10 +23,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-
-    <script>
-            $('.alert').fadeTo(2000, 500).slideUp(500, function(){
-                $(this).remove();
-            });
-    </script>
 </div>
+<script>
+    window.addEventListener('flash', () => {
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('#flash-messages .alert');
+            alerts.forEach(alert => {
+                bootstrap.Alert.getOrCreateInstance(alert).close();
+            });
+        }, 3000);
+    });
+</script>
