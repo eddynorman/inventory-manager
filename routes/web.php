@@ -27,8 +27,12 @@ Route::post('logout', \App\Livewire\Actions\Logout::class)
     ->name('logout');
 
 Route::middleware(['auth','verified'])->group(function () {
-    Route::get('/categories', CategoryManager::class)->name('categories');
-    Route::get('/items', ItemManager::class)->name('items');
+    Route::get('/categories', function () {
+        return view('livewire.index_pages.categories-index');
+    })->name('categories');
+    Route::get('/items', function () {
+        return view('livewire.index_pages.items-index');
+    })->name('items');
     Route::get('/suppliers', SupplierManager::class)->name('suppliers');
     Route::get('/customers', CustomerManager::class)->name('customers');
     Route::get('/locations', LocationManager::class)->name('locations');
