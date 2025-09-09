@@ -90,6 +90,7 @@ class CategoryManager extends Component
         $this->dispatch('hide-delete-modal');
         $this->resetForm();
         session()->flash('success', 'Category deleted.');
+        $this->dispatch('flash');
         $this->dispatch('refresh-table');
     }
 
@@ -97,8 +98,9 @@ class CategoryManager extends Component
     {
         $this->bulkIds = $ids;
 
-        if (empty($this->bulkIds)) {
+        if (count($this->bulkIds) === 0) {
             session()->flash('error', 'No categories selected.');
+            $this->dispatch('flash');
             return;
         }
 
@@ -110,6 +112,7 @@ class CategoryManager extends Component
         if (!empty($this->bulkIds)) {
             $this->service->bulkDelete($this->bulkIds);
             session()->flash('success', 'Selected categories deleted.');
+            $this->dispatch('flash');
         }
 
         $this->dispatch('hide-bulk-delete-modal');
