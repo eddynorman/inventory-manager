@@ -36,7 +36,15 @@ final class CategoryTable extends PowerGridComponent
     {
         return [];
     }
-
+     public function header(): array
+    {
+        return [
+            Button::add('bulk-delete')
+                ->slot('<i class="fa-solid fa-trash"></i> Bulk Delete')
+                ->class('btn btn-danger btn-sm')
+                ->dispatch('bulkDelete.' . $this->tableName, ['table' => $this->tableName]),
+        ];
+    }
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
@@ -44,7 +52,8 @@ final class CategoryTable extends PowerGridComponent
             ->add('description')
             ->add('created_at_formatted', function ($cat) {
                 return Carbon::parse($cat->created_at)->format('d/m/Y H:i');
-            });
+            })
+            ->add('created_at');
         // ❌ no ->add('actions') here
     }
 
@@ -59,8 +68,9 @@ final class CategoryTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Created at', 'created_at_formatted')
-                ->sortable(),
+            Column::make('Created at', 'created_at_formatted', 'created_at')
+                ->sortable()
+                ->searchable(),
 
             Column::action('Actions') // ✅ required for actions()
         ];
@@ -75,19 +85,20 @@ final class CategoryTable extends PowerGridComponent
     public function actions($row): array
     {
         return [
-            Button::add('edit')
-                ->slot('Edit')
-                ->class('btn btn-sm btn-primary')
-                ->dispatch('edit', ['id' => $row->id]),
 
             Button::add('view')
-                ->slot('View')
-                ->class('btn btn-sm btn-info')
+                ->slot('<i class="fa-solid fa-eye"></i>')
+                ->class('btn btn-sm btn-info text-white me-1')
                 ->dispatch('view', ['id' => $row->id]),
 
+            Button::add('edit')
+                ->slot('<i class="fa-solid fa-pen-to-square"></i>')
+                ->class('btn btn-sm btn-primary text-white me-1')
+                ->dispatch('edit', ['id' => $row->id]),
+
             Button::add('delete')
-                ->slot('Delete')
-                ->class('btn btn-sm btn-danger')
+                ->slot('<i class="fa-solid fa-trash"></i>')
+                ->class('btn btn-sm btn-danger me-1')
                 ->dispatch('confirmDelete', ['id' => $row->id]),
         ];
     }

@@ -108,13 +108,39 @@
             </div>
         </div>
     </div>
-
+    <!-- Bulk delete modal -->
+    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete these categories?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" wire:click="bulkDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         window.addEventListener('show-view-modal', () => new bootstrap.Modal(document.getElementById('viewModal')).show());
         window.addEventListener('show-category-modal', () => new bootstrap.Modal(document.getElementById('categoryModal')).show());
         window.addEventListener('hide-category-modal', () => bootstrap.Modal.getInstance(document.getElementById('categoryModal'))?.hide());
         window.addEventListener('show-delete-modal', () => new bootstrap.Modal(document.getElementById('deleteModal')).show());
         window.addEventListener('hide-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('deleteModal'))?.hide());
+        window.addEventListener('show-bulk-delete-modal', () => new bootstrap.Modal(document.getElementById('bulkDeleteModal')).show());
+        window.addEventListener('hide-bulk-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal'))?.hide());
+
+        window.addEventListener('bulkDelete.category-table-1uitsn-table', ( event ) => {
+            alert("Bulk delete triggered for table: " + event.detail.table);
+            const selectedIds = window.pgBulkActions.get(event.detail.table) || [];
+            alert("Selected IDs: " + selectedIds.join(", "));
+            window.dispatchEvent(new CustomEvent('bulkDeleteConfirmWithIds', { detail: { ids: selectedIds } }));
+        });
     </script>
 </div>
 

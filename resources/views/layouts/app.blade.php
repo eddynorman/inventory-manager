@@ -20,6 +20,56 @@
         <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
 
         @livewireStyles
+        <style>
+            /* PowerGrid Table Custom Styles */
+            table.power-grid-table {
+                border: 1px solid #858585 !important; /* Table border */
+                border-collapse: collapse !important;
+            }
+
+            /* Header and cell borders */
+            table.power-grid-table th,
+            table.power-grid-table td {
+                border: 1px solid #858585 !important; /* Cell borders */
+            }
+
+            /* Header styling */
+            table.power-grid-table thead th {
+                background-color: #000 !important; /* Black header */
+                color: #fff !important;
+                position: relative; /* Needed for sorting icons */
+                text-align: center !important; /* Center header text */
+            }
+
+            table.power-grid-table thead th span {
+                display: inline-block;
+                font-size: 1rem;
+                vertical-align: middle;
+            }
+            /* Sorting caret color */
+            table.power-grid-table thead th svg {
+                width: 1.3rem !important; /* adjust width */
+                height: 1.3rem !important; /* adjust height */
+                display: inline-block;
+                color: orange !important;
+                vertical-align: middle;
+                float: right;
+            }
+
+            /* Body cells */
+            table.power-grid-table tbody td {
+                text-align: center !important;
+            }
+
+            /* Center checkboxes in header and cells */
+            table.power-grid-table th .form-check,
+            table.power-grid-table td .form-check {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+        </style>
+
     </head>
     <body class="font-sans antialiased">
         <div class="min-vh-100 bg-light d-flex flex-column">
@@ -97,7 +147,7 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-        
+
         <script>
             function initDataTables() {
                 console.log('Initializing DataTables...');

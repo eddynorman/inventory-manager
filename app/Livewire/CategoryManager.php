@@ -13,6 +13,10 @@ class CategoryManager extends Component
     public string $name = '';
     public ?string $description = '';
     public $items = null;
+    public $bulkIds = [];
+    protected $listeners = [
+        'bulkDeleteConfirmWithIds' => 'bulkDeleteConfirm'
+    ];
 
     public function resetForm(): void
     {
@@ -81,6 +85,37 @@ class CategoryManager extends Component
         $this->dispatch('show-delete-modal');
     }
 
+    public function bulkDeleteConfirm(array $ids): void
+    {
+        $this->bulkIds = $ids;
+
+        if (empty($this->bulkIds)) {
+            session()->flash('error', 'No categories selected for deletion.');
+            return;
+        }
+
+        // Show your bulk delete confirmation modal
+        $this->dispatch('show-bulk-delete-modal');
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->bulkIds)) {
+            session()->flash('error', 'No categories selected.');
+            return;
+        }
+
+        // Delete selected categories
+        Category::whereIn('id', $this->bulkIds)->delete();
+
+        session()->flash('success', 'Selected categories deleted.');
+        $this->dispatch('hide-bulk-delete-modal');
+        // Refresh the PowerGrid table
+        $this->dispatch('refresh-table');
+
+        // Clear selection
+        $this->bulkIds = [];
+    }
     public function delete(): void
     {
         if ($this->categoryId) {
@@ -96,7 +131,7 @@ class CategoryManager extends Component
 
     public function render()
     {
-        
+
         return view('livewire.category-manager')->layout('layouts.app');
     }
 }
