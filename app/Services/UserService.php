@@ -29,9 +29,8 @@ class UserService
 
         $data['is_active'] = $data['isActive'];
         unset($data['isActive']);
-        $user = User::updateOrCreate(['id' => $id], $data);
-        dd($user);
-        return $user;
+        return User::updateOrCreate(['id' => $id], $data);
+
     }
 
     public function delete(int $id): void
