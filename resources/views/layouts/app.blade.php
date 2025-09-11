@@ -6,7 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title','Inventory Manager')</title>
-
+    <!-- Vite -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Fontawesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -26,9 +27,6 @@
 
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
-
-    <!-- Vite -->
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     @livewireStyles
 
     <style>
