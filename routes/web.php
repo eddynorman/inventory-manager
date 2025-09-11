@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\CategoryManager;
 use App\Livewire\ItemManager;
@@ -12,7 +13,7 @@ use App\Livewire\RequisitionManager;
 use App\Livewire\PurchaseManager;
 use App\Livewire\ReceivingManager;
 
-Route::view('/', 'welcome');
+Route::view('/', 'welcome')->name('welcome');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -22,9 +23,12 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::post('logout', \App\Livewire\Actions\Logout::class)
-    ->middleware(['auth'])
-    ->name('logout');
+Route::post('logout', function (){
+
+    (new Logout())->__invoke();
+
+    return redirect()->route('welcome');
+})->middleware(['auth'])->name('logout');
 
 Route::middleware(['auth','verified'])->group(function () {
     Route::get('/categories', function () {
