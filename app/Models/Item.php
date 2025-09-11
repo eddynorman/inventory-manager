@@ -34,10 +34,15 @@ class Item extends Model
         return $this->hasMany(StockAdjustmentItem::class);
     }
 
-    public function locations()
-    {
-        return $this->hasMany(ItemLocation::class);
+    public function locations(){
+        return $this->belongsToMany(
+            Location::class,        // Related model
+            ItemLocation::class, // Pivot table
+            'location_id',      // Foreign key on pivot table referencing Location
+            'item_id'           // Foreign key on pivot table referencing Item
+        );
     }
+    
 
     public function units()
     {

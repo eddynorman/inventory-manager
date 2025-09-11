@@ -237,14 +237,14 @@
     });
 
     // Allow server dispatched browser events to show/hide/flash UI
-    window.addEventListener('flash', () => {
-        // existing flash script uses jQuery; call the same if present
-        if (window.jQuery) {
-            $('.alert').fadeTo(2000, 500).slideUp(500, function(){
-                $(this).remove();
-            });
-        }
-    });
+    // window.addEventListener('flash', () => {
+    //     // existing flash script uses jQuery; call the same if present
+    //     if (window.jQuery) {
+    //         $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+    //             $(this).remove();
+    //         });
+    //     }
+    // });
 
     // Powergrid refresh event handler is handled via the component's dispatchBrowserEvent
 </script>

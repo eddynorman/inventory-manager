@@ -79,8 +79,7 @@ class UnitManager extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'unitId', 'name', 'buyingPrice', 'sellingPrice',
-            'isSmallestUnit', 'smallestUnitsNumber',
+            'unitId', 'name', 'buyingPrice', 'sellingPrice', 'smallestUnitsNumber',
             'buyingPriceIncludesTax', 'sellingPriceIncludesTax', 'isActive',
             'selectedItemId', 'selectedItemName', 'search',
         ]);

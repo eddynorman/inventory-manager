@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\Location;
 use App\Models\User;
-use Illuminate\Validation\Rule;
+use App\Models\Location;
+use App\Services\LocationService;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,98 +13,187 @@ class LocationManager extends Component
 {
     use WithPagination;
 
-    public string $search = '';
-    public int $perPage = 10;
+    protected LocationService $service;
 
+    public function boot(LocationService $service): void
+    {
+        $this->service = $service;
+        $this->users = User::where('role', '!=', 'super') // exclude super role
+            ->orderBy('name')
+            ->get(['id', 'name', 'email'])
+            ->toArray();
+    }
+
+    // Form State
     public ?int $locationId = null;
     public string $name = '';
-    public string $location_type = 'store';
+    public string $locationType = 'store';
     public ?string $address = '';
     public ?string $phone = '';
     public ?string $email = '';
-    public ?int $staff_responsible = null;
+    public ?int $staffResponsible = null;
     public ?string $description = '';
 
-    public function updatingSearch(): void
+    public array $users = [];
+
+    // View State
+    public array $items = [];
+
+    // Move Item State
+    public ?int $movingItemLocationId = null;
+    public ?int $targetLocationId = null;
+    public int $quantity = 1;
+
+    // Modal State
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public bool $showViewModal = false;
+    public bool $showMoveModal = false;
+
+    protected $listeners = [
+        'refresh-table' => 'refreshTable',
+    ];
+
+    public function refreshTable(): void
     {
-        $this->resetPage();
+        // Dispatch browser event the PowerGrid table expects to trigger refresh
+        $this->dispatch('pg:eventRefresh-location-table');
+        // also dispatch flash handler so UI hides flash messages when necessary
+        $this->dispatch('flash');
     }
 
     public function resetForm(): void
     {
-        $this->reset(['locationId','name','location_type','address','phone','email','staff_responsible','description']);
-        $this->location_type = 'store';
+        $this->reset([
+            'locationId',
+            'name',
+            'locationType',
+            'address',
+            'phone',
+            'email',
+            'staffResponsible',
+            'description'
+        ]);
+        $this->locationType = 'store';
         $this->resetValidation();
     }
 
     public function create(): void
     {
+        if(count($this->users) === 0 ){
+            session()->flash('error', 'No users available to assign as staff responsible.');
+            $this->dispatch('flash');
+            return;
+        }
         $this->resetForm();
-        $this->dispatch('show-location-modal');
+        $this->showModal = true;
     }
 
+    #[On('edit')]
     public function edit(int $id): void
     {
-        $l = Location::findOrFail($id);
+        $l = $this->service->getWithItems($id);
         $this->locationId = $l->id;
         $this->name = $l->name;
-        $this->location_type = $l->location_type;
+        $this->locationType = $l->locationType;
         $this->address = (string)($l->address ?? '');
         $this->phone = (string)($l->phone ?? '');
         $this->email = (string)($l->email ?? '');
-        $this->staff_responsible = $l->staff_responsible;
+        $this->staffResponsible = $l->staffResponsible;
         $this->description = (string)($l->description ?? '');
-        $this->dispatch('show-location-modal');
+
+        $this->showModal = true;
     }
 
     public function save(): void
     {
-        $data = $this->validate([
-            'name' => ['required','string','max:255', Rule::unique(Location::class, 'name')->ignore($this->locationId)],
-            'location_type' => ['required','in:warehouse,store,office'],
-            'address' => ['nullable','string','max:255'],
-            'phone' => ['nullable','string','max:255'],
-            'email' => ['nullable','email','max:255'],
-            'staff_responsible' => ['nullable','integer','exists:users,id'],
-            'description' => ['nullable','string'],
-        ]);
+        $data = $this->validate($this->service->rules($this->locationId));
+        $this->service->save($this->locationId, $data);
 
-        Location::updateOrCreate(['id' => $this->locationId], $data);
-        $this->dispatch('hide-location-modal');
+        $this->showModal = false;
         $this->resetForm();
         session()->flash('success', 'Location saved.');
+        $this->refreshTable();
     }
 
+    #[On('confirmDelete')]
     public function confirmDelete(int $id): void
     {
         $this->locationId = $id;
-        $this->dispatch('show-delete-modal');
+        $this->showDeleteModal = true;
     }
 
+    #[On('delete')]
     public function delete(): void
     {
         if ($this->locationId) {
-            Location::where('id', $this->locationId)->delete();
+            $this->service->delete($this->locationId);
         }
-        $this->dispatch('hide-delete-modal');
+        $this->showDeleteModal = false;
         $this->resetForm();
         session()->flash('success', 'Location deleted.');
+        $this->refreshTable();
+    }
+
+    #[On('view')]
+    public function view(int $id): void
+    {
+        $location = $this->service->getWithItems($id);
+        $this->locationId = $location->id;
+        $this->name = $location->name;
+        $this->locationType = $location->locationType;
+        $this->address = (string)($location->address ?? '');
+        $this->phone = (string)($location->phone ?? '');
+        $this->email = (string)($location->email ?? '');
+        $this->staffResponsible = $location->staffResponsible;
+        $this->description = (string)($location->description ?? '');
+        $this->items = $location->items->map(fn($il) => [
+            'id' => $il->id,
+            'item' => ['id' => $il->item->id, 'name' => $il->item->name],
+            'stock' => $il->current_tock,
+        ])->toArray();
+
+        $this->showViewModal = true;
+    }
+
+    public function openMoveModal(int $itemLocationId): void
+    {
+        $this->movingItemLocationId = $itemLocationId;
+        $this->quantity = 1;
+        $this->targetLocationId = null;
+        $this->showMoveModal = true;
+    }
+
+    public function moveItem(): void
+    {
+        $this->validate([
+            'movingItemLocationId' => ['required', 'integer'],
+            'targetLocationId' => ['required', 'integer', 'exists:locations,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        try {
+            $this->service->moveItem(
+                $this->movingItemLocationId,
+                $this->targetLocationId,
+                $this->quantity
+            );
+
+            $this->showMoveModal = false;
+            session()->flash('success', 'Item moved successfully.');
+            $this->dispatch('flash');
+            $this->view($this->locationId); // refresh view data
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+            $this->dispatch('flash');
+        }
     }
 
     public function render()
     {
-        $locations = Location::query()
-            ->when($this->search !== '', function ($q) {
-                $q->where('name','like', "%{$this->search}%");
-            })
-            ->orderBy('name')
-            ->paginate($this->perPage);
-
         return view('livewire.location-manager', [
-            'locations' => $locations,
             'users' => User::orderBy('name')->get(),
-        ])->title('Locations')->layout('layouts.app');
+            'allLocations' => Location::orderBy('name')->get(),
+        ]);
     }
 }
-
-

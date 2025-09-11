@@ -10,7 +10,17 @@ class Location extends Model
 
     public function items()
     {
-        return $this->hasMany(ItemLocation::class);
+        return $this->belongsToMany(
+            Item::class,        // Related model
+            ItemLocation::class, // Pivot table
+            'location_id',      // Foreign key on pivot table referencing Location
+            'item_id'           // Foreign key on pivot table referencing Item
+        );
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'staff_responsible');
     }
 
     public function receivings()
