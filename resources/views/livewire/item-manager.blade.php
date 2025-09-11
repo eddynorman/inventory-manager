@@ -1,182 +1,250 @@
 <div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Items</h5>
-        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
-            <button wire:click="create" class="btn btn-primary">New Item</button>
-        @endif
-    </div>
-
-    <div class="card mb-3">
-        <div class="card-body">
-            <div class="row g-2 align-items-center">
-                <div class="col-auto">
-                    <input type="text" wire:model.debounce.500ms="search" class="form-control" placeholder="Search by name or barcode...">
-                </div>
-                <div class="col-auto">
-                    <select wire:model="perPage" class="form-select">
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('layouts.flash')
 
     <div class="card">
-        <div class="table-responsive">
-            <table class="table table-striped datatable mb-0">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Barcode</th>
-                        <th>Category</th>
-                        <th>Supplier</th>
-                        <th>Stock</th>
-                        <th>Reorder</th>
-                        <th>Active</th>
-                        <th>Sale Item</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($items as $i)
-                        <tr>
-                            <td>{{ $i->name }}</td>
-                            <td>{{ $i->barcode }}</td>
-                            <td>{{ optional($i->category)->name }}</td>
-                            <td>{{ optional($i->supplier)->name }}</td>
-                            <td>{{ $i->current_stock }}</td>
-                            <td>{{ $i->reorder_level }}</td>
-                            <td>
-                                <span class="badge bg-{{ $i->is_active ? 'success' : 'secondary' }}">{{ $i->is_active ? 'Yes' : 'No' }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-{{ $i->is_sale_item ? 'primary' : 'secondary' }}">{{ $i->is_sale_item ? 'Yes' : 'No' }}</span>
-                            </td>
-                            <td class="text-end">
-                                @if(auth()->user()->hasAnyRole(['super','admin']))
-                                    <button class="btn btn-sm btn-outline-secondary" wire:click="edit({{ $i->id }})">Edit</button>
-                                    <button class="btn btn-sm btn-outline-danger" wire:click="confirmDelete({{ $i->id }})">Delete</button>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-title">Items</div>
+            <div class="card-tools">
+                @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+                    <button wire:click="create" class="btn btn-primary">New Item</button>
+                @endif
+            </div>
         </div>
-        <div class="card-footer">
-            {{ $items->links() }}
+
+        <div class="card-body tale-responsive">
+            <livewire:tables.item-table />
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
-    <div class="modal fade" id="itemModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ $itemId ? 'Edit Item' : 'New Item' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Create/Edit Modal (custom modal, livewire controlled) -->
+    @if($showModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+
+                <!-- Modal Header -->
+                <div class="bg-primary text-white px-4 py-3 rounded-t-lg d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ $itemId ? 'Edit Item' : 'New Item' }}</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showModal', false)" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+
+                <!-- Modal Body -->
+                <div class="p-4">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Name</label>
-                            <input type="text" class="form-control" wire:model.defer="name">
+                            <label for="item-name" class="form-label">Name</label>
+                            <input id="item-name" type="text" class="form-control" wire:model.defer="name">
                             @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Barcode</label>
-                            <input type="text" class="form-control" wire:model.defer="barcode">
+                            <label for="item-barcode" class="form-label">Barcode</label>
+                            <input id="item-barcode" type="text" class="form-control" wire:model.defer="barcode">
                             @error('barcode')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Category</label>
-                            <select class="form-select" wire:model.defer="category_id">
+                            <label for="item-category" class="form-label">Category</label>
+                            <select id="item-category" class="form-select" wire:model.defer="categoryId">
                                 <option value="">Select...</option>
                                 @foreach($categories as $c)
-                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                    <option value="{{ $c['id'] }}">{{ $c['name'] }}</option>
                                 @endforeach
                             </select>
-                            @error('category_id')<div class="text-danger small">{{ $message }}</div>@enderror
+                            @error('categoryId')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Supplier</label>
-                            <select class="form-select" wire:model.defer="supplier_id">
+                            <label for="item-supplier" class="form-label">Supplier</label>
+                            <select id="item-supplier" class="form-select" wire:model.defer="supplierId">
                                 <option value="">Select...</option>
                                 @foreach($suppliers as $s)
-                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                    <option value="{{ $s['id'] }}">{{ $s['name'] }}</option>
                                 @endforeach
                             </select>
-                            @error('supplier_id')<div class="text-danger small">{{ $message }}</div>@enderror
+                            @error('supplierId')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-4">
-                            <label class="form-label">Initial Stock</label>
-                            <input type="number" class="form-control" wire:model.defer="initial_stock">
-                            @error('initial_stock')<div class="text-danger small">{{ $message }}</div>@enderror
+                            <label for="item-initial-stock" class="form-label">Initial Stock</label>
+                            <input id="item-initial-stock" type="number" class="form-control" wire:model.defer="initialStock">
+                            @error('initialStock')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-4">
-                            <label class="form-label">Reorder Level</label>
-                            <input type="number" class="form-control" wire:model.defer="reorder_level">
-                            @error('reorder_level')<div class="text-danger small">{{ $message }}</div>@enderror
+                            <label for="item-reorder-level" class="form-label">Reorder Level</label>
+                            <input id="item-reorder-level" type="number" class="form-control" wire:model.defer="reorderLevel">
+                            @error('reorderLevel')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
+                        <!-- Smallest Unit Info -->
                         <div class="col-md-4">
-                            <label class="form-label">Smallest Unit</label>
-                            <select class="form-select" wire:model.defer="smallest_unit_id">
-                                <option value="">Select...</option>
-                                @foreach($units as $u)
-                                    <option value="{{ $u->id }}">{{ $u->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('smallest_unit_id')<div class="text-danger small">{{ $message }}</div>@enderror
+                            <label for="smallest-unit" class="form-label">Smallest Unit Name</label>
+                            <input id="smallest-unit" type="text" class="form-control" wire:model.defer="smallestUnit">
+                            @error('smallestUnit')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
+
                         <div class="col-md-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="activeSwitch" wire:model.defer="is_active">
-                                <label class="form-check-label" for="activeSwitch">Active</label>
+                            <label for="buying-price" class="form-label">Buying Price</label>
+                            <input id="buying-price" type="number" step="0.01" class="form-control" wire:model.defer="buyingPrice">
+                            @error('buyingPrice')<div class="text-danger small">{{ $message }}</div>@enderror
+
+                            <div class="form-check form-switch mt-2">
+                                <input id="buying-includes-tax" class="form-check-input" type="checkbox" wire:model.defer="buyingPriceIncludesTax">
+                                <label for="buying-includes-tax" class="form-check-label">Buying Price Includes Tax</label>
                             </div>
                         </div>
+
                         <div class="col-md-6">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="saleSwitch" wire:model.defer="is_sale_item">
-                                <label class="form-check-label" for="saleSwitch">Sale Item</label>
+                            <label for="selling-price" class="form-label">Selling Price</label>
+                            <input id="selling-price" type="number" step="0.01" class="form-control" wire:model.defer="sellingPrice">
+                            @error('sellingPrice')<div class="text-danger small">{{ $message }}</div>@enderror
+
+                            <div class="form-check form-switch mt-2">
+                                <input id="selling-includes-tax" class="form-check-input" type="checkbox" wire:model.defer="sellingPriceIncludesTax">
+                                <label for="selling-includes-tax" class="form-check-label">Selling Price Includes Tax</label>
                             </div>
+                        </div>
+
+                        <div class="col-md-6 mt-3">
+                            <div class="form-check form-switch">
+                                <input id="is-sale-item" class="form-check-input" type="checkbox" wire:model.defer="isSaleItem">
+                                <label for="is-sale-item" class="form-check-label">Sale Item</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            {{-- Optionally display help text --}}
+                            <small class="text-muted">Smallest unit will be created/updated automatically. Selling price must be greater than buying price.</small>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                <!-- Modal Footer -->
+                <div class="d-flex justify-content-end gap-2 p-4 border-top">
+                    <button type="button" class="btn btn-secondary" wire:click="$set('showModal', false)">Close</button>
                     <button type="button" class="btn btn-primary" wire:click="save">Save</button>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Delete Modal -->
-    <div class="modal fade" id="itemDeleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if($showDeleteModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" role="dialog" aria-modal="true">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h5 class="text-lg font-semibold">Confirm Delete</h5>
+                    <button type="button" class="btn-close" wire:click="$set('showDeleteModal', false)" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this item?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" wire:click="delete">Delete</button>
+                <div>Are you sure you want to delete this item?</div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button class="btn btn-secondary" wire:click="$set('showDeleteModal', false)">Cancel</button>
+                    <button class="btn btn-danger" wire:click="delete">Delete</button>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
-    <script>
-        window.addEventListener('show-item-modal', () => new bootstrap.Modal(document.getElementById('itemModal')).show());
-        window.addEventListener('hide-item-modal', () => bootstrap.Modal.getInstance(document.getElementById('itemModal'))?.hide());
-        window.addEventListener('show-delete-modal', () => new bootstrap.Modal(document.getElementById('itemDeleteModal')).show());
-        window.addEventListener('hide-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('itemDeleteModal'))?.hide());
-    </script>
+    <!-- Bulk Delete Modal -->
+    @if($showBulkDeleteModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h5 class="text-lg font-semibold">Confirm Bulk Delete</h5>
+                    <button type="button" class="btn-close" wire:click="$set('showBulkDeleteModal', false)" aria-label="Close"></button>
+                </div>
+                <div>Are you sure you want to delete selected items?</div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button class="btn btn-secondary" wire:click="$set('showBulkDeleteModal', false)">Cancel</button>
+                    <button class="btn btn-danger" wire:click="bulkDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Assign Category Modal -->
+    @if($showAssignCategoryModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h5 class="text-lg font-semibold">Assign Category</h5>
+                    <button type="button" class="btn-close" wire:click="$set('showAssignCategoryModal', false)" aria-label="Close"></button>
+                </div>
+                <div>
+                    <label for="bulk-category-select" class="form-label">Category</label>
+                    <select id="bulk-category-select" class="form-select" wire:model.defer="bulkCategoryId">
+                        <option value="">Select...</option>
+                        @foreach($categories as $c)
+                            <option value="{{ $c['id'] }}">{{ $c['name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button class="btn btn-secondary" wire:click="$set('showAssignCategoryModal', false)">Cancel</button>
+                    <button class="btn btn-primary" wire:click="assignCategoryToItems">Assign</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Assign Supplier Modal -->
+    @if($showAssignSupplierModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h5 class="text-lg font-semibold">Assign Supplier</h5>
+                    <button type="button" class="btn-close" wire:click="$set('showAssignSupplierModal', false)" aria-label="Close"></button>
+                </div>
+                <div>
+                    <label for="bulk-supplier-select" class="form-label">Supplier</label>
+                    <select id="bulk-supplier-select" class="form-select" wire:model.defer="bulkSupplierId">
+                        <option value="">Select...</option>
+                        @foreach($suppliers as $s)
+                            <option value="{{ $s['id'] }}">{{ $s['name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button class="btn btn-secondary" wire:click="$set('showAssignSupplierModal', false)">Cancel</button>
+                    <button class="btn btn-primary" wire:click="assignSupplierToItems">Assign</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
 </div>
 
+<script>
+    // PowerGrid bulk handlers - fetch selected IDs from pgBulkActions and emit to Livewire
+    window.addEventListener('bulkDelete.item-table-effbnx-table', (event) => {
+        const selectedIds = window.pgBulkActions?.get(event.detail.table) || [];
+        Livewire.emit('bulk-delete-items', selectedIds);
+    });
 
+    window.addEventListener('bulkToggleActive.item-table-effbnx-table', (event) => {
+        const selectedIds = window.pgBulkActions?.get(event.detail.table) || [];
+        Livewire.emit('bulk-toggle-active-items', selectedIds);
+    });
+
+    window.addEventListener('bulkAssignCategory.item-table-effbnx-table', (event) => {
+        const selectedIds = window.pgBulkActions?.get(event.detail.table) || [];
+        Livewire.emit('bulk-assign-category-items', selectedIds);
+    });
+
+    window.addEventListener('bulkAssignSupplier.item-table-effbnx-table', (event) => {
+        const selectedIds = window.pgBulkActions?.get(event.detail.table) || [];
+        Livewire.emit('bulk-assign-supplier-items', selectedIds);
+    });
+
+    // Allow server dispatched browser events to show/hide/flash UI
+    window.addEventListener('flash', () => {
+        // existing flash script uses jQuery; call the same if present
+        if (window.jQuery) {
+            $('.alert').fadeTo(2000, 500).slideUp(500, function(){
+                $(this).remove();
+            });
+        }
+    });
+
+    // Powergrid refresh event handler is handled via the component's dispatchBrowserEvent
+</script>
