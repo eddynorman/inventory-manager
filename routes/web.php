@@ -36,7 +36,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/suppliers', SupplierManager::class)->name('suppliers');
     Route::get('/customers', CustomerManager::class)->name('customers');
     Route::get('/locations', LocationManager::class)->name('locations');
-    Route::get('/units', UnitManager::class)->name('units');
+    Route::get('/units', function() {
+        return view('livewire.index_pages.units-index');
+    })->name('units');
     Route::get('/item-kits', ItemKitManager::class)->name('item-kits');
     Route::get('/requisitions', RequisitionManager::class)->name('requisitions');
     Route::get('/purchases', PurchaseManager::class)->name('purchases');

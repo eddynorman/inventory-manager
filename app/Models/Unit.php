@@ -6,16 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'buying_price', 'selling_price', 'is_smallest_unit', 'smallest_units_number', 'buying_price_includes_tax', 'selling_price_includes_tax', 'is_active'];
-
-    public function items()
-    {
-        return $this->belongsToMany(Item::class, 'item_units')->withTimestamps();
-    }
+    protected $fillable = ['name', 'buying_price', 'selling_price', 'is_smallest_unit', 'smallest_units_number', 'buying_price_includes_tax', 'selling_price_includes_tax', 'is_active', 'item_id'];
 
     public function requisitionItems()
     {
         return $this->hasMany(RequisitionItem::class);
+    }
+
+    public function item(){
+        return $this->belongsTo(Item::class);
     }
 
     public function purchaseItems()

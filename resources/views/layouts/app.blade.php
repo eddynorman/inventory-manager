@@ -74,7 +74,7 @@
         </style>
 
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased container-fluid mx-0">
         <div class="min-vh-100 bg-light d-flex flex-column">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
                 <div class="container-fluid">
@@ -130,7 +130,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Settings</a>
                         </div>
                     </aside>
-                    <main class="col-12 col-md-9 col-lg-10 py-3">
+                    <main class="col-12 col-md-9 col-lg-10 py-3 container">
                         @include('layouts.flash')
                         @if (isset($header))
                             <div class="mb-3">

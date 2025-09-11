@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Unit;
-use Illuminate\Validation\Rule;
+use App\Models\Item;
+use App\Services\UnitService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,98 +12,168 @@ class UnitManager extends Component
     use WithPagination;
 
     public string $search = '';
-    public int $perPage = 10;
+    public ?array $items = null;
+
+    public ?int $selectedItemId = null;
+    public string $selectedItemName = '';
 
     public ?int $unitId = null;
     public string $name = '';
-    public string $buying_price = '';
-    public ?string $selling_price = '';
-    public bool $is_smallest_unit = false;
-    public int $smallest_units_number = 1;
-    public bool $buying_price_includes_tax = false;
-    public bool $selling_price_includes_tax = false;
-    public bool $is_active = true;
+    public ?float $buyingPrice = null;
+    public ?float $sellingPrice = null;
+    public bool $isSmallestUnit = false;
+    public int $smallestUnitsNumber = 1;
+    public bool $buyingPriceIncludesTax = false;
+    public bool $sellingPriceIncludesTax = false;
+    public bool $isActive = true;
 
-    public function updatingSearch(): void
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public bool $showBulkDeleteModal = false;
+
+    public array $selectedUnits = [];
+
+    protected UnitService $unitService;
+
+    protected $listeners = [
+        'edit-unit' => 'edit',
+        'delete-unit' => 'confirmDelete',
+        'bulk-delete-units' => 'confirmBulkDelete',
+        'refresh-table' => 'refreshTable',
+    ];
+
+    /**
+     * Boot method for injecting the service
+     */
+    public function boot(UnitService $unitService): void
     {
-        $this->resetPage();
+        $this->unitService = $unitService;
+    }
+
+    public function refreshTable(): void
+    {
+        $this->dispatch('pg:eventRefresh-units-table-p5xboo-table');
+    }
+
+    public function updatedSearch(): void
+    {
+        if (trim($this->search) !== '') {
+            $this->items = Item::query()
+                ->where('name', 'like', '%' . $this->search . '%')
+                ->orderBy('name')
+                ->limit(5)
+                ->get(['id', 'name'])
+                ->toArray();
+        } else {
+            $this->items = null;
+        }
+    }
+
+    public function selectItem(int $id, string $name): void
+    {
+        $this->selectedItemId = $id;
+        $this->selectedItemName = $name;
+        $this->items = null;
+        $this->search = $name;
     }
 
     public function resetForm(): void
     {
-        $this->reset(['unitId','name','buying_price','selling_price','is_smallest_unit','smallest_units_number','buying_price_includes_tax','selling_price_includes_tax','is_active']);
-        $this->smallest_units_number = 1;
+        $this->reset([
+            'unitId', 'name', 'buyingPrice', 'sellingPrice',
+            'isSmallestUnit', 'smallestUnitsNumber',
+            'buyingPriceIncludesTax', 'sellingPriceIncludesTax', 'isActive',
+            'selectedItemId', 'selectedItemName', 'search',
+        ]);
+        $this->smallestUnitsNumber = 1;
         $this->resetValidation();
     }
 
     public function create(): void
     {
+        
         $this->resetForm();
-        $this->dispatch('show-unit-modal');
+        $this->showModal = true;
+        $this->dispatch('focus-unit-name');
     }
 
     public function edit(int $id): void
     {
-        $u = Unit::findOrFail($id);
-        $this->unitId = $u->id;
-        $this->name = $u->name;
-        $this->buying_price = (string)$u->buying_price;
-        $this->selling_price = $u->selling_price !== null ? (string)$u->selling_price : '';
-        $this->is_smallest_unit = (bool)$u->is_smallest_unit;
-        $this->smallest_units_number = (int)$u->smallest_units_number;
-        $this->buying_price_includes_tax = (bool)$u->buying_price_includes_tax;
-        $this->selling_price_includes_tax = (bool)$u->selling_price_includes_tax;
-        $this->is_active = (bool)$u->is_active;
-        $this->dispatch('show-unit-modal');
+        $unit = $this->unitService->getById($id);
+
+        $this->unitId = $unit->id;
+        $this->name = $unit->name;
+        $this->buyingPrice = $unit->buying_price;
+        $this->sellingPrice = $unit->selling_price;
+        $this->isSmallestUnit = (bool)$unit->is_smallest_unit;
+        $this->smallestUnitsNumber = (int)$unit->smallest_units_number;
+        $this->buyingPriceIncludesTax = (bool)$unit->buying_price_includes_tax;
+        $this->sellingPriceIncludesTax = (bool)$unit->selling_price_includes_tax;
+        $this->isActive = (bool)$unit->is_active;
+
+        if ($unit->item) {
+            $this->selectedItemId = $unit->item_id;
+            $this->selectedItemName = $unit->item->name;
+            $this->search = $unit->item->name;
+        }
+
+        $this->showModal = true;
+        $this->dispatch('focus-unit-name');
     }
 
     public function save(): void
     {
-        $data = $this->validate([
-            'name' => ['required','string','max:255', Rule::unique(Unit::class, 'name')->ignore($this->unitId)],
-            'buying_price' => ['required','numeric','min:0'],
-            'selling_price' => ['nullable','numeric','min:0'],
-            'is_smallest_unit' => ['boolean'],
-            'smallest_units_number' => ['required','integer','min:1'],
-            'buying_price_includes_tax' => ['boolean'],
-            'selling_price_includes_tax' => ['boolean'],
-            'is_active' => ['boolean'],
+        $data = $this->validate($this->unitService->rules($this->unitId), [
+            'selectedItemId.required' => 'Please select an item.',
         ]);
 
-        Unit::updateOrCreate(['id' => $this->unitId], $data);
-        $this->dispatch('hide-unit-modal');
+        $this->unitService->save($this->unitId, $data);
+
+        $this->showModal = false;
         $this->resetForm();
-        session()->flash('success', 'Unit saved.');
+        session()->flash('success', 'Unit saved successfully.');
+        $this->dispatch('flash');
+        $this->refreshTable();
     }
 
     public function confirmDelete(int $id): void
     {
         $this->unitId = $id;
-        $this->dispatch('show-delete-modal');
+        $this->showDeleteModal = true;
     }
 
     public function delete(): void
     {
         if ($this->unitId) {
-            Unit::where('id', $this->unitId)->delete();
+            $this->unitService->delete($this->unitId);
         }
-        $this->dispatch('hide-delete-modal');
+        $this->showDeleteModal = false;
         $this->resetForm();
         session()->flash('success', 'Unit deleted.');
+        $this->dispatch('flash');
+        $this->refreshTable();
+    }
+
+    public function confirmBulkDelete(array $ids): void
+    {
+        $this->selectedUnits = $ids;
+        $this->showBulkDeleteModal = true;
+    }
+
+    public function bulkDelete(): void
+    {
+        if (!empty($this->selectedUnits)) {
+            $this->unitService->bulkDelete($this->selectedUnits);
+        }
+        $this->showBulkDeleteModal = false;
+        $this->selectedUnits = [];
+        session()->flash('success', 'Selected units deleted.');
+        $this->dispatch('flash');
+        $this->refreshTable();
     }
 
     public function render()
     {
-        $units = Unit::query()
-            ->when($this->search !== '', function ($q) {
-                $q->where('name','like', "%{$this->search}%");
-            })
-            ->orderBy('name')
-            ->paginate($this->perPage);
-
-        return view('livewire.unit-manager', compact('units'))
-            ->title('Units')->layout('layouts.app');
+        return view('livewire.unit-manager');
     }
 }
-
-
