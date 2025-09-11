@@ -149,6 +149,7 @@
                             <a href="#" class="list-group-item list-group-item-action">Notifications</a>
                             <a href="{{ route('item-kits') }}" class="list-group-item list-group-item-action {{ request()->routeIs('item-kits') ? 'active' : '' }}">Item Kits</a>
                             <a href="#" class="list-group-item list-group-item-action">Settings</a>
+                            <a href="{{ route('users') }}" class="list-group-item list-group-item-action {{ request()->routeIs('users') ? 'active' : '' }}">User Management</a>
                         </div>
                     </aside>
                     <main class="col-12 col-md-9 col-lg-10 py-3">

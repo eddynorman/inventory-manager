@@ -33,6 +33,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/items', function () {
         return view('livewire.index_pages.items-index');
     })->name('items');
+    Route::get('/users', function () {
+        return view('livewire.index_pages.users-index');
+    })->name('users');
     Route::get('/suppliers', SupplierManager::class)->name('suppliers');
     Route::get('/customers', CustomerManager::class)->name('customers');
     Route::get('/locations', function () {
