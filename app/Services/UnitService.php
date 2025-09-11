@@ -38,7 +38,6 @@ class UnitService
                 'smallest_units_number' => $data['smallestUnitsNumber'],
                 'buying_price_includes_tax' => $data['buyingPriceIncludesTax'],
                 'selling_price_includes_tax' => $data['sellingPriceIncludesTax'],
-                'is_smallest_unit' => $data['isSmallestUnit'] ?? false,
                 'is_active' => $data['isActive'],
                 'item_id' => $data['selectedItemId'],
             ]

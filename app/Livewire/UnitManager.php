@@ -21,7 +21,6 @@ class UnitManager extends Component
     public string $name = '';
     public ?float $buyingPrice = null;
     public ?float $sellingPrice = null;
-    public bool $isSmallestUnit = false;
     public int $smallestUnitsNumber = 1;
     public bool $buyingPriceIncludesTax = false;
     public bool $sellingPriceIncludesTax = false;
@@ -91,7 +90,7 @@ class UnitManager extends Component
 
     public function create(): void
     {
-        
+
         $this->resetForm();
         $this->showModal = true;
         $this->dispatch('focus-unit-name');
@@ -105,7 +104,6 @@ class UnitManager extends Component
         $this->name = $unit->name;
         $this->buyingPrice = $unit->buying_price;
         $this->sellingPrice = $unit->selling_price;
-        $this->isSmallestUnit = (bool)$unit->is_smallest_unit;
         $this->smallestUnitsNumber = (int)$unit->smallest_units_number;
         $this->buyingPriceIncludesTax = (bool)$unit->buying_price_includes_tax;
         $this->sellingPriceIncludesTax = (bool)$unit->selling_price_includes_tax;
