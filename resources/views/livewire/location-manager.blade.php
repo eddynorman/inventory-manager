@@ -30,7 +30,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Type</label>
-                            <select class="form-select" wire:model.defer="location_type">
+                            <select class="form-select" wire:model.defer="locationType">
                                 <option value="store">Store</option>
                                 <option value="warehouse">Warehouse</option>
                                 <option value="office">Office</option>
@@ -58,7 +58,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label">Staff Responsible</label>
-                            <select class="form-select" wire:model.defer="staff_responsible">
+                            <select class="form-select" wire:model.defer="staffResponsible">
                                 <option value="">-- Select --</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
@@ -112,11 +112,11 @@
                 <div class="card-body">
                     <h6>Details</h6>
                     <ul class="list-group mb-4">
-                        <li class="list-group-item"><strong>Type:</strong> {{ ucfirst($location_type) }}</li>
+                        <li class="list-group-item"><strong>Type:</strong> {{ ucfirst($locationType) }}</li>
                         <li class="list-group-item"><strong>Address:</strong> {{ $address }}</li>
                         <li class="list-group-item"><strong>Phone:</strong> {{ $phone }}</li>
                         <li class="list-group-item"><strong>Email:</strong> {{ $email }}</li>
-                        <li class="list-group-item"><strong>Responsible:</strong> {{ optional($users->find($staff_responsible))->name }}</li>
+                        <li class="list-group-item"><strong>Responsible:</strong> {{ collect($users)->firstWhere('id', $staffResponsible)['name'] ?? 'N/A' }}</li>
                         <li class="list-group-item"><strong>Description:</strong> {{ $description }}</li>
                     </ul>
 

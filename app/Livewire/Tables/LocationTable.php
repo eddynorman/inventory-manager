@@ -47,7 +47,9 @@ final class LocationTable extends PowerGridComponent
             ->add('address')
             ->add('phone')
             ->add('email')
-            ->add('staff_responsible', fn(Location $location) => optional($location->user)->name)
+            ->add('staff',function ($location){
+                return $location->user ? $location->user->name : 'N/A';
+            })
             ->add('description');
     }
 
@@ -74,7 +76,7 @@ final class LocationTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Staff', 'staff_responsible')
+            Column::make('Staff', 'staff', 'staff_responsible')
                 ->sortable()
                 ->searchable(),
 

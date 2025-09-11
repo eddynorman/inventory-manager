@@ -95,11 +95,11 @@ class LocationManager extends Component
         $l = $this->service->getWithItems($id);
         $this->locationId = $l->id;
         $this->name = $l->name;
-        $this->locationType = $l->locationType;
+        $this->locationType = $l->location_type;
         $this->address = (string)($l->address ?? '');
         $this->phone = (string)($l->phone ?? '');
         $this->email = (string)($l->email ?? '');
-        $this->staffResponsible = $l->staffResponsible;
+        $this->staffResponsible = $l->staff_responsible;
         $this->description = (string)($l->description ?? '');
 
         $this->showModal = true;
@@ -141,11 +141,11 @@ class LocationManager extends Component
         $location = $this->service->getWithItems($id);
         $this->locationId = $location->id;
         $this->name = $location->name;
-        $this->locationType = $location->locationType;
+        $this->locationType = $location->location_type;
         $this->address = (string)($location->address ?? '');
         $this->phone = (string)($location->phone ?? '');
         $this->email = (string)($location->email ?? '');
-        $this->staffResponsible = $location->staffResponsible;
+        $this->staffResponsible = $location->staff_responsible;
         $this->description = (string)($location->description ?? '');
         $this->items = $location->items->map(fn($il) => [
             'id' => $il->id,

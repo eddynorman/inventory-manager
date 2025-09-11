@@ -13,17 +13,20 @@ class LocationService
     {
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique(Location::class, 'name')->ignore($locationId)],
-            'location_type' => ['required', 'in:warehouse,store,office'],
+            'locationType' => ['required', 'in:warehouse,store,office'],
             'address' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
-            'staff_responsible' => ['nullable', 'integer', 'exists:users,id'],
+            'staffResponsible' => ['nullable', 'integer', 'exists:users,id'],
             'description' => ['nullable', 'string'],
         ];
     }
 
     public function save(?int $id, array $data): Location
     {
+        $data['location_type'] = $data['locationType'];
+        $data['staff_responsible'] = $data['staffResponsible'];
+        
         return Location::updateOrCreate(['id' => $id], $data);
     }
 
