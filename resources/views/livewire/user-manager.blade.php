@@ -14,35 +14,33 @@
 
     <!-- Create/Edit Modal -->
     @if($showModal)
-        <div class="fixed inset-0 z-50 d-flex align-items-center justify-content-center bg-dark bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg w-100" style="max-width: 30rem; max-height: 80%; overflow-y: auto;">
-
-                <div class="bg-primary text-white px-4 py-3 rounded-top d-flex justify-content-between align-items-center">
-                    <h5>{{ $userId ? 'Edit User' : 'New User' }}</h5>
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;">
+            <div class="card shadow-lg" style="max-width: 30rem; width:100%; max-height: 80%; overflow-y:auto;">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ $userId ? 'Edit User' : 'New User' }}</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showModal', false)"></button>
                 </div>
-
-                <div class="p-4" >
+                <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label" for="">Name</label>
-                        <input type="text" name="name" class="form-control" wire:model.defer="name">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" wire:model.defer="name">
                         @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="">Email</label>
+                        <label class="form-label">Email</label>
                         <input type="email" class="form-control" wire:model.defer="email">
                         @error('email')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="">Password</label>
+                        <label class="form-label">Password</label>
                         <input type="password" class="form-control" wire:model.defer="password">
                         @error('password')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="">Type</label>
+                        <label class="form-label">Type</label>
                         <select class="form-select" wire:model.defer="type">
                             <option value="staff">Staff</option>
                             <option value="customer">Customer</option>
@@ -54,7 +52,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label" for="">Role</label>
+                        <label class="form-label">Role</label>
                         <select class="form-select" wire:model.defer="role">
                             <option value="super">Super</option>
                             <option value="admin">Admin</option>
@@ -68,8 +66,7 @@
                         <label class="form-check-label" for="active">Active</label>
                     </div>
                 </div>
-
-                <div class="bg-light px-4 py-3 rounded-bottom d-flex justify-content-end gap-2">
+                <div class="card-footer bg-light d-flex justify-content-end gap-2">
                     <button class="btn btn-secondary" wire:click="$set('showModal', false)">Close</button>
                     <button class="btn btn-primary" wire:click="save">Save</button>
                 </div>
@@ -79,21 +76,20 @@
 
     <!-- Delete Modal -->
     @if($showDeleteModal)
-        <div class="fixed inset-0 z-50 d-flex align-items-center justify-content-center bg-dark bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg w-100" style="max-width: 400px;">
-                <div class="bg-danger text-white px-4 py-3 rounded-top d-flex justify-content-between align-items-center">
-                    <h5>Confirm Delete</h5>
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;">
+            <div class="card shadow-lg" style="max-width: 400px; width:100%;">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Confirm Delete</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showDeleteModal', false)"></button>
                 </div>
-                <div class="p-4">
+                <div class="card-body">
                     <p>Are you sure you want to delete this user?</p>
                 </div>
-                <div class="bg-light px-4 py-3 rounded-bottom d-flex justify-content-end gap-2">
+                <div class="card-footer bg-light d-flex justify-content-end gap-2">
                     <button class="btn btn-secondary" wire:click="$set('showDeleteModal', false)">Cancel</button>
                     <button class="btn btn-danger" wire:click="delete">Delete</button>
                 </div>
             </div>
         </div>
     @endif
-
 </div>

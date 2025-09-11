@@ -14,17 +14,13 @@
 
     <!-- Create/Edit Modal -->
     @if($showModal)
-        <div class="fixed inset-0 w-100 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg custom-modal-width-md">
-
-                <!-- Modal Header -->
-                <div class="bg-primary text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;">
+            <div class="card shadow-lg" style="max-width: 600px; width: 100%;">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ $locationId ? 'Edit Location' : 'New Location' }}</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showModal', false)"></button>
                 </div>
-
-                <!-- Modal Body -->
-                <div class="p-4">
+                <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Name</label>
@@ -65,7 +61,7 @@
                             <select class="form-select" wire:model.defer="staff_responsible">
                                 <option value="">-- Select --</option>
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
                                 @endforeach
                             </select>
                             @error('staff_responsible')<div class="text-danger small">{{ $message }}</div>@enderror
@@ -78,9 +74,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-light px-4 py-3 rounded-b-lg d-flex justify-content-end gap-2">
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button class="btn btn-secondary" wire:click="$set('showModal', false)">Close</button>
                     <button class="btn btn-primary" wire:click="save">Save</button>
                 </div>
@@ -90,22 +84,16 @@
 
     <!-- Delete Modal -->
     @if($showDeleteModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg custom-modal-width-sm">
-
-                <!-- Modal Header -->
-                <div class="bg-danger text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;">
+            <div class="card shadow-lg" style="max-width: 500px; width: 100%;">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Confirm Delete</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showDeleteModal', false)"></button>
                 </div>
-
-                <!-- Modal Body -->
-                <div class="p-4">
-                    <p>Are you sure you want to delete this location?</p>
+                <div class="card-body">
+                    Are you sure you want to delete this location?
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-light px-4 py-3 rounded-b-lg d-flex justify-content-end gap-2">
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button class="btn btn-secondary" wire:click="$set('showDeleteModal', false)">Cancel</button>
                     <button class="btn btn-danger" wire:click="delete">Delete</button>
                 </div>
@@ -115,17 +103,13 @@
 
     <!-- View Modal -->
     @if($showViewModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg w-full custom-modal-width-2xl h-[90vh] overflow-y-auto">
-
-                <!-- Modal Header -->
-                <div class="bg-info text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
+        <div class="d-flex justify-content-center align-items-start position-fixed top-0 start-0 w-100 h-100 py-5" style="background: rgba(0,0,0,0.5); z-index:1050; overflow-y:auto;">
+            <div class="card shadow-lg" style="max-width: 900px; width: 100%;">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Location: {{ $name }}</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showViewModal', false)"></button>
                 </div>
-
-                <!-- Modal Body -->
-                <div class="p-4">
+                <div class="card-body">
                     <h6>Details</h6>
                     <ul class="list-group mb-4">
                         <li class="list-group-item"><strong>Type:</strong> {{ ucfirst($location_type) }}</li>
@@ -165,9 +149,7 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-light px-4 py-3 rounded-b-lg d-flex justify-content-end">
+                <div class="card-footer d-flex justify-content-end bg-light">
                     <button class="btn btn-secondary" wire:click="$set('showViewModal', false)">Close</button>
                 </div>
             </div>
@@ -176,17 +158,13 @@
 
     <!-- Move Item Modal -->
     @if($showMoveModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-lg">
-
-                <!-- Modal Header -->
-                <div class="bg-warning text-white px-4 py-3 rounded-t-lg flex justify-between items-center">
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.6); z-index:1050;">
+            <div class="card shadow-lg" style="max-width: 500px; width: 100%;">
+                <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Move Item</h5>
                     <button class="btn-close btn-close-white" wire:click="$set('showMoveModal', false)"></button>
                 </div>
-
-                <!-- Modal Body -->
-                <div class="p-4">
+                <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Target Location</label>
                         <select class="form-select" wire:model.defer="targetLocationId">
@@ -197,16 +175,13 @@
                         </select>
                         @error('targetLocationId')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Quantity</label>
                         <input type="number" class="form-control" wire:model.defer="quantity" min="1">
                         @error('quantity')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                 </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-light px-4 py-3 rounded-b-lg d-flex justify-content-end gap-2">
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button class="btn btn-secondary" wire:click="$set('showMoveModal', false)">Cancel</button>
                     <button class="btn btn-primary" wire:click="moveItem">Move</button>
                 </div>
