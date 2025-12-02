@@ -1,5 +1,5 @@
 <!-- Flash Messages -->
-<div id="flash-messages" style="position: fixed; top: 80px; right: 20px; z-index: 1050; max-width: 400px;">
+<div id="flash-messages" style="position: fixed; top: 80px; right: 20px; z-index: 10000; max-width: 400px;">
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow" role="alert">
             <i class="fas fa-check-circle me-2"></i>

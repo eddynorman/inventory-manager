@@ -278,3 +278,4 @@ class ItemManager extends Component
         ]);
     }
 }
+
