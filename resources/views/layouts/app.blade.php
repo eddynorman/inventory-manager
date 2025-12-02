@@ -61,7 +61,7 @@
     </style>
 </head>
 <body class="font-sans antialiased mx-0">
-<div class="min-vh-100 bg-light d-flex flex-column">
+<div class="min-vh-100 bg-light d-flex flex-column" style="padding-bottom: 3rem">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ route('dashboard') }}">Inventory Manager</a>
