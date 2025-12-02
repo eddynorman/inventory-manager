@@ -50,10 +50,29 @@ class UnitService
      */
     public function createSmallest(array $data): Unit
     {
-        $data['isSmallestUnit'] = true;
         $data['smallestUnitsNumber'] = 1;
 
-        return $this->save(null, $data);
+        return Unit::create(
+            [
+                'name' => $data['name'],
+                'buying_price' => $data['buyingPrice'],
+                'selling_price' => $data['sellingPrice'] ?? null,
+                'is_smallest_unit' => true,
+                'smallest_units_number' => $data['smallestUnitsNumber'],
+                'buying_price_includes_tax' => $data['buyingPriceIncludesTax'],
+                'selling_price_includes_tax' => $data['sellingPriceIncludesTax'],
+                'is_active' => $data['isActive'],
+                'item_id' => $data['selectedItemId'],
+            ]
+        );
+    }
+
+    /**
+     * Get an items's smallest unit
+     */
+    public function getSmallest(int $item_id): Unit
+    {
+        return Unit::where('item_id', $item_id)->where('is_smallest_unit', true)->first();
     }
 
     /**

@@ -54,7 +54,10 @@ final class ItemTable extends PowerGridComponent
             ->add('initial_stock')
             ->add('current_stock')
             ->add('reorder_level')
-            ->add('is_sale_item');
+            ->add('is_sale_item')
+            ->add('sale_item', function($item){
+                return $item->is_sale_item ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>';
+            });
     }
 
     public function columns(): array
@@ -83,7 +86,7 @@ final class ItemTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Is sale item', 'is_sale_item')
+            Column::make('Is sale item', 'sale_item', 'is_sale_item')
                 ->sortable()
                 ->searchable(),
 
@@ -119,20 +122,18 @@ final class ItemTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert('.$rowId.')');
-    }
-
     public function actions(Item $row): array
     {
         return [
             Button::add('edit')
-                ->slot('Edit: '.$row->id)
-                ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+                ->slot('<i class="fa-solid fa-pen-to-square"></i>')
+                ->class('btn btn-primary btn-sm')
+                ->dispatch('edit', ['id' => $row->id]),
+
+            Button::add('delete')
+                ->slot('<i class="fa-solid fa-trash"></i>')
+                ->class('btn btn-danger btn-sm')
+                ->dispatch('confirmDelete', ['id' => $row->id]),
         ];
     }
 

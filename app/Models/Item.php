@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
 {
-    protected $fillable = ['name', 'barcode', 'category_id', 'supplier_id', 'initial_stock', 'current_stock', 'reorder_level', 'smallest_unit_id', 'is_active', 'is_sale_item'];
+    protected $fillable = ['name', 'barcode', 'category_id', 'supplier_id', 'initial_stock', 'current_stock', 'reorder_level', 'is_active', 'is_sale_item'];
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -14,10 +14,6 @@ class Item extends Model
 
     public function disposed(){
         return $this->hasMany(DisposeItem::class);
-    }
-
-    public function smallestUnit(){
-        return $this->belongsTo(Unit::class, 'smallest_unit_id');
     }
 
     public function supplier(){
@@ -42,7 +38,7 @@ class Item extends Model
             'item_id'           // Foreign key on pivot table referencing Item
         );
     }
-    
+
 
     public function units()
     {

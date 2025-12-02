@@ -51,6 +51,8 @@ class ItemManager extends Component
     protected ItemService $service;
 
     protected $listeners = [
+        'edit' => 'edit',
+        'confirmDelete' => 'confirmDelete',
         'refresh-table' => 'refreshTable',
         'bulk-delete-items' => 'confirmBulkDelete',
         'bulk-toggle-active-items' => 'confirmBulkToggleActive',
@@ -70,9 +72,9 @@ class ItemManager extends Component
     public function refreshTable(): void
     {
         // Dispatch browser event the PowerGrid table expects to trigger refresh
-        $this->dispatchBrowserEvent('pg:eventRefresh-item-table-effbnx-table');
+        $this->dispatch('pg:eventRefresh-item-table-effbnx-table');
         // also dispatch flash handler so UI hides flash messages when necessary
-        $this->dispatchBrowserEvent('flash');
+        $this->dispatch('flash');
     }
 
     public function resetForm(): void
@@ -102,10 +104,9 @@ class ItemManager extends Component
 
         $this->resetForm();
         $this->showModal = true;
-        $this->dispatchBrowserEvent('show-item-modal'); // optional: consistent with older JS
+        $this->dispatch('show-item-modal'); // optional: consistent with older JS
     }
 
-    #[On('edit')]
     public function edit(int $id): void
     {
         $item = $this->service->getById($id);
@@ -113,6 +114,7 @@ class ItemManager extends Component
         $this->name = $item->name;
         $this->barcode = $item->barcode;
         $this->categoryId = $item->category_id;
+        $this->locationId = $item->locations->first();
         $this->supplierId = $item->supplier_id;
         $this->initialStock = $item->initial_stock;
         $this->reorderLevel = $item->reorder_level;
@@ -130,7 +132,7 @@ class ItemManager extends Component
         $this->isSaleItem = (bool)$item->is_sale_item;
 
         $this->showModal = true;
-        $this->dispatchBrowserEvent('show-item-modal');
+        $this->dispatch('show-item-modal');
     }
 
     public function save(): void
@@ -141,6 +143,7 @@ class ItemManager extends Component
             ]);
 
             // Map Livewire keys to service expected keys (service expects camel-case keys already)
+            //dd($data);
             $this->service->save($this->itemId, $data);
 
             $this->showModal = false;
@@ -150,13 +153,19 @@ class ItemManager extends Component
             // refresh table in browser
             $this->refreshTable();
         } catch (ValidationException $ve) {
+            session()->flash('error', $ve->getMessage());
+            $this->dispatch('flash');
+
             // bubble validation errors to UI
             throw $ve;
+
         } catch (\Exception $e) {
             // log server error and show friendly message
+            //dd($e);
+            //dd($data);
             logger()->error('Item save failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'An unexpected error occurred while saving the item.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
         }
     }
 
@@ -164,7 +173,7 @@ class ItemManager extends Component
     {
         $this->itemId = $id;
         $this->showDeleteModal = true;
-        $this->dispatchBrowserEvent('show-delete-modal');
+        $this->dispatch('show-delete-modal');
     }
 
     public function delete(): void
@@ -180,7 +189,7 @@ class ItemManager extends Component
         } catch (\Exception $e) {
             logger()->error('Item delete failed: '.$e->getMessage());
             session()->flash('error', 'Could not delete item.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
         }
     }
 
@@ -198,12 +207,12 @@ class ItemManager extends Component
             $this->showBulkDeleteModal = false;
             $this->selectedIds = [];
             session()->flash('success', 'Items deleted successfully.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
             $this->refreshTable();
         } catch (\Exception $e) {
             logger()->error('Bulk delete failed: '.$e->getMessage());
             session()->flash('error', 'Unable to delete selected items.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
         }
     }
 
@@ -214,7 +223,7 @@ class ItemManager extends Component
         // Here we'll set them active if any are inactive (simple heuristic)
         $this->service->bulkToggleActive($ids, true);
         session()->flash('success', 'Selected items activated.');
-        $this->dispatchBrowserEvent('flash');
+        $this->dispatch('flash');
         $this->refreshTable();
     }
 
@@ -228,14 +237,14 @@ class ItemManager extends Component
     {
         if (!$this->bulkCategoryId) {
             session()->flash('error', 'Please select a category.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
             return;
         }
         $this->service->bulkAssignCategory($this->selectedIds, $this->bulkCategoryId);
         $this->showAssignCategoryModal = false;
         $this->selectedIds = [];
         session()->flash('success', 'Category assigned to selected items.');
-        $this->dispatchBrowserEvent('flash');
+        $this->dispatch('flash');
         $this->refreshTable();
     }
 
@@ -249,14 +258,14 @@ class ItemManager extends Component
     {
         if (!$this->bulkSupplierId) {
             session()->flash('error', 'Please select a supplier.');
-            $this->dispatchBrowserEvent('flash');
+            $this->dispatch('flash');
             return;
         }
         $this->service->bulkAssignSupplier($this->selectedIds, $this->bulkSupplierId);
         $this->showAssignSupplierModal = false;
         $this->selectedIds = [];
         session()->flash('success', 'Supplier assigned to selected items.');
-        $this->dispatchBrowserEvent('flash');
+        $this->dispatch('flash');
         $this->refreshTable();
     }
 

@@ -66,4 +66,4 @@ You can now:
 php artisan migrate --seed
 Login with super@example.com / password
 
-Next batch: Sales, Transfers, Issues, Stock Adjustments, Disposals, and Notifications.
+

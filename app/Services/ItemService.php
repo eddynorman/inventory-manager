@@ -77,14 +77,12 @@ class ItemService
             // create/update smallest unit for this item
             $this->unitService->createSmallest([
                 'name' => $data['smallestUnit'],
-                'item_id' => $item->id,
-                'buying_price' => $data['buyingPrice'],
-                'selling_price' => $data['sellingPrice'],
-                'smallest_units_number' => 1,
-                'is_smallest_unit' => true,
-                'buying_price_includes_tax' => $data['buyingPriceIncludesTax'] ?? false,
-                'selling_price_includes_tax' => $data['sellingPriceIncludesTax'] ?? false,
-                'is_active' => $data['isActive'] ?? true,
+                'selectedItemId' => $item->id,
+                'buyingPrice' => $data['buyingPrice'],
+                'sellingPrice' => $data['sellingPrice'],
+                'buyingPriceIncludesTax' => $data['buyingPriceIncludesTax'] ?? false,
+                'sellingPriceIncludesTax' => $data['sellingPriceIncludesTax'] ?? false,
+                'isActive' => $data['isActive'] ?? true,
             ]);
 
             $itemLocation = new ItemLocation();
