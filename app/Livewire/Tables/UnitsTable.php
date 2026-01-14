@@ -129,13 +129,13 @@ final class UnitsTable extends PowerGridComponent
         ];
     }
 
-    // public function actionRules($row): array
-    // {
-    //    return [
-    //         // Hide button edit for ID 1
-    //         Rule::button('edit')
-    //             ->when(fn($row) => $row->id === 1)
-    //             ->hide(),
-    //     ];
-    // }
+    public function actionRules($row): array
+    {
+       return [
+            // Hide button delete for smallest units
+            Rule::button('delete')
+                ->when(fn($row) => $row->is_smallest_unit === 1)
+                ->hide(),
+        ];
+    }
 }
