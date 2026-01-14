@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\ItemLocation;
 use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class ItemService
@@ -24,7 +25,7 @@ class ItemService
     public function rules(?int $itemId = null): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('items')->ignore($itemId)],
             'barcode' => ['required', 'string', 'max:100'],
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
             'supplierId' => ['nullable', 'integer', 'exists:suppliers,id'],
