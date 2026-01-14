@@ -99,10 +99,9 @@ class ItemService
     public function delete(int $id): void
     {
         // remove units first to keep DB consistent
-        UnitService::class; // ensure class available (no-op)
+
         // delete units for this item then item
         DB::transaction(function () use ($id) {
-            Unit::where('item_id', $id)->delete();
             Item::where('id', $id)->delete();
             ItemLocation::where('item_id', $id)->delete();
         });
