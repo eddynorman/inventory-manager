@@ -47,6 +47,7 @@ class UnitManager extends Component
     public function boot(UnitService $unitService): void
     {
         $this->unitService = $unitService;
+        $this->items = Item::orderBy('name')->get(['id', 'name'])->toArray();
     }
 
     public function refreshTable(): void
@@ -87,9 +88,12 @@ class UnitManager extends Component
         $this->resetValidation();
     }
 
-    public function create(): void
+    public function create()
     {
-
+        if (count($this->items) === 0) {
+            session()->flash('error', 'You must create an item before adding units.');
+            return redirect()->route('items', ['openModal' => 1]);
+        }
         $this->resetForm();
         $this->showModal = true;
         $this->dispatch('focus-unit-name');
