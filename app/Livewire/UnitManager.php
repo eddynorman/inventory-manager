@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Item;
+use App\Models\Unit;
 use App\Services\UnitService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -157,7 +158,11 @@ class UnitManager extends Component
 
     public function confirmBulkDelete(array $ids): void
     {
-        $this->selectedUnits = $ids;
+        //remove ids belonging to smallest items
+        $newIds = array_filter($ids, function ($id) {
+            return !Unit::where('id', $id)->where('is_smallest_unit', true)->exists();
+        });
+        $this->selectedUnits = $newIds;
         $this->showBulkDeleteModal = true;
     }
 
