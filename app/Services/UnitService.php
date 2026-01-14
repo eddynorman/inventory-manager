@@ -10,10 +10,11 @@ class UnitService
     /**
      * Validation rules for creating/updating a unit
      */
-    public function rules(?int $unitId = null): array
+    public function rules(?int $unitId = null, ?int $itemId = null): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique(Unit::class, 'name')->ignore($unitId)],
+            'name' => ['required', 'string', 'max:255',Rule::unique('units')
+                ->where(fn ($q) => $q->where('item_id', $itemId))->ignore($unitId),],
             'buyingPrice' => ['required', 'numeric', 'min:0'],
             'sellingPrice' => ['nullable', 'numeric', 'min:0'],
             'smallestUnitsNumber' => ['required', 'integer', 'min:1'],
