@@ -26,7 +26,7 @@ class ItemService
     {
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('items')->ignore($itemId)],
-            'barcode' => ['required', 'string', 'max:100'],
+            'barcode' => ['nullable', 'string', 'max:100'],
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
             'supplierId' => ['nullable', 'integer', 'exists:suppliers,id'],
             'locationId' =>['required','integer','exists:locations,id'],
