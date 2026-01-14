@@ -48,8 +48,12 @@ final class UnitsTable extends PowerGridComponent
             ->add('item',function($unit){
                 return $unit->item->name ?? '-';
             })
-            ->add('buying_price')
-            ->add('selling_price')
+            ->add('buying_price', function ($unit) {
+                return number_format($unit->buying_price, 2);
+            })
+            ->add('selling_price', function ($unit) {
+                return number_format($unit->selling_price, 2);
+            })
             ->add('is_smallest_unit')
             ->add('smallest_unit', function ($unit) {
                 return $unit->is_smallest_unit ? '<b>Yes</b>' : 'No';
