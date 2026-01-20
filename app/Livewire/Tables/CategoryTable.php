@@ -42,7 +42,7 @@ final class CategoryTable extends PowerGridComponent
             Button::add('bulk-delete')
                 ->slot('<i class="fa-solid fa-trash"></i> Bulk Delete')
                 ->class('btn btn-danger btn-sm')
-                ->dispatch('bulkDelete.' . $this->tableName, ['table' => $this->tableName]),
+                ->dispatch('bulkDelete.Categories', ['ids' => $this->checkboxValues]),
         ];
     }
     public function fields(): PowerGridFields

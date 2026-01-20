@@ -3,10 +3,19 @@
 namespace App\Services;
 
 use App\Models\Category;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class CategoryService
 {
+    public function rules(?int $categoryId = null): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories')->ignore($categoryId)],
+            'description' => ['nullable', 'string'],
+        ];
+    }
+
     public function getById(int $id): Category
     {
         return Category::findOrFail($id);
@@ -22,21 +31,10 @@ class CategoryService
 
     public function createOrUpdate(array $data, ?int $id = null): Category
     {
-        // Validate unique name
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-        ];
-
-        $validator = \Illuminate\Support\Facades\Validator::make($data, $rules);
-
-        if ($validator->fails()) {
-            throw new ValidationException($validator);
-        }
-
+        $data['name'] = trim($data['name']);
         return Category::updateOrCreate(
             ['id' => $id],
-            $validator->validated()
+            $data
         );
     }
 

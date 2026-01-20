@@ -9,18 +9,20 @@
 
     <div class="card">
         <div class=" card-body table-responsive px-2">
-             @livewire('tables.category-table')
+            @livewire('tables.category-table')
         </div>
     </div>
     <!-- View Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">Category Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if($showViewModal)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+            style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showViewModal', false)">
+
+            <div class="card shadow-lg w-100" style="max-width: 500px;" wire:click.stop>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Category Details</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showViewModal', false)"></button>
                 </div>
-                <div class="modal-body">
+                <div class="card-body">
                     @if($categoryId)
                         <h5>{{ $name }}</h5>
                         <p>{{ $description }}</p>
@@ -39,90 +41,89 @@
                         <p>Loading...</p>
                     @endif
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
+                    <button class="btn btn-secondary" wire:click="$set('showViewModal', false)">Cancel</button>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Create/Edit Modal -->
-    <div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">{{ $categoryId ? 'Edit Category' : 'New Category' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if($showCategoryModal)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showCategoryModal', false)">
+
+            <div class="card shadow-lg w-100" style="max-width: 700px; height: auto;" wire:click.stop>
+                <!-- Header -->
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0">{{ $categoryId ? 'Edit Category' : 'New Category' }}</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showCategoryModal', false)"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label" for="name">Name</label>
-                        <input type="text" id="name" class="form-control" wire:model.defer="name">
-                        @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
+
+
+                <form action="#" method="post" wire:submit.prevent="save">
+                    <!-- Body (scrollable) -->
+                    <div class="card-body overflow-auto">
+                        <div class="mb-3">
+                            <label class="form-label" for="name">Name</label>
+                            <input type="text" id="name" class="form-control" wire:model.defer="name">
+                            @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="description">Description</label>
+                            <textarea id="description" class="form-control" rows="3" wire:model.defer="description"></textarea>
+                            @error('description')<div class="text-danger small">{{ $message }}</div>@enderror
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="description">Description</label>
-                        <textarea id="description" class="form-control" rows="3" wire:model.defer="description"></textarea>
-                        @error('description')<div class="text-danger small">{{ $message }}</div>@enderror
+
+                    <!-- Footer -->
+                    <div class="card-footer d-flex justify-content-end gap-2 bg-light">
+                        <button type="button" class="btn btn-secondary" wire:click="$set('showCategoryModal', false)">Close</button>
+                        <button type="submit" class="btn btn-primary" >Save</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" wire:click="save">Save</button>
-                </div>
+                </form>
+
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if($showDeleteModal)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showDeleteModal', false)">
+
+            <div class="card shadow-lg w-100" style="max-width: 700px; height: auto;" wire:click.stop>
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showDeleteModal', false)"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this category?
+                <div class="card-body overflow-auto">
+                    <p>Are you sure you want to delete this category?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
+                    <button type="button" class="btn btn-secondary" wire:click="$set('showDeleteModal', false)">Cancel</button>
                     <button type="button" class="btn btn-danger" wire:click="delete">Delete</button>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
+
     <!-- Bulk delete modal -->
-    <div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if($showBulkDeleteModal)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showBulkDeleteModal', false)">
+
+            <div class="card shadow-lg w-100" style="max-width: 700px; height: auto;" wire:click.stop>
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showBulkDeleteModal', false)"></button>
                 </div>
-                <div class="modal-body">
-                    Are you sure you want to delete these categories?
+                <div class="card-body overflow-auto">
+                    <p>Are you sure you want to delete these {{ count($bulkIds) }} categories?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
+                    <button type="button" class="btn btn-secondary" wire:click="$set('showBulkDeleteModal', false)">Cancel</button>
                     <button type="button" class="btn btn-danger" wire:click="bulkDelete">Delete</button>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        window.addEventListener('show-view-modal', () => new bootstrap.Modal(document.getElementById('viewModal')).show());
-        window.addEventListener('show-category-modal', () => new bootstrap.Modal(document.getElementById('categoryModal')).show());
-        window.addEventListener('hide-category-modal', () => bootstrap.Modal.getInstance(document.getElementById('categoryModal'))?.hide());
-        window.addEventListener('show-delete-modal', () => new bootstrap.Modal(document.getElementById('deleteModal')).show());
-        window.addEventListener('hide-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('deleteModal'))?.hide());
-        window.addEventListener('show-bulk-delete-modal', () => new bootstrap.Modal(document.getElementById('bulkDeleteModal')).show());
-        window.addEventListener('hide-bulk-delete-modal', () => bootstrap.Modal.getInstance(document.getElementById('bulkDeleteModal'))?.hide());
-
-        window.addEventListener('bulkDelete.category-table-1uitsn-table', ( event ) => {
-            const selectedIds = window.pgBulkActions.get(event.detail.table) || [];
-            window.dispatchEvent(new CustomEvent('bulkDeleteConfirmWithIds', { detail: { ids: selectedIds } }));
-        });
-    </script>
+    @endif
 </div>
 

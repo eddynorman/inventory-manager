@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Services\CategoryService;
-use Livewire\Attributes\On;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class CategoryManager extends Component
@@ -14,8 +14,18 @@ class CategoryManager extends Component
     public ?array $items = null;
     public array $bulkIds = [];
 
+    public bool $showCategoryModal = false;
+    public bool $showDeleteModal = false;
+    public bool $showBulkDeleteModal = false;
+    public bool $showViewModal = false;
+
     protected $listeners = [
-        'bulkDeleteConfirmWithIds' => 'bulkDeleteConfirm'
+        'bulkDelete.Categories' => 'bulkDeleteConfirm',
+        'bulkDeleteConfirmWithIds' => 'bulkDeleteConfirm',
+        'edit' => 'edit',
+        'create' => 'create',
+        'confirmDelete' => 'confirmDelete',
+        'view' => 'view',
     ];
 
     protected CategoryService $service;
@@ -34,10 +44,9 @@ class CategoryManager extends Component
     public function create(): void
     {
         $this->resetForm();
-        $this->dispatch('show-category-modal');
+        $this->showCategoryModal = true;
     }
 
-    #[On('view')]
     public function view(int $id): void
     {
         $cat = $this->service->getById($id);
@@ -46,40 +55,42 @@ class CategoryManager extends Component
         $this->description = (string)($cat->description ?? '');
         $this->items = $this->service->getItems($id);
 
-        $this->dispatch('show-view-modal');
+        $this->showViewModal = true;
     }
 
-    #[On('edit')]
     public function edit(int $id): void
     {
         $cat = $this->service->getById($id);
         $this->categoryId = $cat->id;
         $this->name = $cat->name;
         $this->description = (string)($cat->description ?? '');
-        $this->dispatch('show-category-modal');
+        $this->showCategoryModal = true;
     }
 
     public function save(): void
     {
-        $data = [
-            'name' => $this->name,
-            'description' => $this->description
-        ];
-
-        $this->service->createOrUpdate($data, $this->categoryId);
-
-        $this->dispatch('hide-category-modal');
-        $this->resetForm();
-        session()->flash('success', 'Category saved.');
-        $this->dispatch('flash');
-        $this->dispatch('refresh-table');
+        try {
+            $validated = $this->validate($this->service->rules($this->categoryId));
+            $this->service->createOrUpdate($validated, $this->categoryId);
+            $this->showCategoryModal = false;
+            $this->resetForm();
+            session()->flash('success', 'Category saved.');
+            $this->dispatch('flash');
+            $this->dispatch('refresh-table');
+        } catch (ValidationException $ve) {
+            session()->flash('error', $ve->getMessage());
+            $this->dispatch('flash');
+            // bubble validation errors to UI
+            throw $ve;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 
-    #[On('confirmDelete')]
     public function confirmDelete(int $id): void
     {
         $this->categoryId = $id;
-        $this->dispatch('show-delete-modal');
+        $this->showDeleteModal = true;
     }
 
     public function delete(): void
@@ -97,14 +108,13 @@ class CategoryManager extends Component
     public function bulkDeleteConfirm(array $ids): void
     {
         $this->bulkIds = $ids;
-
         if (count($this->bulkIds) === 0) {
             session()->flash('error', 'No categories selected.');
             $this->dispatch('flash');
             return;
         }
 
-        $this->dispatch('show-bulk-delete-modal');
+        $this->showBulkDeleteModal = true;
     }
 
     public function bulkDelete(): void
@@ -115,7 +125,7 @@ class CategoryManager extends Component
             $this->dispatch('flash');
         }
 
-        $this->dispatch('hide-bulk-delete-modal');
+        $this->showBulkDeleteModal = false;
         $this->bulkIds = [];
         $this->dispatch('refresh-table');
     }
