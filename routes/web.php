@@ -34,6 +34,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/categories', function () {
         return view('livewire.index_pages.categories-index');
     })->name('categories');
+    Route::get('/departments', function () {
+        return view('livewire.index_pages.departments-index');
+    })->name('departments');
     Route::get('/items', function () {
         return view('livewire.index_pages.items-index');
     })->name('items');
