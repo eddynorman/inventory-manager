@@ -11,6 +11,7 @@ class CategoryService
     public function rules(?int $categoryId = null): array
     {
         return [
+            'departmentId' => ['required', 'integer', 'exists:departments,id'],
             'name' => ['required', 'string', 'max:255', Rule::unique('categories')->ignore($categoryId)],
             'description' => ['nullable', 'string'],
         ];
@@ -32,6 +33,7 @@ class CategoryService
     public function createOrUpdate(array $data, ?int $id = null): Category
     {
         $data['name'] = trim($data['name']);
+        $data['department_id'] = $data['departmentId'];
         return Category::updateOrCreate(
             ['id' => $id],
             $data

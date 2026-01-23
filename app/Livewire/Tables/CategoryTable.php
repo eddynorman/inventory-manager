@@ -50,6 +50,10 @@ final class CategoryTable extends PowerGridComponent
         return PowerGrid::fields()
             ->add('name')
             ->add('description')
+            ->add('department_id')
+            ->add('department', function($cat){
+                return e(strtoupper($cat->department->name));
+            })
             ->add('created_at_formatted', function ($cat) {
                 return Carbon::parse($cat->created_at)->format('d/m/Y H:i');
             })
@@ -65,6 +69,10 @@ final class CategoryTable extends PowerGridComponent
                 ->searchable(),
 
             Column::make('Description', 'description')
+                ->sortable()
+                ->searchable(),
+
+            Column::make('Department', 'department','department_id')
                 ->sortable()
                 ->searchable(),
 

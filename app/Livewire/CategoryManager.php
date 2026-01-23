@@ -3,8 +3,12 @@
 namespace App\Livewire;
 
 use App\Services\CategoryService;
+use App\Services\DepartmentService;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+
+use function PHPUnit\Framework\isEmpty;
 
 class CategoryManager extends Component
 {
@@ -13,6 +17,9 @@ class CategoryManager extends Component
     public ?string $description = '';
     public ?array $items = null;
     public array $bulkIds = [];
+    public ?array $departments = null;
+    public ?int $departmentId = null;
+    public string $department = '';
 
     public bool $showCategoryModal = false;
     public bool $showDeleteModal = false;
@@ -29,20 +36,28 @@ class CategoryManager extends Component
     ];
 
     protected CategoryService $service;
+    protected DepartmentService $dptService;
 
     public function boot(CategoryService $service): void
     {
+        $this->dptService = new DepartmentService();
         $this->service = $service;
+        $this->departments = $this->dptService->getAll();
     }
 
     public function resetForm(): void
     {
-        $this->reset(['categoryId', 'name', 'description']);
+        $this->reset(['categoryId', 'departmentId','name', 'description']);
         $this->resetValidation();
     }
 
-    public function create(): void
+    public function create()
     {
+        if (count($this->departments) === 0) {
+            // redirect to departments page and open modal there (controller/view should handle openModal param)
+            session()->flash('error', 'You must create a department before adding categories.');
+            return redirect()->route('departments', ['showDepartmentModal' => true]);
+        }
         $this->resetForm();
         $this->showCategoryModal = true;
     }
@@ -52,6 +67,7 @@ class CategoryManager extends Component
         $cat = $this->service->getById($id);
         $this->categoryId = $cat->id;
         $this->name = $cat->name;
+        $this->department = $cat->department()->get('name');
         $this->description = (string)($cat->description ?? '');
         $this->items = $this->service->getItems($id);
 
@@ -62,6 +78,7 @@ class CategoryManager extends Component
     {
         $cat = $this->service->getById($id);
         $this->categoryId = $cat->id;
+        $this->departmentId = $cat->department_id;
         $this->name = $cat->name;
         $this->description = (string)($cat->description ?? '');
         $this->showCategoryModal = true;

@@ -69,6 +69,16 @@
                             @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
                         </div>
                         <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select id="department" class="form-select" wire:model.defer="departmentId">
+                                <option value="">Select...</option>
+                                @foreach($departments as $d)
+                                    <option value="{{ $d['id'] }}">{{ $d['name'] }}</option>
+                                @endforeach
+                            </select>
+                            @error('deparmentId')<div class="text-danger small">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label" for="description">Description</label>
                             <textarea id="description" class="form-control" rows="3" wire:model.defer="description"></textarea>
                             @error('description')<div class="text-danger small">{{ $message }}</div>@enderror
