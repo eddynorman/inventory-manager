@@ -94,7 +94,7 @@ class ItemManager extends Component
         if (count($this->categories) === 0) {
             // redirect to categories page and open modal there (controller/view should handle openModal param)
             session()->flash('error', 'You must create a category before adding items.');
-            return redirect()->route('categories', ['openModal' => 1]);
+            return redirect()->route('categories', ['showCategoryModal' => true]);
         }
         if (count($this->locations) === 0) {
             // redirect to locations page and open modal there (controller/view should handle openModal param)
