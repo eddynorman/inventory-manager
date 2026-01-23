@@ -114,6 +114,7 @@
                     <a href="{{ route('customers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('customers') ? 'active' : '' }}">Customers</a>
                     <a href="#" class="list-group-item list-group-item-action">Stock Adjustments</a>
                     <a href="{{ route('categories') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories') ? 'active' : '' }}">Categories</a>
+                    <a href="{{ route('departments') }}" class="list-group-item list-group-item-action {{ request()->routeIs('departments') ? 'active' : '' }}">Departments</a>
                     <a href="#" class="list-group-item list-group-item-action">Notifications</a>
                     <a href="{{ route('item-kits') }}" class="list-group-item list-group-item-action {{ request()->routeIs('item-kits') ? 'active' : '' }}">Item Kits</a>
                     <a href="#" class="list-group-item list-group-item-action">Settings</a>
