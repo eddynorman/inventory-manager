@@ -99,4 +99,7 @@ class UnitService
     {
         return Unit::with('item')->findOrFail($id);
     }
+    public function getNameById(int $id) :string{
+        return $this->getById($id)->name;
+    }
 }
