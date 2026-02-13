@@ -42,7 +42,7 @@ class Item extends Model
 
     public function units()
     {
-        return $this->belongsToMany(Unit::class, 'item_units')->withTimestamps();
+        return $this->hasMany(Unit::class);
     }
 
     public function requisitionItems()
