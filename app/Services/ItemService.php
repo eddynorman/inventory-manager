@@ -140,4 +140,18 @@ class ItemService
     {
         return Item::with(['units' => fn($q) => $q->where('is_smallest_unit', true)])->findOrFail($id);
     }
+
+    public function getUnits(int $itemId): array
+    {
+        return Unit::where('item_id', $itemId)->get()->toArray();
+    }
+    public function getSmallestUnit(int $itemId): Unit
+    {
+        return Unit::where('item_id', $itemId)->where('is_smallest_unit', true)->first();
+    }
+
+    public function search(string $query): array
+    {
+        return Item::where('name', 'like', '%'.$query.'%')->get()->toArray();
+    }
 }
