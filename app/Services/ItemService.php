@@ -154,4 +154,50 @@ class ItemService
     {
         return Item::where('name', 'like', '%'.$query.'%')->get()->toArray();
     }
+
+    /**
+     * Increase stock for multiple items.
+     *
+     * @param array<int, array{item_id:int, quantity:float|int}> $items
+     * @return void
+     */
+    public function increaseStock(array $items): void
+    {
+        DB::transaction(function () use ($items) {
+            foreach ($items as $data) {
+
+                $item = Item::lockForUpdate()->findOrFail($data['item_id']);
+
+                $item->increment('quantity', $data['quantity']);
+            }
+        });
+    }
+
+    /**
+     * Decrease stock for multiple items.
+     *
+     * Ensures stock never goes below zero.
+     *
+     * @param array<int, array{item_id:int, quantity:float|int}> $items
+     * @throws ValidationException
+     * @return void
+     */
+    public function decreaseStock(array $items): void
+    {
+        DB::transaction(function () use ($items) {
+
+            foreach ($items as $data) {
+
+                $item = Item::lockForUpdate()->findOrFail($data['item_id']);
+
+                if ($data['quantity'] > $item->quantity) {
+                    throw ValidationException::withMessages([
+                        'stock' => "Insufficient stock for {$item->name}."
+                    ]);
+                }
+
+                $item->decrement('quantity', $data['quantity']);
+            }
+        });
+    }
 }
