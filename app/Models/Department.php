@@ -16,7 +16,14 @@ class Department extends Model
     }
 
     public function items(){
-        return $this->hasManyThrough(Item::class, Category::class);
+        return $this->hasManyThrough(
+            Item::class,
+            Category::class,
+            'department_id', // Foreign key on categories table
+            'category_id',   // Foreign key on items table
+            'id',            // Local key on departments table
+            'id'             // Local key on categories table
+        );
     }
 
     public function __toString()
