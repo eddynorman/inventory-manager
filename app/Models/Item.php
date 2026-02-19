@@ -74,4 +74,18 @@ class Item extends Model
     {
         return $this->hasMany(IssueItem::class);
     }
+
+    /**
+     * Scope a query to only include low stock items.
+    */
+    public function scopeLowStock($query)
+    {
+        return $query->whereColumn('current_stock', '<=', 'reorder_level');
+    }
+
+    public function scopeHighStock($query)
+    {
+        return $query->whereColumn('current_stock', '>', 'reorder_level');
+    }
+
 }
