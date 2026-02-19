@@ -22,4 +22,20 @@ class Requisition extends Model
     {
         return $this->hasMany(RequisitionItem::class);
     }
+
+    public function reject(int $userId, string $reason): void
+    {
+        $this->update([
+            'status' => 'rejected',
+            'rejected_by' => $userId,
+            'rejected_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+    }
+
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
 }
