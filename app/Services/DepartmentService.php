@@ -44,12 +44,12 @@ class DepartmentService
 
     public function getLowStockItems(int $departmentId){
         $department = $this->getById($departmentId);
-        return $department->lowStockItems()->get()->toArray();
+        return $department->lowStockItems()->select('items.id','items.name','items.current_stock')->get()->toArray();
     }
 
     public function getHighStockItems(int $departmentId){
         $department = $this->getById($departmentId);
-        return $department->highStockItems()->get()->toArray();
+        return $department->highStockItems()->select('items.id','items.name','items.current_stock')->get()->toArray();
     }
 
     public function searchItems(int $departmentId, string $search): array
