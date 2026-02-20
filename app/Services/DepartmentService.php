@@ -39,6 +39,16 @@ class DepartmentService
         return $department->items()->get()->toArray();
     }
 
+    public function searchItems(int $departmentId, string $search): array
+    {
+        return $this->getById($departmentId)
+            ->items()
+            ->select('id', 'name', 'current_stock')
+            ->where('name', 'like', '%' . $search . '%')
+            ->get()
+            ->toArray();
+    }
+
     public function createOrUpdate(array $data, ?int $id = null): Department
     {
         return Department::updateOrCreate(
