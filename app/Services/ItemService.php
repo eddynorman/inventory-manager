@@ -30,6 +30,7 @@ class ItemService
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
             'supplierId' => ['nullable', 'integer', 'exists:suppliers,id'],
             'locationId' =>['required','integer','exists:locations,id'],
+            'newLocationId' =>['required','integer','exists:locations,id'],
             'initialStock' => ['required', 'integer', 'min:0'],
             'reorderLevel' => ['required', 'integer', 'min:0'],
             'smallestUnitId' => ['nullable','integer','exists:units,id'],
@@ -86,12 +87,11 @@ class ItemService
                 'isActive' => $data['isActive'] ?? true,
             ],$data['smallestUnitId']);
 
-            $itemLocation = new ItemLocation();
-            $itemLocation->item_id = $item->id;
-            $itemLocation->location_id = $data['locationId'];
-            $itemLocation->quantity = $data['initialStock'];
-            $itemLocation->save();
 
+            $item->locations()->updateExistingPivot($data['locationId'],[
+                'quantity' => $data['initialStock'],
+                'location_id' => $data['newLocationId']
+            ]);
             return $item;
         });
     }

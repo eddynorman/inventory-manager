@@ -21,6 +21,7 @@ class ItemManager extends Component
     public ?int $categoryId = null;
     public ?int $supplierId = null;
     public ?int $locationId = null;
+    public ?int $newLocationId = null;
     public int $initialStock = 0;
     public int $reorderLevel = 0;
 
@@ -115,7 +116,8 @@ class ItemManager extends Component
         $this->name = $item->name;
         $this->barcode = $item->barcode;
         $this->categoryId = $item->category_id;
-        $this->locationId = $item->locations->first();
+        $this->locationId = $item->locations->first()->id;
+        $this->newLocationId = $this->locationId;
         $this->supplierId = $item->supplier_id;
         $this->initialStock = $item->initial_stock;
         $this->reorderLevel = $item->reorder_level;
@@ -166,8 +168,8 @@ class ItemManager extends Component
 
         } catch (\Exception $e) {
             // log server error and show friendly message
-            dd($e);
-            dd($data);
+            // dd($e);
+            // dd($data);
             logger()->error('Item save failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'An unexpected error occurred while saving the item.');
             $this->dispatch('flash');

@@ -52,7 +52,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="location" class="form-label">Location</label>
-                        <select id="location" class="form-select" wire:model.defer="locationId">
+                        <select id="location" class="form-select" wire:model.defer="newLocationId">
                             <option value="">Select...</option>
                             @foreach($locations as $l)
                                 <option value="{{ $l['id'] }}">{{ $l['name'] }}</option>

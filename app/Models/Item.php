@@ -33,9 +33,9 @@ class Item extends Model
     public function locations(){
         return $this->belongsToMany(
             Location::class,        // Related model
-            ItemLocation::class, // Pivot table
-            'location_id',      // Foreign key on pivot table referencing Location
-            'item_id'           // Foreign key on pivot table referencing Item
+            'item_locations',
+            'item_id',         // foreign key on pivot for this model
+            'location_id'      // foreign key on pivot for related model
         );
     }
 
