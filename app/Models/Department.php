@@ -26,6 +26,16 @@ class Department extends Model
         );
     }
 
+    public function lowStockItems()
+    {
+        return $this->items()->lowStock();
+    }
+
+    public function highStockItems()
+    {
+        return $this->items()->hightock();
+    }
+
     public function __toString()
     {
         return strtoupper($this->name);
