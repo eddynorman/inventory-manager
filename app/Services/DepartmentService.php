@@ -24,7 +24,10 @@ class DepartmentService
     }
 
     public function getAll():array{
-        return Department::all()->toArray();
+        return Department::select('id', 'name')
+        ->orderBy('name')
+        ->get()
+        ->toArray();
     }
 
     public function getCategories(int $departmentId): array
