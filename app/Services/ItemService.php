@@ -32,6 +32,7 @@ class ItemService
             'locationId' =>['required','integer','exists:locations,id'],
             'initialStock' => ['required', 'integer', 'min:0'],
             'reorderLevel' => ['required', 'integer', 'min:0'],
+            'smallestUnitId' => ['nullable','integer','exists:units,id'],
             'smallestUnit' => ['required', 'string', 'max:255'],
             'buyingPrice' => ['required', 'numeric', 'min:0'],
             'sellingPrice' => ['required', 'numeric', 'gt:buyingPrice'],
@@ -49,7 +50,6 @@ class ItemService
     public function save(?int $itemId, array $data): Item
     {
         return DB::transaction(function () use ($itemId, $data) {
-
             // Ensure category exists (double-check)
             $category = Category::find($data['categoryId'] ?? null);
             if (!$category) {
@@ -63,7 +63,7 @@ class ItemService
                 ['id' => $itemId],
                 [
                     'name' => $data['name'],
-                    'barcode' => $data['barcode'],
+                    'barcode' => $data['barcode']?? null,
                     'category_id' => $data['categoryId'],
                     'supplier_id' => $data['supplierId'] ?? null,
                     'initial_stock' => $data['initialStock'],
@@ -84,7 +84,7 @@ class ItemService
                 'buyingPriceIncludesTax' => $data['buyingPriceIncludesTax'] ?? false,
                 'sellingPriceIncludesTax' => $data['sellingPriceIncludesTax'] ?? false,
                 'isActive' => $data['isActive'] ?? true,
-            ]);
+            ],$data['smallestUnitId']);
 
             $itemLocation = new ItemLocation();
             $itemLocation->item_id = $item->id;

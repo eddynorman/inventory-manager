@@ -49,23 +49,43 @@ class UnitService
      * Create a smallest unit for an item
      * This sets is_smallest_unit = true and smallest_units_number = 1
      */
-    public function createSmallest(array $data): Unit
+    public function createSmallest(array $data, ?int $unitId = null): Unit
     {
         $data['smallestUnitsNumber'] = 1;
 
-        return Unit::create(
-            [
-                'name' => $data['name'],
-                'buying_price' => $data['buyingPrice'],
-                'selling_price' => $data['sellingPrice'] ?? null,
-                'is_smallest_unit' => true,
-                'smallest_units_number' => $data['smallestUnitsNumber'],
-                'buying_price_includes_tax' => $data['buyingPriceIncludesTax'],
-                'selling_price_includes_tax' => $data['sellingPriceIncludesTax'],
-                'is_active' => $data['isActive'],
-                'item_id' => $data['selectedItemId'],
-            ]
-        );
+        if ($unitId !== null) {
+            $saved = Unit::findOrFail($unitId)->update(
+                [
+                    'name' => $data['name'],
+                    'buying_price' => $data['buyingPrice'],
+                    'selling_price' => $data['sellingPrice'] ?? null,
+                    'is_smallest_unit' => true,
+                    'smallest_units_number' => $data['smallestUnitsNumber'],
+                    'buying_price_includes_tax' => $data['buyingPriceIncludesTax'],
+                    'selling_price_includes_tax' => $data['sellingPriceIncludesTax'],
+                    'is_active' => $data['isActive'],
+                    'item_id' => $data['selectedItemId'],
+                ]
+            );
+
+            return Unit::find($unitId);
+        }else{
+                return Unit::create(
+                [
+                    'name' => $data['name'],
+                    'buying_price' => $data['buyingPrice'],
+                    'selling_price' => $data['sellingPrice'] ?? null,
+                    'is_smallest_unit' => true,
+                    'smallest_units_number' => $data['smallestUnitsNumber'],
+                    'buying_price_includes_tax' => $data['buyingPriceIncludesTax'],
+                    'selling_price_includes_tax' => $data['sellingPriceIncludesTax'],
+                    'is_active' => $data['isActive'],
+                    'item_id' => $data['selectedItemId'],
+                ]
+            );
+        }
+
+
     }
 
     /**

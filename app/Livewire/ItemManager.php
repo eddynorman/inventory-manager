@@ -17,7 +17,7 @@ class ItemManager extends Component
 
     public ?int $itemId = null;
     public string $name = '';
-    public string $barcode = '';
+    public ?string $barcode = null;
     public ?int $categoryId = null;
     public ?int $supplierId = null;
     public ?int $locationId = null;
@@ -29,6 +29,7 @@ class ItemManager extends Component
     public ?int $bulkLocationId = null;
 
     public string $smallestUnit = '';
+    public ?int $smallestUnitId = null;
     public ?float $buyingPrice = null;
     public ?float $sellingPrice = null;
     public bool $buyingPriceIncludesTax = false;
@@ -121,6 +122,7 @@ class ItemManager extends Component
 
         if ($item->units->isNotEmpty()) {
             $unit = $item->units->first();
+            $this->smallestUnitId = $unit->id;
             $this->smallestUnit = $unit->name;
             $this->buyingPrice = $unit->buying_price;
             $this->sellingPrice = $unit->selling_price;
@@ -137,6 +139,9 @@ class ItemManager extends Component
 
     public function save(): void
     {
+        if($this->barcode == ""){
+            $this->barcode = null;
+        }
         try {
             $data = $this->validate($this->service->rules($this->itemId), [
                 'sellingPrice.gt' => 'Selling price must be greater than buying price.'
@@ -161,8 +166,8 @@ class ItemManager extends Component
 
         } catch (\Exception $e) {
             // log server error and show friendly message
-            //dd($e);
-            //dd($data);
+            dd($e);
+            dd($data);
             logger()->error('Item save failed: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'An unexpected error occurred while saving the item.');
             $this->dispatch('flash');
