@@ -37,6 +37,10 @@ class Requisition extends Model
         'fund_amount'    => 'decimal:2',
     ];
 
+    public function department(){
+        return $this->belongsTo(Department::class,'department_id');
+    }
+
     public function requestedBy()
     {
         return $this->belongsTo(User::class, 'requested_by_id');
