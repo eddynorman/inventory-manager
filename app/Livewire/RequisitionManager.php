@@ -42,6 +42,12 @@ class RequisitionManager extends Component
     protected RequisitionService $requisitionService;
     protected ItemService $itemService;
 
+    protected $listeners = [
+        'edit'=> 'edit',
+        'view' => 'view',
+        'delete' => 'delete'
+    ];
+
     public function boot(DepartmentService $departmentService, RequisitionService $requisitionService, ItemService $itemService){
         $this->departmentService = $departmentService;
         $this->requisitionService = $requisitionService;
@@ -195,16 +201,40 @@ class RequisitionManager extends Component
 
     public function edit(int $id): void
     {
-        $r = Requisition::findOrFail($id);
+        $r = $this->requisitionService->getById($id);
         $this->reqId = $r->id;
+        $this->department_id = $r->department_id;
         $this->cost = (string)$r->cost;
         $this->status = $r->status;
         $this->description = (string)($r->description ?? '');
         $this->date_requested = $r->date_requested;
         $this->date_approved = $r->date_approved;
         $this->requested_by_id = $r->requested_by_id;
-        $this->approved_by_id = $r->approved_by_id;
-        $this->dispatch('show-requisition-modal');
+
+        $reqItems = $r->items;
+        foreach($reqItems as $reqItem){
+            $item = $this->itemService->getById($reqItem->item_id);
+            $units = $item->units->toArray();
+            foreach($units as $index2 => $unit){
+                if($unit['id'] == $reqItem->unit_id){
+                    $units[$index2]['buying_price'] = $reqItem->unit_price;
+                    break;
+                }
+            }
+            $this->items[] = [
+            'item_id' => $reqItem->item_id,
+            'name' => $item->name,
+            'units' => $units,
+            'quantity' => $reqItem->quantity,
+            'current_stock' => $reqItem->current_stock,
+            'selected_unit_id' => $reqItem->unit_id,
+            'unit_price' => $reqItem->unit_price,
+            'total' => $reqItem->total,
+            ];
+        }
+        $this->showCreateEditPage = true;
+        $this->showListTable = false;
+
     }
 
     public function save(): void
