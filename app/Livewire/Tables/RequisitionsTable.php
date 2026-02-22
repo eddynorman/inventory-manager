@@ -18,6 +18,10 @@ final class RequisitionsTable extends PowerGridComponent
     public string $sortField = 'date_requested';
     public string $sortDirection = 'desc';
 
+    protected $listeners = [
+        'refresh-requisitions-table' => '$refresh',
+    ];
+
     public function setUp(): array
     {
         $this->showCheckBox();
