@@ -202,38 +202,44 @@ class RequisitionManager extends Component
     public function edit(int $id): void
     {
         $r = $this->requisitionService->getById($id);
-        $this->reqId = $r->id;
-        $this->department_id = $r->department_id;
-        $this->cost = (string)$r->cost;
-        $this->status = $r->status;
-        $this->description = (string)($r->description ?? '');
-        $this->date_requested = $r->date_requested;
-        $this->date_approved = $r->date_approved;
-        $this->requested_by_id = $r->requested_by_id;
+        if($r->status != 'funded')
+        {
+            $this->reqId = $r->id;
+            $this->department_id = $r->department_id;
+            $this->cost = (string)$r->cost;
+            $this->status = $r->status;
+            $this->description = (string)($r->description ?? '');
+            $this->date_requested = $r->date_requested;
+            $this->date_approved = $r->date_approved;
+            $this->requested_by_id = $r->requested_by_id;
 
-        $reqItems = $r->items;
-        foreach($reqItems as $reqItem){
-            $item = $this->itemService->getById($reqItem->item_id);
-            $units = $item->units->toArray();
-            foreach($units as $index2 => $unit){
-                if($unit['id'] == $reqItem->unit_id){
-                    $units[$index2]['buying_price'] = $reqItem->unit_price;
-                    break;
+            $reqItems = $r->items;
+            foreach($reqItems as $reqItem){
+                $item = $this->itemService->getById($reqItem->item_id);
+                $units = $item->units->toArray();
+                foreach($units as $index2 => $unit){
+                    if($unit['id'] == $reqItem->unit_id){
+                        $units[$index2]['buying_price'] = $reqItem->unit_price;
+                        break;
+                    }
                 }
+                $this->items[] = [
+                'item_id' => $reqItem->item_id,
+                'name' => $item->name,
+                'units' => $units,
+                'quantity' => $reqItem->quantity,
+                'current_stock' => $reqItem->current_stock,
+                'selected_unit_id' => $reqItem->unit_id,
+                'unit_price' => $reqItem->unit_price,
+                'total' => $reqItem->total,
+                ];
             }
-            $this->items[] = [
-            'item_id' => $reqItem->item_id,
-            'name' => $item->name,
-            'units' => $units,
-            'quantity' => $reqItem->quantity,
-            'current_stock' => $reqItem->current_stock,
-            'selected_unit_id' => $reqItem->unit_id,
-            'unit_price' => $reqItem->unit_price,
-            'total' => $reqItem->total,
-            ];
+            $this->showCreateEditPage = true;
+            $this->showListTable = false;
+        }else {
+            session()->flash("error","You can not edit a funded requisition!");
+            $this->dispatch('flash');
         }
-        $this->showCreateEditPage = true;
-        $this->showListTable = false;
 
     }
 
