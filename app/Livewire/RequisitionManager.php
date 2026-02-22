@@ -213,6 +213,7 @@ class RequisitionManager extends Component
         try {
             $this->requisitionService->save($this->reqId, $data);
             $this->showCreateEditPage = false;
+            $this->updatedShowCreateEditPage();
             $this->resetForm();
             session()->flash('success', 'Requisition saved.');
             $this->dispatch('flash');
