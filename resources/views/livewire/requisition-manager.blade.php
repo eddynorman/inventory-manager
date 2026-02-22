@@ -159,7 +159,7 @@
                     <h5 class="mb-0">Confirm Delete</h5>
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('showDeleteModal', false)"></button>
                 </div>
-                <div class="card-body">Are you sure you want to delete this kit?</div>
+                <div class="card-body">Are you sure you want to delete requisition {{ str_pad($reqId, 5, "0", STR_PAD_LEFT) }}?</div>
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showDeleteModal', false)">Cancel</button>
                     <button type="button" class="btn btn-danger" wire:click="delete">Delete</button>
