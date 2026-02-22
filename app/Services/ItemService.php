@@ -138,7 +138,7 @@ class ItemService
 
     public function getById(int $id): Item
     {
-        return Item::with(['units' => fn($q) => $q->where('is_smallest_unit', true)])->findOrFail($id);
+        return Item::with('units')->findOrFail($id);
     }
 
     public function getUnits(int $itemId): array
