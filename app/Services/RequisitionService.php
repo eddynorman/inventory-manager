@@ -26,7 +26,9 @@ class RequisitionService
     public function rules(?int $requisitionId = null): array
     {
         return [
-            'description'        => ['required', 'string'],
+            'description'        => ['nullable', 'string'],
+            'cost'               => ['required','numeric'],
+            'department_id'      => ['required','exists:departments,id'],
             'requested_by_id'    => ['required', 'exists:users,id'],
             'status'             => ['nullable', Rule::in([
                 'pending', 'reviewed', 'approved', 'funded', 'rejected'
@@ -39,6 +41,7 @@ class RequisitionService
             'items.*.current_stock'     => ['required', 'numeric'],
             'items.*.unit_price'          => ['required', 'numeric', 'min:1'],
             'items.*.selected_unit_id'  => ['required', 'exists:units,id'],
+            'items.*.total'             => ['required', 'numeric'],
         ];
     }
 
@@ -50,16 +53,17 @@ class RequisitionService
 
     public function save(?int $requisitionId, array $data): void
     {
+
         foreach ($data['items'] as $index => $item) {
             $data['items'][$index]['unit_id'] = $item['selected_unit_id'];
             unset($data['items'][$index]['selected_unit_id']);
         }
-
         DB::transaction(function () use ($requisitionId, $data) {
 
             $requisitionData = collect($data)
                 ->except('items')
                 ->toArray();
+
 
             if (!$requisitionId) {
                 $requisitionData['status'] = 'pending';
@@ -89,9 +93,9 @@ class RequisitionService
                         'item_id'        => $item['item_id'],
                         'current_stock'  => $item['current_stock'],
                         'quantity'       => $item['quantity'],
-                        'unit_id'        => $item['selected_unit_id'],
+                        'unit_id'        => $item['unit_id'],
                         'unit_price'     => $item['unit_price'],
-                        'total'          => $item['quantity'] * $item['unit_price']
+                        'total'          => $item['total']
                     ]
                 );
             }
