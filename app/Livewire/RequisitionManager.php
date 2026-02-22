@@ -45,7 +45,7 @@ class RequisitionManager extends Component
     protected $listeners = [
         'edit'=> 'edit',
         'view' => 'view',
-        'delete' => 'delete'
+        'delete' => 'confirmDelete'
     ];
 
     public function boot(DepartmentService $departmentService, RequisitionService $requisitionService, ItemService $itemService){
@@ -60,6 +60,11 @@ class RequisitionManager extends Component
         $this->reset(['reqId','cost','status','description','date_requested','date_approved','requested_by_id','reviewed_by','approved_by_id','funded_by','reviewed_on','funded_on','rejected_at','search','items','department_id']);
         $this->status = 'pending';
         $this->resetValidation();
+    }
+
+    public function refreshTable(): void
+    {
+        $this->dispatch('refresh-requisitions-table');
     }
 
     public function updatedShowCreateEditPage(){
@@ -264,17 +269,19 @@ class RequisitionManager extends Component
     public function confirmDelete(int $id): void
     {
         $this->reqId = $id;
-        $this->dispatch('show-delete-modal');
+        $this->showDeleteModal = true;
     }
 
     public function delete(): void
     {
         if ($this->reqId) {
-            Requisition::where('id', $this->reqId)->delete();
+            $this->requisitionService->delete($this->reqId);
         }
-        $this->dispatch('hide-delete-modal');
+        $this->showDeleteModal = false;
         $this->resetForm();
+        $this->refreshTable();
         session()->flash('success', 'Requisition deleted.');
+        $this->dispatch('flash');
     }
 
      protected function messages(): array
