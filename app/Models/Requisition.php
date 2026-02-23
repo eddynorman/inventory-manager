@@ -24,6 +24,7 @@ class Requisition extends Model
         'funded_on',
 
         'fund_amount',
+        'funded_to',
         'rejected_at',
         'rejection_reason',
     ];
@@ -46,9 +47,23 @@ class Requisition extends Model
         return $this->belongsTo(User::class, 'requested_by_id');
     }
 
+    public function reviewedBy()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function fundedBy()
+    {
+        return $this->belongsTo(User::class, 'funded_by');
+    }
+
+    public function fundedTo(){
+        return $this->belongsTo(User::class,'funded_to');
     }
 
     public function rejectedBy()
@@ -79,13 +94,14 @@ class Requisition extends Model
         ]);
     }
 
-    public function fund(int $userId, float $fundAmount): void
+    public function fund(int $userId, float $fundAmount,int $fundedTo): void
     {
         $this->update([
             'status'      => 'funded',
             'funded_by'   => $userId,
             'funded_on'   => now(),
             'fund_amount' => $fundAmount,
+            'funded_to'   => $fundedTo,
         ]);
     }
 

@@ -140,9 +140,9 @@ class RequisitionService
         });
     }
 
-    public function fund(int $requisitionId, int $userId, float $fundAmount): void
+    public function fund(int $requisitionId, int $userId, float $fundAmount, int $fundedTo): void
     {
-        DB::transaction(function () use ($requisitionId, $userId, $fundAmount) {
+        DB::transaction(function () use ($requisitionId, $userId, $fundAmount,$fundedTo) {
 
             $requisition = Requisition::with('items')->findOrFail($requisitionId);
 
@@ -161,8 +161,8 @@ class RequisitionService
             // })->toArray();
 
             // $this->itemService->decreaseStock($stockPayload);
-
-            $requisition->fund($userId, $fundAmount);
+            
+            $requisition->fund($userId, $fundAmount,$fundedTo);
         });
     }
 

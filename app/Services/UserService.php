@@ -47,4 +47,9 @@ class UserService
     {
         User::whereIn('id', $ids)->update(['role' => $role]);
     }
+
+    public function getAll():array
+    {
+        return User::all()->toArray();
+    }
 }

@@ -62,8 +62,9 @@ final class RequisitionsTable extends PowerGridComponent
             ->add('status', fn (Requisition $model) =>
                 $this->statusWithNextStep($model->status)
             )
-            ->add('fund_amount', fn (Requisition $model) =>
-                number_format($model->fund_amount, 2)
+            ->add('fund_amount')
+            ->add('fund_amount_formatted', fn (Requisition $model) =>
+                number_format((float)$model->fund_amount, 2)
             )
 
             ->add('requested_by', fn (Requisition $model) => $model->requestedBy?->name)
@@ -93,7 +94,7 @@ final class RequisitionsTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Fund Amount', 'fund_amount')
+            Column::make('Fund Amount', 'fund_amount_formatted','fund_amount')
                 ->sortable()
                 ->searchable(),
 
