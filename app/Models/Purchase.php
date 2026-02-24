@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Purchase extends Model
 {
-    protected $fillable = ['purchase_date', 'requisition_id', 'purchased_by_id', 'supplier_id', 'total_amount', 'payment_status'];
+    protected $fillable = ['requisition_id', 'purchased_by_id', 'total_amount','is_received'];
 
     public function requisition()
     {

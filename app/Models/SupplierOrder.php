@@ -13,7 +13,8 @@ class SupplierOrder extends Model
         'amount_paid',
         'amount_pending',
         'payment_status',
-        'created_by'
+        'created_by',
+        'is_received'
     ];
 
     public function requisition(){
