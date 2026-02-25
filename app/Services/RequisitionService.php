@@ -161,7 +161,7 @@ class RequisitionService
             // })->toArray();
 
             // $this->itemService->decreaseStock($stockPayload);
-            
+
             $requisition->fund($userId, $fundAmount,$fundedTo);
         });
     }
@@ -191,6 +191,17 @@ class RequisitionService
     public function getById(int $id): Requisition
     {
         return Requisition::with('items')->findOrFail($id);
+    }
+
+    public function getUnpurchased(){
+        return Requisition::with('items')->select(['requisitions.id','requisitions.department_id','requisitions.total'])->where('requisitions.is_purchased','=',true)->get();
+    }
+
+    public function markAsPurchased(int $id){
+        $req = $this->getById($id);
+        $req->update([
+            'is_purchased' => true,
+        ]);
     }
 
     public function delete(int $id): void
