@@ -57,7 +57,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/requisitions', function(){
         return view('livewire.index_pages.requisitions-index');
     })->name('requisitions');
-    Route::get('/purchases', PurchaseManager::class)->name('purchases');
+    Route::get('/purchases', function(){
+        return view('livewire.index_pages.purchases-index');
+    })->name('purchases');
     Route::get('/receivings', ReceivingManager::class)->name('receivings');
 });
 
