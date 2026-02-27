@@ -114,4 +114,14 @@ class Requisition extends Model
             'rejection_reason' => $reason,
         ]);
     }
+
+    public function scopeFunded($query)
+    {
+        return $query->where('status', 'funded');
+    }
+
+    public function scopeUnpurchased($query)
+    {
+        return $query->where('is_purchased', false);
+    }
 }
