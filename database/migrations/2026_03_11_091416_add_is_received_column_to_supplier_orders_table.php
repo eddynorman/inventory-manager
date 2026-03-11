@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('supplier_orders', function (Blueprint $table) {
+            $table->dropColumn('is_received');
             $table->boolean('is_received')->default(false);
         });
     }
