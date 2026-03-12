@@ -194,7 +194,11 @@ class RequisitionService
     }
 
     public function getUnpurchased(){
-        return Requisition::with('items')->select(['requisitions.id','requisitions.department_id','requisitions.total'])->where('requisitions.is_purchased','=',true)->get();
+        return Requisition::with('items')
+            ->select(['id','department_id','cost'])
+            ->funded()
+            ->unpurchased()
+            ->get();
     }
 
     public function markAsPurchased(int $id){
