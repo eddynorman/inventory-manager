@@ -36,13 +36,15 @@ class Item extends Model
             'item_locations',
             'item_id',         // foreign key on pivot for this model
             'location_id'      // foreign key on pivot for related model
-        );
+        )
+        ->withPivot('quantity')
+        ->withTimestamps();
     }
 
 
     public function units()
     {
-        return $this->hasMany(Unit::class);
+        return $this->hasMany(Unit::class,'item_id','id');
     }
 
     public function requisitionItems()
