@@ -29,8 +29,8 @@ class ItemService
             'barcode' => ['nullable', 'string', 'max:100'],
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
             'supplierId' => ['nullable', 'integer', 'exists:suppliers,id'],
-            'locationId' =>['required','integer','exists:locations,id'],
-            'newLocationId' =>['required','integer','exists:locations,id'],
+            'locationId' => ['nullable','integer','exists:locations,id'],
+            'newLocationId' => ['required','integer','exists:locations,id'],
             'initialStock' => ['required', 'integer', 'min:0'],
             'reorderLevel' => ['required', 'integer', 'min:0'],
             'smallestUnitId' => ['nullable','integer','exists:units,id'],
@@ -88,10 +88,22 @@ class ItemService
             ],$data['smallestUnitId']);
 
 
-            $item->locations()->updateExistingPivot($data['locationId'],[
+           if (empty($data['locationId'])) {
+
+            // create new pivot record
+            $item->locations()->attach($data['newLocationId'], [
+                'quantity' => $data['initialStock']
+            ]);
+
+        } else {
+
+            // update existing pivot record
+            $item->locations()->updateExistingPivot($data['locationId'], [
                 'quantity' => $data['initialStock'],
                 'location_id' => $data['newLocationId']
             ]);
+
+        }
             return $item;
         });
     }
