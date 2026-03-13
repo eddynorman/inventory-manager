@@ -27,6 +27,7 @@ class Requisition extends Model
         'funded_to',
         'rejected_at',
         'rejection_reason',
+        'is_purchased'
     ];
 
     protected $casts = [
