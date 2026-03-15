@@ -6,11 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Receiving extends Model
 {
-    protected $fillable = ['purchase_id', 'received_by_id', 'location_id'];
+    protected $fillable = ['purchase_id', 'supplier_order_id', 'received_by_id', 'location_id'];
 
     public function purchase()
     {
         return $this->belongsTo(Purchase::class);
+    }
+
+    public function supplierOrder()
+    {
+        return $this->belongsTo(\App\Models\SupplierOrder::class, 'supplier_order_id');
     }
 
     public function receiver()
