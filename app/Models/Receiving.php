@@ -15,7 +15,7 @@ class Receiving extends Model
 
     public function supplierOrder()
     {
-        return $this->belongsTo(\App\Models\SupplierOrder::class, 'supplier_order_id');
+        return $this->belongsTo(SupplierOrder::class, 'supplier_order_id');
     }
 
     public function receiver()

@@ -4,13 +4,14 @@ namespace App\Livewire\Tables;
 
 use App\Models\Receiving;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\Filter;
+use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
-use PowerComponents\LivewirePowerGrid\Rules\Rule;
-
 final class ReceivingsTable extends PowerGridComponent
 {
     public string $tableName = 'receivings-table-rcv-table';
@@ -74,7 +75,7 @@ final class ReceivingsTable extends PowerGridComponent
         // hide delete for non-admins
         /** @var \PowerComponents\LivewirePowerGrid\Rules\Rule $deleteRule */
         $deleteRule = Rule::button('delete')
-            ->when(fn($row) => !auth()->user()->hasAnyRole(['super','admin']));
+            ->when(fn($row) => !Auth::user()->hasAnyRole(['super','admin']));
         $deleteRule->hide();
 
         return [$deleteRule];
