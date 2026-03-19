@@ -10,16 +10,11 @@ class StockAdjustmentItem extends Model
 
     public function stockAdjustment()
     {
-        return $this->belongsTo(StockAdjustment::class);
+        return $this->belongsTo(StockAdjustment::class,'stock_adjustment_id');
     }
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
-    }
-
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class);
+        return $this->belongsTo(Item::class,'item_id');
     }
 }
