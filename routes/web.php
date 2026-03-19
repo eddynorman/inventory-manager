@@ -63,6 +63,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/receivings', function(){
         return view('livewire.index_pages.receivings-index');
     })->name('receivings');
+    Route::get('/adjustments', function(){
+        return view('livewire.index_pages.stock-adjustment-index');
+    })->name('adjustments');
 });
 
 require __DIR__.'/auth.php';

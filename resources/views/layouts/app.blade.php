@@ -112,7 +112,7 @@
                     <a href="{{ route('units') }}" class="list-group-item list-group-item-action {{ request()->routeIs('units') ? 'active' : '' }}">Units</a>
                     <a href="{{ route('suppliers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('suppliers') ? 'active' : '' }}">Suppliers</a>
                     <a href="{{ route('customers') }}" class="list-group-item list-group-item-action {{ request()->routeIs('customers') ? 'active' : '' }}">Customers</a>
-                    <a href="#" class="list-group-item list-group-item-action">Stock Adjustments</a>
+                    <a href="{{ route('adjustments') }}" class="list-group-item list-group-item-action">Stock Adjustments</a>
                     <a href="{{ route('categories') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories') ? 'active' : '' }}">Categories</a>
                     <a href="{{ route('departments') }}" class="list-group-item list-group-item-action {{ request()->routeIs('departments') ? 'active' : '' }}">Departments</a>
                     <a href="#" class="list-group-item list-group-item-action">Notifications</a>
