@@ -1,9 +1,6 @@
 <div>
     @include('layouts.flash')
     @if($showIndexPage)
-        <div class="d-flex justify-content-end align-items-center mb-3">
-
-        </div>
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
