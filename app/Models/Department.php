@@ -31,6 +31,10 @@ class Department extends Model
         return $this->items()->lowStock();
     }
 
+    public function requisitions(){
+        return $this->hasMany(Requisition::class,'department_id','id');
+    }
+
     public function highStockItems()
     {
         return $this->items()->hightock();
