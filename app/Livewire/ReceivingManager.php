@@ -226,11 +226,7 @@ class ReceivingManager extends Component
 
     public function save(): void
     {
-        try {
-            $data = $this->validate($this->receivingService->rules($this->type));
-        } catch (\Throwable $th) {
-            dd($th);
-        }
+        $data = $this->validate($this->receivingService->rules($this->type));
         try {
             $this->receivingService->saveReceiving($data, Auth::id());
             $this->showCreateReceivingPage = false;
