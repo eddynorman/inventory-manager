@@ -60,7 +60,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/purchases', function(){
         return view('livewire.index_pages.purchases-index');
     })->name('purchases');
-    Route::get('/receivings', ReceivingManager::class)->name('receivings');
+    Route::get('/receivings', function(){
+        return view('livewire.index_pages.receivings-index');
+    })->name('receivings');
 });
 
 require __DIR__.'/auth.php';
