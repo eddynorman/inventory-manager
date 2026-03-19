@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockAdjustment extends Model
 {
-    protected $fillable = ['user_id', 'description'];
+    protected $fillable = ['user_id', 'location_id','description'];
 
     public function createdBy()
     {
-        return $this->belongsTo(User::class,'created_by');
+        return $this->belongsTo(User::class,'user_id');
     }
 
     public function location(){

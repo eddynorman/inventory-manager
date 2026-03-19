@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockAdjustmentItem extends Model
 {
-    protected $fillable = ['stock_adjustment_id', 'item_id', 'unit_id', 'quantity'];
+    protected $fillable = ['stock_adjustment_id', 'item_id', 'reason','current_stock','new_stock', 'quantity'];
 
     public function stockAdjustment()
     {
