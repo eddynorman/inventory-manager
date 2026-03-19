@@ -180,7 +180,7 @@ class ItemService
 
                 $item = Item::lockForUpdate()->findOrFail($data['item_id']);
 
-                $item->increment('quantity', $data['quantity']);
+                $item->increment('current_stock', $data['quantity']);
             }
         });
     }
