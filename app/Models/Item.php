@@ -41,6 +41,10 @@ class Item extends Model
         ->withTimestamps();
     }
 
+    public function locationItems(){
+        return $this->hasMany(ItemLocation::class,'item_id','id');
+    }
+
 
     public function units()
     {
