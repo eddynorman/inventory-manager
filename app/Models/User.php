@@ -59,6 +59,12 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
+    public function servedSales()
+    {
+        return $this->belongsToMany(Sale::class, 'sale_served_by')
+            ->withTimestamps();
+    }
+
     public function hasAnyRole(array $roles): bool
     {
         return in_array($this->role, $roles, true);
