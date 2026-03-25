@@ -16,7 +16,7 @@ return new class extends Migration
             $table->renameColumn('user_id','created_by');
             $table->enum('status',['pending','completed','cancelled'])->after('created_by');
             $table->enum('type',['upfront','credit']);
-            $table->enum('payment_status',['unpaid','partial','paid']);
+            $table->enum('payment_status',['unpaid','partial','paid'])->change();
             $table->decimal('total_amount',10,2)->default(0)->change();
             $table->decimal('total_paid',10,2)->default(0)->after('total_amount');
             $table->decimal('balance',10,2)->default(0)->after('total_paid');
