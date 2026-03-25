@@ -81,6 +81,10 @@ class Item extends Model
         return $this->hasMany(IssueItem::class);
     }
 
+    public function batches(){
+        $this->hasMany(StockBatch::class,'item_id');
+    }
+
     /**
      * Scope a query to only include low stock items.
     */
