@@ -35,7 +35,8 @@ class Location extends Model
 
     public function sales()
     {
-        return $this->hasMany(Sale::class);
+        return $this->belongsToMany(Sale::class, 'sale_locations')
+                    ->withTimestamps();
     }
 
     public function transfersFrom()
