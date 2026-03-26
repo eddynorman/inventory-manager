@@ -13,14 +13,25 @@ class Sale extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function user()
+    public function createdBy()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'created_by');
     }
 
-    public function location()
+    public function payments(){
+        return $this->hasMany(SalePayment::class,'sale_id');
+    }
+
+    public function servedBy()
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsToMany(User::class, 'sale_served_by')
+                    ->withTimestamps();
+    }
+
+    public function locations()
+    {
+        return $this->belongsToMany(Location::class, 'sale_locations')
+                    ->withTimestamps();
     }
 
     public function items()
