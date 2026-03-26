@@ -22,6 +22,10 @@ class SaleItem extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function batchUsages(){
+        return $this->hasMany(SaleItemBatch::class,'sale_item_id');
+    }
 }
 
 
