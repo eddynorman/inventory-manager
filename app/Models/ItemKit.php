@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ItemKit extends Model
 {
-    protected $fillable = ['name', 'description', 'selling_price','selling_price_includes_tax'];
+    protected $fillable = ['name', 'description', 'selling_price','selling_price_includes_tax','category_id'];
 
     public function items(){
         return $this->belongsToMany(Item::class, 'item_kit_items')->withPivot('id','quantity', 'unit_id', 'item_id')->withTimestamps();
@@ -15,5 +15,9 @@ class ItemKit extends Model
     public function kitItems()
     {
         return $this->hasMany(ItemKitItem::class,'item_kit_id');
+    }
+
+    public function category(){
+        return $this->belongsTo(Category::class,'category_id');
     }
 }
