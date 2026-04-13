@@ -24,20 +24,20 @@ class StockMovementService
         ]);
     }
 
-    public function saleItemsSync(array $saleItems, int $saleId, int $fromLocation, int $userId){
-        return DB::transaction(function () use ($saleItems,$saleId,$fromLocation, $userId){
+    public function saleItemsSync(array $saleItems, int $saleId, int $userId, StockBatchType $type){
+        return DB::transaction(function () use ($saleItems,$saleId, $userId,$type){
                 foreach($saleItems as $item){
-                $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',StockBatchType::ITEM_SALE->value)->where('item_id',$item['id']);
+                $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',$type->value)->where('item_id',$item['item_id']);
                 if(!$movement->isEmpty() && $movement->quantity != -$item['quantity']){
                     $movement->quantity = -$item['quantity'];
                     $movement->save();
                 }else{
                     StockMovement::create([
                         'item_id'          => $item['item_id'],
-                        'from_location_id' => $fromLocation,
+                        'from_location_id' => $item['location_id'],
                         'quantity'         => -$item['quantity'],
                         'type'             => "Item Sale",
-                        'reference_type'   => StockBatchType::ITEM_SALE->value,
+                        'reference_type'   => $type->value,
                         'reference_id'     => $saleId,
                         'created_by'       => $userId,
                     ]);
@@ -46,31 +46,7 @@ class StockMovementService
         });
     }
 
-    public function kitItemsSync(array $saleKits,int $saleId, int $fromLocation, int $userId){
-        return DB::transaction(function () use ($saleKits, $saleId, $fromLocation, $userId){
-            foreach($saleKits as $kit){
-                $kit = ItemKit::find($kit['kit_id']);
-                $kit_items = $kit->kitItems()->get();
-                foreach($kit_items as $k){
-                    $unit = Unit::find($k->unit_id);
-                    $qty = $k->quantity * $unit->smallest_units_number;
-                    $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',StockBatchType::KIT_SALE->value)->where('item_id',$k->item_id);
-                    if(!$movement->isEmpty() && $movement->quantity != -$qty){
-                        $movement->quantity = -$qty;
-                        $movement->save();
-                    }else{
-                        StockMovement::create([
-                            'item_id'          => $k->item_id,
-                            'from_location_id' => $fromLocation,
-                            'quantity'         => -$qty,
-                            'type'             => "Kit Item Sale",
-                            'reference_type'   => StockBatchType::KIT_SALE->value,
-                            'reference_id'     => $saleId,
-                            'created_by'       => $userId,
-                        ]);
-                    }
-                }
-            }
-        });
+    public function deleteSaleMovement(int $saleId,int $itemId,StockBatchType $type){
+        StockMovement::where('reference_id',$saleId)->where('reference_type',$type->value)->where('item_id',$itemId)->delete();
     }
 }
