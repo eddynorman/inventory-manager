@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SaleItemKit extends Model
 {
-    protected $fillable = ['sale_id','item_kit_id','quantity','cost_at_sale','selling_price'];
+    protected $fillable = ['sale_id','item_kit_id','quantity','cost_at_sale','selling_price','total'];
 
     public function items(){
         return $this->hasMany(SaleItemKitItem::class,'sale_item_kit_id');
