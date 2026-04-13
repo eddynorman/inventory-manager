@@ -16,4 +16,8 @@ class Category extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function itemKits(){
+        return $this->hasMany(ItemKit::class,'category_id');
+    }
 }
