@@ -21,14 +21,14 @@ class StockBatchService
 
     public function getByItem(int $itemId){
         return StockBatch::where('item_id', $itemId)
-            ->where('quantity_remaining', '>', 0)
+            ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at')
             ->get();
     }
 
     public function getByLocations(array $locationIds){
         return StockBatch::whereIn('location_id', $locationIds)
-            ->where('quantity_remaining', '>', 0)
+            ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at')
             ->get();
     }
@@ -36,7 +36,7 @@ class StockBatchService
     public function getByItemAndLocation(int $itemId, array $locationIds){
         return StockBatch::where('item_id', $itemId)
             ->whereIn('location_id', $locationIds)
-            ->where('quantity_remaining', '>', 0)
+            ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at')
             ->get();
     }
@@ -54,11 +54,11 @@ class StockBatchService
             ->get();
     }
 
-    public function createBatch(int $item_id,int $location_id,float $quantity_remaining,float $unit_cost,string $reference_type,int $reference_id){
+    public function createBatch(int $item_id,int $location_id,float $remaining_quantity,float $unit_cost,string $reference_type,int $reference_id){
         $batch = StockBatch::create([
             'item_id' => $item_id,
             'location_id' => $location_id,
-            'quantity_remaining' => $quantity_remaining,
+            'remaining_quantity' => $remaining_quantity,
             'unit_cost' => $unit_cost,
             'reference_type' => $reference_type,
             'reference_id' => $reference_id,
@@ -71,7 +71,7 @@ class StockBatchService
         return DB::transaction(function () use ($itemId,$locationIds,$consumeQty,$type,$type_id){
             $batches = StockBatch::where('item_id', $itemId)
                 ->whereIn('location_id', $locationIds)
-                ->where('quantity_remaining', '>', 0)
+                ->where('remaining_quantity', '>', 0)
                 ->orderBy('created_at')
                 ->lockForUpdate()
                 ->cursor();
@@ -83,14 +83,14 @@ class StockBatchService
 
                 if ($remainingQty <= 0) break;
 
-                $takeQty = min($remainingQty, $batch->quantity_remaining);
+                $takeQty = min($remainingQty, $batch->remaining_quantity);
 
                 $totalCost += $takeQty * $batch->unit_cost;
 
-                $batch->decrement('quantity_remaining', $takeQty);
+                $batch->decrement('remaining_quantity', $takeQty);
 
                 $remainingQty -= $takeQty;
-                $returnData['qtys'][] = ['quantity' => $takeQty,'unit_cost' => $batch->unit_cost, 'batch_id' => $batch->id];
+                $returnData['qtys'][] = ['quantity' => $takeQty,'unit_cost' => $batch->unit_cost, 'batch_id' => $batch->id, 'location_id' => $batch->location_id,'item_id' => $itemId];
                 $saleItemId = null;
                 $saleItemKitItemId = null;
                 if($type == StockBatchType::ITEM_SALE){
@@ -145,7 +145,7 @@ class StockBatchService
                     throw new Exception("Invalid reverse quantity");
                 }
 
-                $batch->quantity_remaining += $consumption['quantity'];
+                $batch->remaining_quantity += $consumption['quantity'];
                 $batch->save();
             }
             // 🔥 Delete usage records AFTER reversing
@@ -171,7 +171,7 @@ class StockBatchService
                     throw new Exception("Invalid reverse quantity");
                 }
 
-                $batch->increment('quantity_remaining', $usage->quantity);
+                $batch->increment('remaining_quantity', $usage->quantity);
             }
 
             // delete after reverse
