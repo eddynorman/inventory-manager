@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    protected $fillable = ['sale_date', 'customer_id', 'user_id', 'location_id', 'total_amount', 'payment_status'];
+    protected $fillable = ['sale_date', 'customer_id', 'user_id', 'location_id', 'created_by','total_amount', 'payment_status'];
 
     public function customer()
     {
@@ -24,7 +24,7 @@ class Sale extends Model
 
     public function servedBy()
     {
-        return $this->belongsToMany(User::class, 'sale_served_by')
+        return $this->belongsToMany(User::class, 'sale_served_bies')
                     ->withTimestamps();
     }
 
@@ -36,7 +36,11 @@ class Sale extends Model
 
     public function items()
     {
-        return $this->hasMany(SaleItem::class);
+        return $this->hasMany(SaleItem::class,'sale_id');
+    }
+
+    public function kits(){
+        return $this->hasMany(SaleItemKit::class,'sale_id');
     }
 }
 
