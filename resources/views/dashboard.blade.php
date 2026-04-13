@@ -55,10 +55,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(\App\Models\Sale::with('location')->orderByDesc('id')->limit(5)->get() as $sale)
+                                @foreach(\App\Models\Sale::with('locations')->orderByDesc('id')->limit(5)->get() as $sale)
                                     <tr>
                                         <td>{{ $sale->sale_date }}</td>
-                                        <td>{{ optional($sale->location)->name ?? '-' }}</td>
+                                        <td>{{ optional($sale->locations->first())->name ?? '-' }}</td>
                                         <td>{{ number_format($sale->total_amount,2) }}</td>
                                     </tr>
                                 @endforeach
