@@ -102,7 +102,7 @@
                 <div class="list-group list-group-flush">
                     <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('items') }}" class="list-group-item list-group-item-action {{ request()->routeIs('items') ? 'active' : '' }}">Items</a>
-                    <a href="#" class="list-group-item list-group-item-action">Sales</a>
+                    <a href="{{ route('sales') }}" class="list-group-item list-group-item-action {{ request()->routeIs('sales') ? 'active' : '' }}">Sales</a>
                     <a href="{{ route('purchases') }}" class="list-group-item list-group-item-action {{ request()->routeIs('purchases') ? 'active' : '' }}">Purchases</a>
                     <a href="{{ route('receivings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('receivings') ? 'active' : '' }}">Receivings</a>
                     <a href="#" class="list-group-item list-group-item-action">Transfers</a>
@@ -117,6 +117,7 @@
                     <a href="{{ route('departments') }}" class="list-group-item list-group-item-action {{ request()->routeIs('departments') ? 'active' : '' }}">Departments</a>
                     <a href="#" class="list-group-item list-group-item-action">Notifications</a>
                     <a href="{{ route('item-kits') }}" class="list-group-item list-group-item-action {{ request()->routeIs('item-kits') ? 'active' : '' }}">Item Kits</a>
+                    <a href="#" class="list-group-item list-group-item-action">Inventory</a>
                     <a href="#" class="list-group-item list-group-item-action">Settings</a>
                     <a href="{{ route('users') }}" class="list-group-item list-group-item-action {{ request()->routeIs('users') ? 'active' : '' }}">User Management</a>
                 </div>
