@@ -162,7 +162,7 @@ class SaleService
     public function syncRemovedItem(int $saleId,array $saleItems){
         $batchService = new StockBatchService();
         $stockMovementService = new StockMovementService();
-        $currentItems = SaleItem::where('sale_id',$saleId);
+        $currentItems = SaleItem::where('sale_id',$saleId)->get();
         foreach($currentItems as $currentItem){
             $found = false;
             foreach($saleItems as $saleItem){
