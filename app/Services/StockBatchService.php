@@ -8,6 +8,8 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 
 use App\Enums\StockBatchType;
+use App\Models\Item;
+use App\Models\ItemLocation;
 
 class StockBatchService
 {
@@ -54,17 +56,41 @@ class StockBatchService
             ->get();
     }
 
-    public function createBatch(int $item_id,int $location_id,float $remaining_quantity,float $unit_cost,string $reference_type,int $reference_id){
-        $batch = StockBatch::create([
-            'item_id' => $item_id,
-            'location_id' => $location_id,
-            'remaining_quantity' => $remaining_quantity,
-            'unit_cost' => $unit_cost,
-            'reference_type' => $reference_type,
-            'reference_id' => $reference_id,
-        ]);
+    // Update Stock Helper Methods
+    public function increaseStock(int $itemId,int $locationId, float $quantity){
+        DB::transaction(function () use ($itemId,$locationId,$quantity){
+            $general_item = Item::find($itemId);
+            $itemLocation = ItemLocation::where('location_id',$locationId)->where('item_id',$itemId)->get()->first();
+            $general_item->increment('current_stock',$quantity);
+            $itemLocation->increment('quantity', $quantity);
+        });
+    }
 
-        return $batch;
+    public function decreaseStock(int $itemId,int $locationId, float $quantity){
+        DB::transaction(function () use ($itemId,$locationId,$quantity){
+            $general_item = Item::find($itemId);
+            $itemLocation = ItemLocation::where('location_id',$locationId)->where('item_id',$itemId)->get()->first();
+            $general_item->decrement('current_stock',$quantity);
+            $itemLocation->decrement('quantity', $quantity);
+        });
+    }
+
+    public function createBatch(int $item_id,int $location_id,float $remaining_quantity,float $unit_cost,string $reference_type,int $reference_id){
+        return DB::transaction(function () use ($item_id,$location_id,$remaining_quantity,$unit_cost,$reference_type,$reference_id){
+            $batch = StockBatch::create([
+                'item_id' => $item_id,
+                'location_id' => $location_id,
+                'remaining_quantity' => $remaining_quantity,
+                'unit_cost' => $unit_cost,
+                'reference_type' => $reference_type,
+                'reference_id' => $reference_id,
+            ]);
+
+            $this->increaseStock($item_id,$location_id,$remaining_quantity);
+
+            return $batch;
+        });
+
     }
 
     public function consumeBatches(int $itemId,array $locationIds,float $consumeQty = 1,StockBatchType $type,int $type_id){
@@ -88,6 +114,9 @@ class StockBatchService
                 $totalCost += $takeQty * $batch->unit_cost;
 
                 $batch->decrement('remaining_quantity', $takeQty);
+
+                //update Stock
+                $this->decreaseStock($itemId,$batch->location_id,$takeQty);
 
                 $remainingQty -= $takeQty;
                 $returnData['qtys'][] = ['quantity' => $takeQty,'unit_cost' => $batch->unit_cost, 'batch_id' => $batch->id, 'location_id' => $batch->location_id,'item_id' => $itemId];
@@ -147,6 +176,8 @@ class StockBatchService
 
                 $batch->remaining_quantity += $consumption['quantity'];
                 $batch->save();
+
+                $this->increaseStock($batch->item_id,$batch->location_id,$consumption['quantity']);
             }
             // 🔥 Delete usage records AFTER reversing
             SaleItemBatch::whereIn('id', collect($batchConsumptions)->pluck('id'))
