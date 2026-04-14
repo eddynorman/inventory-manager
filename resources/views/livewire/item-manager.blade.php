@@ -52,7 +52,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="location" class="form-label">Location</label>
-                        <select id="location" class="form-select" wire:model.defer="newLocationId">
+                        <select id="location" class="form-select" wire:model.defer="newLocationId" {{ $itemId ? 'disabled' : '' }}>
                             <option value="">Select...</option>
                             @foreach($locations as $l)
                                 <option value="{{ $l['id'] }}">{{ $l['name'] }}</option>
@@ -71,7 +71,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="item-initial-stock" class="form-label">Initial Stock</label>
-                        <input id="item-initial-stock" type="number" class="form-control" wire:model.defer="initialStock">
+                        <input id="item-initial-stock" type="number" class="form-control" wire:model.defer="initialStock" {{ $itemId ? 'disabled' : '' }}>
                         @error('initialStock')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-4">
