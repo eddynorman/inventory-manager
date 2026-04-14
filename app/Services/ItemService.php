@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\StockBatchType;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\ItemLocation;
+use App\Models\StockMovement;
 use App\Models\Unit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -13,10 +16,14 @@ use Illuminate\Validation\ValidationException;
 class ItemService
 {
     protected UnitService $unitService;
+    protected StockBatchService $batchService;
+    protected StockMovementService $movementService;
 
-    public function __construct(UnitService $unitService)
+    public function __construct(UnitService $unitService, StockBatchService $batchService, StockMovementService $movementService)
     {
         $this->unitService = $unitService;
+        $this->batchService = $batchService;
+        $this->movementService = $movementService;
     }
 
     /**
@@ -68,8 +75,8 @@ class ItemService
                     'category_id' => $data['categoryId'],
                     'supplier_id' => $data['supplierId'] ?? null,
                     'initial_stock' => $data['initialStock'],
-                    // keep current_stock untouched on update; on create set to initialStock
-                    'current_stock' => $itemId ? Item::find($itemId)->current_stock ?? $data['initialStock'] : $data['initialStock'],
+                    // keep current_stock untouched on update; on create set to 0 as stock will be handled by stock batch
+                    'current_stock' => $itemId ? Item::find($itemId)->current_stock ?? 0 : 0,
                     'reorder_level' => $data['reorderLevel'],
                     'is_sale_item' => $data['isSaleItem'] ?? true,
                     'is_active' => $data['isActive'] ?? true,
@@ -87,23 +94,23 @@ class ItemService
                 'isActive' => $data['isActive'] ?? true,
             ],$data['smallestUnitId']);
 
-
            if (empty($data['locationId'])) {
+                // create new pivot record
+                $item->locations()->attach($data['newLocationId'], [
+                    'quantity' => 0,
+                ]);
+            } else {
+                // update existing pivot record
+                $item->locations()->updateExistingPivot($data['locationId'], [
+                    'quantity' => $data['initialStock'],
+                    'location_id' => $data['newLocationId']
+                ]);
 
-            // create new pivot record
-            $item->locations()->attach($data['newLocationId'], [
-                'quantity' => $data['initialStock']
-            ]);
-
-        } else {
-
-            // update existing pivot record
-            $item->locations()->updateExistingPivot($data['locationId'], [
-                'quantity' => $data['initialStock'],
-                'location_id' => $data['newLocationId']
-            ]);
-
-        }
+            }
+            if($itemId == null){
+                $this->batchService->createBatch($item->id,$data['newLocationId'],$data['initialStock'],$data['buyingPrice'],'new_item',$item->id);
+                $this->movementService->createMovement($item->id,$data['newLocationId'],null,$data['initialStock'],'new_item',StockBatchType::NEW_ITEM,$item->id,Auth::id());
+            }
             return $item;
         });
     }
