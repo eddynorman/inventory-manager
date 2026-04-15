@@ -231,7 +231,7 @@ class PurchaseService
         return DB::transaction(function () use ($purchase_data, $user_id) {
 
             $purchase = null;
-            if($purchase_data['purchase']['id'] != null){
+            if(isset($purchase_data['purchase']['id']) && $purchase_data['purchase']['id'] != null){
                 $purchase = Purchase::find($purchase_data['purchase']['id']);
                 if($purchase->is_received == true){
                     return $purchase;
@@ -248,7 +248,7 @@ class PurchaseService
 
                 $total = 0;
                 //remove items that are no longer in the purchase
-                if($purchase_data['purchase']['id'] != null){
+                if(isset($purchase_data['purchase']['id']) && $purchase_data['purchase']['id'] != null){
                     $keepIds = collect($purchase_data['purchase']['items'])
                         ->pluck('id')
                         ->filter()
@@ -314,7 +314,7 @@ class PurchaseService
         return DB::transaction(function () use ($order_data, $user_id) {
 
             $order = null;
-            if($order_data['order']['id'] != null){
+            if(isset($order_data['order']['id']) && $order_data['order']['id'] != null){
                 $order = SupplierOrder::find($order_data['order']['id']);
                 if($order->is_received == true){
                     return $order;
@@ -333,7 +333,7 @@ class PurchaseService
                 $total = 0;
 
                 //remove items that are no longer in the purchase
-                if($order_data['order']['id'] != null){
+                if(isset($order_data['order']['id']) && $order_data['order']['id'] != null){
                     $keepIds = collect($order_data['order']['items'])
                         ->pluck('id')
                         ->filter()
