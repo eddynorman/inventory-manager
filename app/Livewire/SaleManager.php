@@ -292,6 +292,7 @@ class SaleManager extends Component
             $this->sale['total'] += $item['total'];
         }
         $this->sale['balance'] = $this->sale['total'] - $this->sale['paid'];
+        $this->paymentAmount = $this->sale['balance'];
     }
 
     public function addPayment(){
