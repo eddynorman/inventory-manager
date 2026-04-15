@@ -303,7 +303,7 @@
 
             {{-- HEADER --}}
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">@if (isset($purchase['id']))
+                <h4 class="mb-0">@if (isset($order['id']))
                     Edit
                 @else
                     Create
@@ -317,52 +317,52 @@
             <div class="card-body">
 
                 {{-- REQUISITION AND SUPPLIER SELECT --}}
-                @if (isset($purchase['id']))
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Select Requisition</label>
+                @if (!isset($order['id']))
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Select Requisition</label>
 
-                            <select wire:model.live="selected_requisition_id"
-                                    id="requisition-select"
-                                    class="form-select">
+                                <select wire:model.live="selected_requisition_id"
+                                        id="requisition-select"
+                                        class="form-select">
 
-                                <option value="">--- Please Select A Requisition ---</option>
+                                    <option value="">--- Please Select A Requisition ---</option>
 
-                                @foreach ($requisitions as $req)
-                                    <option value="{{ $req['id'] }}">
-                                        {{ str_pad($req['id'],5,0,STR_PAD_LEFT) }}
-                                        | {{ $req['department_name'] }}
-                                        | {{ $req['requested_by_name'] }}
-                                        | {{ number_format($req['cost'],2) }}
-                                    </option>
-                                @endforeach
+                                    @foreach ($requisitions as $req)
+                                        <option value="{{ $req['id'] }}">
+                                            {{ str_pad($req['id'],5,0,STR_PAD_LEFT) }}
+                                            | {{ $req['department_name'] }}
+                                            | {{ $req['requested_by_name'] }}
+                                            | {{ number_format($req['cost'],2) }}
+                                        </option>
+                                    @endforeach
 
-                            </select>
-                            @error('requisition.requisition_id')
-                                <small class="text-danger">You must select a requisition!</small>
-                            @enderror
+                                </select>
+                                @error('requisition.requisition_id')
+                                    <small class="text-danger">You must select a requisition!</small>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="supplier-list" class="form-label fw-bold">Select Supplier</label>
+                                <select wire:model.live="selected_supplier_id"
+                                        id="supplier-select"
+                                        class="form-select">
+
+                                    <option value="">--- Please Select A Supplier ---</option>
+
+                                    @foreach ($suppliers as $supplier)
+                                        <option value="{{ $supplier['id'] }}">{{ $supplier['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('selected_supplier_id')
+                                    <small class="text-danger">Supplier must be selected</small>
+                                @enderror
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="supplier-list" class="form-label fw-bold">Select Supplier</label>
-                            <select wire:model.live="selected_supplier_id"
-                                    id="supplier-select"
-                                    class="form-select">
-
-                                <option value="">--- Please Select A Supplier ---</option>
-
-                                @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier['id'] }}">{{ $supplier['name'] }}</option>
-                                @endforeach
-                            </select>
-                            @error('selected_supplier_id')
-                                <small class="text-danger">Supplier must be selected</small>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
                 @endif
 
                 {{-- AVAILABLE ITEMS --}}
