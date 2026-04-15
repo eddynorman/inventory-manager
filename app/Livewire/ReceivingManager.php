@@ -123,7 +123,7 @@ class ReceivingManager extends Component
         array_splice($this->source['available'],$index,1);
         $sum = 0;
         foreach( $this->receiving['items'] as $item){
-            $sum += $item['total'];
+            $sum += $item['received_quantity']*$item['unit_price'];
         }
         $this->receiving['grand_total'] = $sum;
     }
