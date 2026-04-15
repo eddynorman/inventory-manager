@@ -105,7 +105,7 @@ class ReceivingService
                     if($loc_i->item_id == $data['item_id']){
                         $unit = Unit::find($data['unit_id']);
                         $rcv_qty = $data['received_quantity']*$unit->smallest_units_number;
-                        $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$data['buyingPrice'],'receiving',$rcvId);
+                        $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$unit->buying_price,'receiving',$rcvId);
                         $this->movementService->createMovement($data['item_id'],$location_id,null,$rcv_qty,'receiving',StockBatchType::RECEIVING,$rcvId,Auth::id());
                         $items[$key]['processed'] = true;
 
@@ -124,7 +124,7 @@ class ReceivingService
                         'location_id' => $location_id,
                         'quantity' => 0,//quantity will be updated by stock batch service
                     ]);
-                    $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$data['buyingPrice'],'receiving',$rcvId);
+                    $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$unit->buying_price,'receiving',$rcvId);
                     $this->movementService->createMovement($data['item_id'],$location_id,null,$rcv_qty,'receiving',StockBatchType::RECEIVING,$rcvId,Auth::id());
                 }
             }
@@ -168,8 +168,8 @@ class ReceivingService
                 }else{
                     $source_item = SupplierOrderItem::find($item['id']);
                 }
-                $source_item->received_quantity = $item['received_quantity'];
-                if($item['quantity'] == $item['received_quantity']){
+                $source_item->received_quantity += $item['received_quantity'];
+                if($source_item->received_quantity == $item['quantity']){
                     $source_item->is_received = true;
                 }
                 $source_item->save();
