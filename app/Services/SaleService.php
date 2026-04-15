@@ -34,6 +34,7 @@ class SaleService
     public function rules(){
         return [
             'locationIds' => ['required','array','min:1'],
+            'payments' => ['nullable','array'],
             'sale' => ['required','array','min:2'],
             'sale.id' => ['nullable','integer','exists:sales,id'],
             'sale.served_by' => ['required','array','min:1'],
@@ -58,7 +59,7 @@ class SaleService
         return DB::transaction(function () use($userId,$locationIds,$servedByIds,$type) {
             $sale = Sale::create([
                 'created_by'   => $userId,
-                'status'       => 'draft',
+                'status'       => 'pending',
                 'sale_type'    => $type,
                 'total_amount' => 0,
                 'total_paid'   => 0,
@@ -80,7 +81,7 @@ class SaleService
 
     public function getSale(int $saleId): Sale
     {
-        return Sale::with(['items', 'payments', 'servedBy'])->findOrFail($saleId);
+        return Sale::with(['items', 'payments', 'servedBy','locations'])->findOrFail($saleId);
     }
 
     public function getUnits(int $itemId){
@@ -331,7 +332,11 @@ class SaleService
             $sale->total_paid += $amount;
             $sale->balance = $sale->total_amount - $sale->total_paid;
 
-            $sale->status = $sale->balance <= 0 ? 'paid' : 'partially_paid';
+            //$sale->status = $sale->balance <= 0 ? 'completed' : 'pending';
+            $sale->payment_status = $sale->balance <= 0 ? 'paid' : 'partial';
+            if($sale->balance <= 0){
+                $this->completeSale($sale->id);
+            }
 
             $sale->save();
         });
@@ -343,7 +348,7 @@ class SaleService
     |--------------------------------------------------------------------------
     */
 
-    public function completeSale(int $saleId, array $locationIds, int $userId): void
+    public function completeSale(int $saleId): void
     {
         DB::transaction(function () use ($saleId) {
 
@@ -539,6 +544,15 @@ class SaleService
             $this->saveItems($items,$saleId,$saleData['locationIds']);
             $this->saveKIts($kits,$saleId,$saleData['locationIds']);
             $this->recalculateTotals($saleId);
+
+            //payments
+            if(count($saleData['payments']) > 0){
+                foreach($saleData['payments'] as $payment){
+                    if(!isset($payment['id'])){
+                        $this->addPayment($saleId,$payment['amount'],$payment['method']['id'],Auth::id());
+                    }
+                }
+            }
             return $saleId;
         });
     }
