@@ -122,15 +122,19 @@ class StockBatchService
                 $returnData['qtys'][] = ['quantity' => $takeQty,'unit_cost' => $batch->unit_cost, 'batch_id' => $batch->id, 'location_id' => $batch->location_id,'item_id' => $itemId];
                 $saleItemId = null;
                 $saleItemKitItemId = null;
+                $adjustmentItemId = null;
                 if($type == StockBatchType::ITEM_SALE){
                     $saleItemId = $type_id;
                 }else if($type == StockBatchType::KIT_SALE){
                     $saleItemKitItemId = $type_id;
+                }else if($type == StockBatchType::ADJUSTMENT_NEGATIVE){
+                    $adjustmentItemId = $type_id;
                 }
                 SaleItemBatch::create([
                     'item_id' => $itemId,
                     'sale_item_id' => $saleItemId,
                     'sale_item_kit_item_id' => $saleItemKitItemId,
+                    'adjustment_item_id' => $adjustmentItemId,
                     'stock_batch_id' => $batch->id,
                     'quantity' => $takeQty,
                     'unit_cost' => $batch->unit_cost,
