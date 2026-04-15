@@ -2,21 +2,27 @@
 
 namespace App\Services;
 
+use App\Enums\StockBatchType;
 use App\Models\ItemLocation;
 use App\Models\Location;
 use App\Models\StockAdjustment;
+use App\Models\Unit;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StockAdjustmentService
 {
     private ItemService $itemService;
+    protected StockBatchService $batchService;
+    protected StockMovementService $movementService;
     /**
      * Create a new class instance.
      */
-    public function __construct(ItemService $itemService)
+    public function __construct(ItemService $itemService, StockBatchService $batchService, StockMovementService $movementService)
     {
         $this->itemService = $itemService;
+        $this->batchService = $batchService;
+        $this->movementService = $movementService;
     }
 
     public function rules(){
@@ -90,13 +96,15 @@ class StockAdjustmentService
                     'reason' => $item['reason'],
                 ]);
 
-                // 3. Update location stock
-                $locationItem->quantity = $adjustmentItem->new_stock;
-                $locationItem->save();
-
-                // 4. Update General stock
-                $item['quantity'] = $adjustmentQty;
-                $this->itemService->increaseStock([$item]);
+                // 3. Update location stock using batch service and stock movement
+                $unit = Unit::where('item_id',$item['item_id'])->where('is_smallest_unit',true)->get()->first();
+                if($adjustmentQty >= 0){
+                    $this->batchService->createBatch($item['item_id'],$data['location_id'],$adjustmentQty,$unit->buying_price,'adjustment',$adjustment->id);
+                    $this->movementService->createMovement($item['item_id'],$data['location_id'],null,$adjustmentQty,'adjustment',StockBatchType::ADJUSTMENT,$adjustment->id,Auth::id());
+                }else{
+                    $this->batchService->consumeBatches($item['item_id'],[$data['location_id']],abs($adjustmentQty),StockBatchType::ADJUSTMENT_NEGATIVE,$adjustmentItem->id);
+                    $this->movementService->createMovement($item['item_id'],$data['location_id'],null,$adjustmentQty,'adjustment',StockBatchType::ADJUSTMENT_NEGATIVE,$adjustment->id,Auth::id());
+                }
             }
         });
     }
