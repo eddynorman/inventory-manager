@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\StockBatchType;
 use App\Models\Item;
 use App\Models\ItemLocation;
 use App\Models\Purchase;
@@ -11,15 +12,20 @@ use App\Models\Receiving;
 use App\Models\ReceivingItem;
 use App\Models\SupplierOrderItem;
 use App\Models\Unit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReceivingService
 {
     private PurchaseService $purchaseService;
+    protected StockBatchService $batchService;
+    protected StockMovementService $movementService;
 
-    public function __construct(PurchaseService $purchaseService)
+    public function __construct(PurchaseService $purchaseService, StockBatchService $batchService, StockMovementService $movementService)
     {
         $this->purchaseService = $purchaseService;
+        $this->batchService = $batchService;
+        $this->movementService = $movementService;
     }
 
     public function rules(string $type):array{
@@ -90,21 +96,19 @@ class ReceivingService
         return $this->purchaseService->getById($id,$type);
     }
 
-    public function increaseStock(array $items, int $location_id): void
+    public function updateStock(array $items, int $location_id,$rcvId): void
     {
-        DB::transaction(function () use ($items,$location_id) {
+        DB::transaction(function () use ($items,$location_id,$rcvId) {
             $location_items = ItemLocation::where('location_id',$location_id)->get();
             foreach ($items as $key => $data) {
                 foreach($location_items as $loc_i){
                     if($loc_i->item_id == $data['item_id']){
                         $unit = Unit::find($data['unit_id']);
-                        $loc_i->increment('quantity',$data['received_quantity']*$unit->smallest_units_number);
-                        $loc_i->save();
+                        $rcv_qty = $data['received_quantity']*$unit->smallest_units_number;
+                        $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$data['buyingPrice'],'receiving',$rcvId);
+                        $this->movementService->createMovement($data['item_id'],$location_id,null,$rcv_qty,'receiving',StockBatchType::RECEIVING,$rcvId,Auth::id());
                         $items[$key]['processed'] = true;
 
-                        //update general table
-                        $item = Item::lockForUpdate()->findOrFail($data['item_id']);
-                        $item->increment('current_stock', $data['received_quantity']*$unit->smallest_units_number);
                         break;
                     }
                 }
@@ -114,13 +118,14 @@ class ReceivingService
             foreach ($items as $key => $data) {
                 if(!isset($data['processed'])){
                     $unit = Unit::find($data['unit_id']);
+                    $rcv_qty = $data['received_quantity']*$unit->smallest_units_number;
                     ItemLocation::create([
                         'item_id' => $data['item_id'],
                         'location_id' => $location_id,
-                        'quantity' => $data['received_quantity']*$unit->smallest_units_number
+                        'quantity' => 0,//quantity will be updated by stock batch service
                     ]);
-                    $item = Item::lockForUpdate()->findOrFail($data['item_id']);
-                    $item->increment('current_stock', $data['received_quantity']);
+                    $this->batchService->createBatch($data['item_id'],$location_id,$rcv_qty,$data['buyingPrice'],'receiving',$rcvId);
+                    $this->movementService->createMovement($data['item_id'],$location_id,null,$rcv_qty,'receiving',StockBatchType::RECEIVING,$rcvId,Auth::id());
                 }
             }
 
@@ -171,14 +176,14 @@ class ReceivingService
 
             }
 
-            $this->increaseStock($data['receiving']['items'],$data['location_id']);
+            $this->updateStock($data['receiving']['items'],$data['location_id'],$receiving->id);
 
             // mark source as received
             $source = null;
             if ($data['type'] == "purchase") {
                 $source = Purchase::find($receiving->purchase_id);
             }else{
-                $source = Purchase::find($receiving->purchase_id);
+                $source = SupplierOrder::find($receiving->supplier_order_id);
             }
             if ($source) {
                 $s_items = $source->items;
