@@ -289,7 +289,7 @@
                                             </td>
 
                                             <td>
-                                                {{ number_format($item['total'],2) }}
+                                                {{ number_format($item['unit_price']*$item['received_quantity'],2) }}
                                             </td>
 
                                             <td class="text-center">
