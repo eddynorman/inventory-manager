@@ -69,6 +69,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/sales', function(){
         return view('livewire.index_pages.sales-index');
     })->name('sales');
+    Route::get('settings', function(){
+        return view('livewire.index_pages.settings-index');
+    })->name('settings');
 });
 
 require __DIR__.'/auth.php';
