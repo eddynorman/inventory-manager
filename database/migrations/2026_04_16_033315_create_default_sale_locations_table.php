@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('default_sale_locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id')->unique()->constrained('locations,id');
+            $table->foreignId('location_id')->unique()->constrained('locations','id');
             $table->timestamps();
         });
     }
