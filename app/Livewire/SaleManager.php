@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Location;
 use App\Models\PaymentMethod;
 use App\Models\User;
+use App\Services\OrganisationService;
 use App\Services\SaleService;
 use Livewire\Component;
 
@@ -18,6 +19,7 @@ class SaleManager extends Component
     public array $locationIds = [];
     public array $locations = [];
     public array $selectedLocations = [];
+    public $selected_id = "";
     public array $paymentMethods = [];
     public array $payments = [];
     public string $search = '';
@@ -37,9 +39,9 @@ class SaleManager extends Component
     public bool $showPendingSales = false;
     public bool $showIndex = true;
     public bool $showConfirmSale = false;
-    public $showLocationDropdown = false;
 
     private SaleService $service;
+    private OrganisationService $organisationService;
 
     public function mount(){
         $this->sale['served_by'] = [];
@@ -49,11 +51,14 @@ class SaleManager extends Component
         $this->users = User::all()->toArray();
         $this->selectedMethodId = $this->paymentMethods[0]['id'] ?? null;
         $this->locations = Location::all()->toArray();
+        $this->organisationService = new OrganisationService();
+        $this->loadDefaultLocations();
     }
 
-    public function boot(SaleService $service){
+    public function boot(SaleService $service, OrganisationService $organisationService){
         $this->paymentMethods = PaymentMethod::all()->toArray();
         $this->service = $service;
+        $this->organisationService = $organisationService;
     }
 
     public function updatedSearch(){
@@ -104,7 +109,7 @@ class SaleManager extends Component
                 $this->locationIds[] = $id;
             }
             $this->selectedLocations = collect($this->locations)->whereIn('id',$this->locationIds)->values()->toArray();
-            $this->showLocationDropdown = false;
+            $this->selected_id = "";
         }
     }
 
@@ -114,6 +119,16 @@ class SaleManager extends Component
             array_filter($this->locationIds, fn($i) => $i != $id)
         );
         $this->selectedLocations = collect($this->locations)->whereIn('id',$this->locationIds)->values()->toArray();
+    }
+
+    public function loadDefaultLocations(){
+        $defaultLocations = $this->organisationService->getDefaultSaleLocations();
+        if(count($defaultLocations) > 0){
+            foreach($defaultLocations as $loc){
+                $this->locationIds[] = $loc->location_id;
+            }
+            $this->selectedLocations = collect($this->locations)->whereIn('id',$this->locationIds)->values()->toArray();
+        }
     }
 
     public function moveDown()

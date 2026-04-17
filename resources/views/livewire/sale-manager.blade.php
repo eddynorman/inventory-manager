@@ -16,9 +16,9 @@
                         <div class="card shadow-sm mb-3">
                             <div class="card-body">
                                 <!-- Locations -->
-                                <div class="row">
+                                <div class="row align-items-center">
                                     <div class="col-md-4">
-                                        <select name="location-select" id="location-select" class="form-select" wire:change="selectLocation($event.target.value)">
+                                        <select name="location-select" id="location-select" class="form-select" wire:model='selected_id' wire:change="selectLocation($event.target.value)">
                                             <option value="">Select Location...</option>
                                             @foreach ($locations as $location)
                                                 <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
