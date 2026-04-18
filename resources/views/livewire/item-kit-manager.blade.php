@@ -16,7 +16,7 @@
     @if($showViewKitModal)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showViewKitModal', false)">
 
-            <div class="card shadow-lg w-100" style="max-width: 700px; height: auto; border-width:0px;" wire:click.stop>
+            <div class="card shadow-lg w-100" style="max-width: 800px; height: auto; border-width:0px;" wire:click.stop>
                 <!-- Header -->
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center py-3">
                     <h5 class="mb-0">Kit Details</h5>
@@ -25,8 +25,9 @@
                 <div class="card-body overflow-auto p-3">
                     <div class="mb-3">
                         <div class="row">
-                            <div class="col-md-5"><p><b>Name:</b> <i>{{ $name }}</i></p></div>
-                            <div class="col-md-4"><p><b>Price:</b> <i>{{ $selling_price }}</i></p></div>
+                            <div class="col-md-3"><p><b>Name:</b> <i>{{ $name }}</i></p></div>
+                            <div class="col-md-3"><p><b>Category:</b> <i>{{ $category->name }}</i></p></div>
+                            <div class="col-md-3"><p><b>Price:</b> <i>{{ $selling_price }}</i></p></div>
                             <div class="col-md-3"><p><b>Tax incl:</b> <i>{{$selling_price_includes_tax?'Yes':"No"}}</i></p></div>
                         </div>
                         <p><b>Items:</b></p>
@@ -143,6 +144,16 @@
                         <label class="form-label">Name</label>
                         <input type="text" class="form-control" wire:model.defer="name">
                         @error('name')<div class="text-danger small">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="kit-category" class="form-label">Category</label>
+                        <select id="kit-category" class="form-select" wire:model.defer="categoryId">
+                            <option value="">Select...</option>
+                            @foreach($categories as $c)
+                                <option value="{{ $c['id'] }}">{{ $c['name'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('categoryId')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Selling Price</label>

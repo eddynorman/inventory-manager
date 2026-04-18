@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-
+use App\Models\Category;
 use App\Models\ItemKit;
 use App\Services\ItemKitService;
 use App\Services\ItemService;
@@ -20,6 +20,9 @@ class ItemKitManager extends Component
     public int $perPage = 10;
 
     public array $items = [];
+    public array $categories = [];
+    public $category;
+    public ?int $categoryId = null;
     public string $searchItem = '';
     public array $searchItems = [];
     public ?int $kitId = null;
@@ -49,9 +52,13 @@ class ItemKitManager extends Component
         $this->resetPage();
     }
 
-    public function updatingSearchItem(): void
+    public function updatedSearchItem(): void
     {
-        $this->searchItems = $this->itemService->search($this->searchItem);
+        if(trim($this->searchItem) != ""){
+            $this->searchItems = $this->itemService->search($this->searchItem);
+        }else{
+            $this->searchItems = [];
+        }
         //dd($this->searchItems);
     }
 
@@ -72,11 +79,12 @@ class ItemKitManager extends Component
         $this->itemService = $itemService;
         $this->itemKitService = $itemKitService;
         $this->unitService = $unitService;
+        $this->categories = Category::orderBy('name')->get()->toArray();
     }
 
     public function resetForm(): void
     {
-        $this->reset(['kitId','name','description','selling_price','selling_price_includes_tax','items','searchItem','searchItems']);
+        $this->reset(['kitId','name','categoryId','description','selling_price','selling_price_includes_tax','items','searchItem','searchItems']);
         $this->resetValidation();
     }
     /**
@@ -89,8 +97,8 @@ class ItemKitManager extends Component
         $units = $this->itemService->getUnits($itemId);
         //if item is already in the kit, update the quantity
         $found = false;
-        foreach($this->items as $index => $item){
-            if($item['item_id'] == $itemId){
+        foreach($this->items as $index => $i){
+            if($i['item_id'] == $itemId){
                 $this->items[$index]['quantity'] += 1;
                 $found = true;
                 break;
@@ -138,6 +146,7 @@ class ItemKitManager extends Component
 
     public function view(int $id): void{
         $k = ItemKit::findOrFail($id);
+        $this->category = Category::findOrFail($k->category_id);
         $this->kitId = $k->id;
         $this->name = $k->name;
         $this->description = (string)($k->description ?? '');
@@ -173,7 +182,13 @@ class ItemKitManager extends Component
         $this->itemKitService->save($this->kitId,$data);
         $this->showKitModal = false;
         $this->resetForm();
+        $this->refreshTable();
         session()->flash('success', 'Item kit saved.');
+        $this->dispatch('flash');
+    }
+
+    public function refreshTable(){
+        $this->dispatch('pg:eventRefresh-item-kit-table');
     }
 
     public function confirmDelete(int $id): void
@@ -189,7 +204,9 @@ class ItemKitManager extends Component
         }
         $this->showDeleteModal = false;
         $this->resetForm();
+        $this->refreshTable();
         session()->flash('success', 'Item kit deleted.');
+        $this->dispatch('flash');
     }
 
     public function confirmBulkDelete(array $ids){

@@ -13,6 +13,7 @@ class ItemKitService
     {
         return [
             'name' => ['required','string','max:255',Rule::unique('item_kits')->ignore($kitId)],
+            'categoryId' => ['required','integer','exists:categories,id'],
             'description' => ['nullable','string'],
             'selling_price' => ['required','numeric','min:0'],
             'selling_price_includes_tax' => ['boolean'],
@@ -31,6 +32,7 @@ class ItemKitService
             unset($data['items'][$index]['selected_unit_id']);
         }
         FacadesDB::transaction(function () use( $data, $kitId){
+            $data['category_id'] = $data['categoryId'];
             $kitData = collect($data)->except('items')->toArray();
             $kit = ItemKit::updateOrCreate(['id' => $kitId], $kitData);
             $keepIds = collect($data['items'])
