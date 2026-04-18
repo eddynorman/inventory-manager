@@ -211,7 +211,7 @@ class SaleManager extends Component
             if ($foundIndex === null) {
                 $item['quantity'] = 1;
                 $item['units'] = [
-                    ['id' => 0, 'name' => 'kit']
+                    ['id' => 0, 'name' => 'kit','selling_price' => $item['selling_price'],'smallest_units_number' => 1]
                 ];
                 $item['selected_unit_id'] = 0;
                 $item['total'] = $item['selling_price'];
@@ -351,10 +351,13 @@ class SaleManager extends Component
     public function saveSale(){
         try {
             $data = $this->validate($this->service->rules());
-            $saleId = $this->service->save($data,$this->saleId,"upfront");
-            dd($saleId);
+            $this->service->save($data,$this->saleId,"upfront");
+            session()->flash('Success',"Sale saved successfully!");
+            $this->dispatch('flash');
         } catch (\Throwable $th) {
-            dd($th);
+            //dd($th);
+            session()->flash('error',$th->getMessage());
+            $this->dispatch('flash');
         }
         $this->showConfirmSale = false;
     }
