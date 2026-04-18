@@ -43,7 +43,7 @@ class SaleService
             'sale.items.*.type' => ['required','string'],
             'sale.items.*.kit_id' => ['nullable','integer','exists:item_kits,id'],
             'sale.items.*.quantity' => ['required','numeric','gt:0'],
-            'sale.items.*.selected_unit_id' => ['required','integer','exists:units,id'],
+            'sale.items.*.selected_unit_id' => ['required','integer'],
         ];
     }
 
@@ -196,8 +196,8 @@ class SaleService
             $stockMovementService = new StockMovementService();
             $movementData = [];
             foreach ($kits as $kitt) {
-                $existing = $sale->kits()->where('item_kit_id', $kit['kit_id'])->first();
-                $kit = ItemKit::find($kit['kit_id']);
+                $existing = $sale->kits()->where('item_kit_id', $kitt['kit_id'])->first();
+                $kit = ItemKit::find($kitt['kit_id']);
                 if ($existing) {
                     if($existing->quantity != $kitt['quantity']){
                         $kit_items = $kit->kitItems()->get();
@@ -214,7 +214,7 @@ class SaleService
                                     $saleItemKitItemId = $ski->id;
                                     $usages = $batchService->getBatchUsageForReverse($ski);
                                     $batchService->reverseConsumption($usages);
-                                    $returned = $batchService->consumeBatches($k->item_id,$locationIds,$qty,StockBatchType::KIT_SALE,$saleItemKitItemId);
+                                    $returned = $batchService->consumeBatches($k->item_id,$locationIds,$qty,StockBatchType::KIT_SALE,$saleItemKitItemId,$kit->name);
                                     foreach($returned['qtys'] as $rq){
                                         $movementData[] = $rq;
                                     }
@@ -253,7 +253,7 @@ class SaleService
                             'unit_price'     => $price,
                             'cost_at_sale'   => 0,
                         ]);
-                        $returned = $batchService->consumeBatches($k->item_id,$locationIds,$qty,StockBatchType::KIT_SALE,$saleItemKitItem->id);
+                        $returned = $batchService->consumeBatches($k->item_id,$locationIds,$qty,StockBatchType::KIT_SALE,$saleItemKitItem->id,$kit->name);
                         foreach($returned['qtys'] as $rq){
                             $movementData[] = $rq;
                         }
@@ -421,7 +421,7 @@ class SaleService
         foreach ($kit->kitItems as $kitItem) {
             $unit = Unit::find($kitItem->unit_id);
 
-            $numberPerKit = $unit->smallest_unit_number * $kitItem->quantity;
+            $numberPerKit = $unit->smallest_units_number * $kitItem->quantity;
 
             $available = ItemLocation::where('item_id', $kitItem->item_id)
                 ->whereIn('location_id', $locationIds)
