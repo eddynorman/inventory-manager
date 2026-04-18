@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\StockBatchType;
 use App\Models\Item;
 use App\Models\ItemLocation;
+use App\Models\Location;
 
 class StockBatchService
 {
@@ -93,8 +94,8 @@ class StockBatchService
 
     }
 
-    public function consumeBatches(int $itemId,array $locationIds,float $consumeQty = 1,StockBatchType $type,int $type_id){
-        return DB::transaction(function () use ($itemId,$locationIds,$consumeQty,$type,$type_id){
+    public function consumeBatches(int $itemId,array $locationIds,float $consumeQty = 1,StockBatchType $type,int $type_id, ?string $contextName = null){
+        return DB::transaction(function () use ($itemId,$locationIds,$consumeQty,$type,$type_id,$contextName){
             $batches = StockBatch::where('item_id', $itemId)
                 ->whereIn('location_id', $locationIds)
                 ->where('remaining_quantity', '>', 0)
@@ -145,7 +146,19 @@ class StockBatchService
             }
 
             if ($remainingQty > 0) {
-                throw new Exception("Insufficient stock");
+                $availableQty = $consumeQty - $remainingQty;
+                $item = Item::find($itemId);
+                $locations = Location::whereIn('id', $locationIds)->pluck('name')->implode(', ');
+
+                $message = "Insufficient stock for {$item->name}.\n"
+                    . "Needed: {$consumeQty}, Available: {$availableQty}\n"
+                    . "at {$locations}.";
+
+                if ($type == StockBatchType::KIT_SALE && $contextName) {
+                    $message .= "\nUsed in kit: {$contextName}.";
+                }
+
+                throw new Exception($message);
             }
             $returnData['total_cost'] = $totalCost;
             return $returnData;
