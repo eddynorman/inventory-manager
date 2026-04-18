@@ -31,6 +31,6 @@
             alerts.forEach(alert => {
                 bootstrap.Alert.getOrCreateInstance(alert).close();
             });
-        }, 3000);
+        }, 5000);
     });
 </script>
