@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\DefaultSaleLocation;
 use App\Models\Organization;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class OrganisationService
 {
@@ -17,38 +19,76 @@ class OrganisationService
 
     public function rules(){
         return [
-            'organisation' => ['required','array','min:6'],
-            'organisation.name' => ['required','string'],
-            'organisation.email' => ['required','email:rfc,dns'],
-            'organisation.phone1' => ['required','string'],
-            'organisation.name2' => ['nullable','string'],
-            'organisation.street' => ['required','string'],
-            'organisation.city' => ['required','string'],
-            'organisation.country' => ['required','string'],
-            'organisation.logo' => ['nullable','string'],
+            'organisation' => ['required', 'array'],
+
+            'organisation.name' => ['required', 'string', 'max:255'],
+
+            'organisation.email' => [
+                'nullable',
+                'email:rfc,dns',
+                'max:255'
+            ],
+
+            'organisation.phone1' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s]+$/'
+            ],
+
+            'organisation.phone2' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^[0-9+\-\s]+$/'
+            ],
+
+            'organisation.street' => ['required', 'string', 'max:255'],
+            'organisation.city' => ['required', 'string', 'max:100'],
+            'organisation.country' => ['required', 'string', 'max:100'],
+
+            'logo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048' // 2MB
+            ],
         ];
     }
 
-    public function getById(int $id){
-        return Organization::findOrFail($id);
+    public function getOrganisation(){
+        return Organization::first();
     }
 
-    public function save(array $data,?int $id = null){
-        $org = Organization::updateOrCreate(
-            ['id' => $id],
-            [
-                'name' => $data['name'],
-                'phone1' => $data['phone1'],
-                'phone2' =>$data['phone2'],
-                'email' =>$data['email'],
-                'street' =>$data['street'],
-                'city' =>$data['city'],
-                'country' =>$data['country'],
-                'logo' =>$data['logo'],
-            ]
-        );
+    public function save(array $data): Organization
+    {
+        return DB::transaction(function () use ($data) {
 
-        return $org;
+            $organisation = Organization::first();
+            // single-record system (settings style)
+
+            // HANDLE LOGO
+            if (isset($data['logo']) && $data['logo']!=null) {
+
+                // delete old logo if exists
+                if ($organisation && $organisation->logo) {
+                    Storage::disk('public')->delete($organisation->logo);
+                }
+
+                $path = $data['logo']->store('organisation', 'public');
+                //dd($path);
+                $data['organisation']['logo'] = $path;
+            }
+
+            // UPDATE OR CREATE
+            dd(optional($organisation)->id);
+            $organisation = Organization::updateOrCreate(
+                ['id' => optional($organisation)->id],
+                $data['organisation']
+            );
+
+            return $organisation;
+        });
     }
 
     public function getDefaultSaleLocations(){
