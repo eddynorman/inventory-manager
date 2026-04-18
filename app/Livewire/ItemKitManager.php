@@ -165,6 +165,7 @@ class ItemKitManager extends Component
         $k = ItemKit::findOrFail($id);
         $this->kitId = $k->id;
         $this->name = $k->name;
+        $this->categoryId = $k->category_id;
         $this->description = (string)($k->description ?? '');
         $this->selling_price = (string)$k->selling_price;
         $this->selling_price_includes_tax = (bool)$k->selling_price_includes_tax;
