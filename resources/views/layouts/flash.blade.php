@@ -11,7 +11,7 @@
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
-            {{ session('error') }}
+            {!! nl2br(e(session('error'))) !!}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
