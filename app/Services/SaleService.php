@@ -331,14 +331,12 @@ class SaleService
 
             $sale->total_paid += $amount;
             $sale->balance = $sale->total_amount - $sale->total_paid;
-
             //$sale->status = $sale->balance <= 0 ? 'completed' : 'pending';
             $sale->payment_status = $sale->balance <= 0 ? 'paid' : 'partial';
+            $sale->save();
             if($sale->balance <= 0){
                 $this->completeSale($sale->id);
             }
-
-            $sale->save();
         });
     }
 
@@ -362,6 +360,41 @@ class SaleService
             $sale->completed_at = now();
             $sale->save();
         });
+    }
+
+    public function getPrintSaleData(int $saleId):array{
+        $saleData = [];
+        $sale = Sale::with(['items.item','kits.kit', 'payments.method', 'servedBy','createdBy'])->findOrFail($saleId);
+        $saleData['created_at'] = $sale->created_at;
+        $saleData['total_amount'] = $sale->total_amount;
+        $saleData['pending'] = $sale->balance;
+        $saleData['id'] = $sale->id;
+
+        foreach($sale->items as $saleItem){
+            $i = [
+                'name' => $saleItem->item->name,
+                'selling_price' => $saleItem->unit_price,
+                'quantity' => $saleItem->quantity,
+            ];
+            $saleData['items'][] = $i;
+        }
+        foreach($sale->kits as $saleKit){
+            $i = [
+                'name' => $saleKit->kit->name,
+                'selling_price' => $saleKit->selling_price,
+                'quantity' => $saleKit->quantity,
+            ];
+            $saleData['items'][] = $i;
+        }
+        $saleData['servedBy'] = $sale->servedBy->pluck('name')->join(', ');
+
+        $saleData['recordedBy'] = $sale->createdBy->name;
+        $saleData['payments'] = [];
+        foreach($sale->payments as $payment){
+            $saleData['payments'][] = ['amount' => $payment->amount, 'method' => $payment->method->toArray()];
+        }
+
+        return $saleData;
     }
 
     /*
