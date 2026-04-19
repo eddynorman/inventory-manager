@@ -20,6 +20,7 @@ class SaleManager extends Component
     public array $locations = [];
     public array $selectedLocations = [];
     public $selected_id = "";
+    public $selected_user_id = "";
     public array $paymentMethods = [];
     public array $payments = [];
     public string $search = '';
@@ -351,15 +352,29 @@ class SaleManager extends Component
     public function saveSale(){
         try {
             $data = $this->validate($this->service->rules());
-            $this->service->save($data,$this->saleId,"upfront");
+            $saleid = $this->service->save($data,$this->saleId,"upfront");
+            $this->sale['served_by'] = [];
+            $this->sale['items'] = [];
+            $this->sale['paid'] = 0;
+            $this->sale['balance'] = 0;
+            $this->servers = [];
+            $this->selected_user_id = "";
+            $this->calculateTotal();
+            $this->reset('payments','paymentAmount');
             session()->flash('Success',"Sale saved successfully!");
             $this->dispatch('flash');
+            $this->dispatch('focus-search');
+            $this->printSale($saleid);
         } catch (\Throwable $th) {
             //dd($th);
             session()->flash('error',$th->getMessage());
             $this->dispatch('flash');
         }
         $this->showConfirmSale = false;
+    }
+
+    public function printSale(int $id){
+        $this->dispatch('print-sale', saleId: $id);
     }
 
     public function render()
