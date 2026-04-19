@@ -27,8 +27,8 @@ class StockMovementService
     public function saleItemsSync(array $saleItems, int $saleId, int $userId, StockBatchType $type){
         return DB::transaction(function () use ($saleItems,$saleId, $userId,$type){
             foreach($saleItems as $item){
-                $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',$type->value)->where('item_id',$item['item_id'])->get();
-                if(!$movement->isEmpty() && $movement->quantity != -$item['quantity']){
+                $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',$type->value)->where('item_id',$item['item_id'])->get()->first();
+                if($movement != null && $movement->quantity != -$item['quantity']){
                     $movement->quantity = -$item['quantity'];
                     $movement->save();
                 }else{
