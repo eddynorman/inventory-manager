@@ -12,6 +12,10 @@ use App\Livewire\ItemKitManager;
 use App\Livewire\RequisitionManager;
 use App\Livewire\PurchaseManager;
 use App\Livewire\ReceivingManager;
+use App\Models\Organization;
+use App\Models\Sale;
+use App\Services\SaleService;
+use App\Services\StockBatchService;
 
 Route::view('/', 'welcome')->name('welcome');
 
@@ -69,6 +73,12 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/sales', function(){
         return view('livewire.index_pages.sales-index');
     })->name('sales');
+    Route::get('/print/sale/{sale}', function ($saleId) {
+        $organisation = Organization::first()->toArray();
+        $saleService = new SaleService(new StockBatchService);
+        $sale = $saleService->getPrintSaleData($saleId);
+        return view('print.sale-receipt2', compact('sale','organisation'));
+    });
     Route::get('settings', function(){
         return view('livewire.index_pages.settings-index');
     })->name('settings');
