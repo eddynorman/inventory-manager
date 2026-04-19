@@ -212,7 +212,7 @@
                         </div>
 
                         <select class="form-select"
-                            wire:change="selectUser($event.target.value)">
+                            wire:change="selectUser($event.target.value)" wire:model='selected_user_id'>
                             <option value="">Select user</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
@@ -377,7 +377,30 @@
         </div>
     @endif
 
+    <script>
+        window.addEventListener('print-sale', event => {
+            let url = `/print/sale/${event.detail.saleId}`;
 
+            let iframe = document.getElementById('print-frame');
+
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'print-frame';
+                iframe.style.position = 'absolute';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                document.body.appendChild(iframe);
+            }
+
+            iframe.src = url;
+
+            iframe.onload = function () {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            };
+        });
+    </script>
     <!-- 🔹 KEYBOARD + AUTO FOCUS -->
     <script>
     document.addEventListener('livewire:initialized', () => {
