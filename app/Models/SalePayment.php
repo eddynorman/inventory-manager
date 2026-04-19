@@ -15,4 +15,8 @@ class SalePayment extends Model
     public function sale(){
         return $this->belongsTo(Sale::class,'sale_id');
     }
+
+    public function method(){
+        return $this->belongsTo(PaymentMethod::class,'payment_method');
+    }
 }
