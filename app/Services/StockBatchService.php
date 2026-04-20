@@ -94,7 +94,7 @@ class StockBatchService
 
     }
 
-    public function consumeBatches(int $itemId,array $locationIds,float $consumeQty = 1,StockBatchType $type,int $type_id, ?string $contextName = null){
+    public function consumeBatches(int $itemId,array $locationIds,float $consumeQty,StockBatchType $type,int $type_id, ?string $contextName = null){
         return DB::transaction(function () use ($itemId,$locationIds,$consumeQty,$type,$type_id,$contextName){
             $batches = StockBatch::where('item_id', $itemId)
                 ->whereIn('location_id', $locationIds)
