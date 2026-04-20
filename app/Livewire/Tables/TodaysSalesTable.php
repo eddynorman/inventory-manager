@@ -108,30 +108,30 @@ final class TodaysSalesTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-        Column::make('Sale #', 'sale_no','id')
-            ->sortable()
-            ->searchable(),
+            Column::make('Sale #', 'sale_no','id')
+                ->sortable()
+                ->searchable(),
 
-        Column::make('Created By', 'created_by_name')
-            ->searchable(),
+            Column::make('Created By', 'created_by_name')
+                ->searchable(),
 
-        Column::make('Created At', 'created_at_formatted', 'created_at')
-            ->sortable(),
+            Column::make('Created At', 'created_at_formatted', 'created_at')
+                ->sortable(),
 
-        Column::make('Served By', 'served_by_names')
-            ->sortable(),
+            Column::make('Served By', 'served_by_names')
+                ->sortable(),
 
-        Column::make('Status', 'status_badge','status')
-            ->sortable(),
+            Column::make('Status', 'status_badge','status')
+                ->sortable(),
 
-        Column::make('Total', 'total_amount_formatted', 'total_amount')
-            ->sortable(),
+            Column::make('Total', 'total_amount_formatted', 'total_amount')
+                ->sortable(),
 
-        Column::make('Balance', 'balance_formatted', 'balance')
-            ->sortable(),
+            Column::make('Balance', 'balance_formatted', 'balance')
+                ->sortable(),
 
-        Column::action('Actions'),
-    ];
+            Column::action('Actions'),
+        ];
     }
 
     public function filters(): array
@@ -147,12 +147,17 @@ final class TodaysSalesTable extends PowerGridComponent
             Button::add('view')
                 ->slot('<i class="fa fa-eye"></i>')
                 ->class('btn btn-sm btn-info')
-                ->dispatch('viewSale', ['id' => $row->id]),
+                ->dispatch('viewSale', ['saleId' => $row->id]),
 
             Button::add('edit')
                 ->slot('<i class="fa fa-pen"></i>')
                 ->class('btn btn-sm btn-primary')
-                ->dispatch('editSale', ['id' => $row->id]),
+                ->dispatch('editSale', ['saleId' => $row->id]),
+
+            Button::add('add-payment')
+                ->slot('<i class="fa fa-money-bill"></i>')
+                ->class('btn btn-sm btn-success')
+                ->dispatch('addPayment', ['saleId' => $row->id]),
 
             Button::add('print')
                 ->slot('<i class="fa fa-print"></i>')
@@ -167,6 +172,9 @@ final class TodaysSalesTable extends PowerGridComponent
             // Hide button edit for non pending sale
             Rule::button('edit')
                 ->when(fn($row) => $row->status !== 'pending')
+                ->hide(),
+            Rule::button('add-payment')
+                ->when(fn($row) => $row->status !== 'pending' && $row->balance <= 0)
                 ->hide(),
         ];
     }
