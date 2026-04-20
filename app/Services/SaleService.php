@@ -81,7 +81,7 @@ class SaleService
 
     public function getSale(int $saleId): Sale
     {
-        return Sale::with(['items', 'payments', 'servedBy','locations'])->findOrFail($saleId);
+        return Sale::with(['items.item','kits.kit', 'payments.method', 'servedBy','createdBy','locations'])->findOrFail($saleId);
     }
 
     public function getUnits(int $itemId){
@@ -438,14 +438,14 @@ class SaleService
         }
     }
 
-    private function getItemStock(int $itemId, array $locationIds): int
+    public function getItemStock(int $itemId, array $locationIds): int
     {
         return ItemLocation::where('item_id', $itemId)
             ->whereIn('location_id', $locationIds)
             ->sum('quantity');
     }
 
-    private function getKitAvailableQty(int $kitId, array $locationIds): int
+    public function getKitAvailableQty(int $kitId, array $locationIds): int
     {
         $kit = ItemKit::with('kitItems')->find($kitId);
 
