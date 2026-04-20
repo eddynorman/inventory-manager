@@ -11,10 +11,14 @@ use PowerComponents\LivewirePowerGrid\Facades\Filter;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
 
 final class PendingSalesTable extends PowerGridComponent
 {
     public string $tableName = 'pending-sales-table-xkotlo-table';
+
+    public string $sortField = 'created_at';
+    public string $sortDirection = 'desc';
 
     public function setUp(): array
     {
@@ -49,18 +53,11 @@ final class PendingSalesTable extends PowerGridComponent
             ->add('payment_status')
             ->add('status')
             ->add('created_at')
+            ->add('created_at_formatted',fn ($sale) => optional($sale->created_at)->format('d/m/Y H:i') )
             ->add('created_by_name', fn($sale) => $sale->createdBy?->name ?? '-')
 
             ->add('served_by_names', function ($sale) {
                 return $sale->servedBy->pluck('name')->implode(', ') ?: '-';
-            })
-
-            ->add('status_badge', function ($sale) {
-                return match ($sale->status) {
-                    'pending' => '<span class="badge bg-warning text-dark">Pending</span>',
-                    'completed' => '<span class="badge bg-success">Completed</span>',
-                    default => '<span class="badge bg-secondary">'.$sale->status.'</span>',
-                };
             })
             ->add('total_amount_formatted', fn($sale) => number_format($sale->total_amount, 2))
             ->add('balance_formatted', fn($sale) => number_format($sale->balance, 2));
@@ -73,13 +70,13 @@ final class PendingSalesTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Created By', 'created_by_name')
+            Column::make('Created By', 'created_by_name','created_by')
                 ->searchable(),
 
-            Column::make('Served By', 'served_by_names')
+            Column::make('Created At', 'created_at_formatted', 'created_at')
                 ->sortable(),
 
-            Column::make('Status', 'status_badge')
+            Column::make('Served By', 'served_by_names')
                 ->sortable(),
 
             Column::make('Total', 'total_amount_formatted', 'total_amount')
@@ -104,12 +101,17 @@ final class PendingSalesTable extends PowerGridComponent
             Button::add('view')
                 ->slot('<i class="fa fa-eye"></i>')
                 ->class('btn btn-sm btn-info')
-                ->dispatch('viewSale', ['id' => $row->id]),
+                ->dispatch('viewSale', ['saleId' => $row->id]),
 
             Button::add('edit')
                 ->slot('<i class="fa fa-pen"></i>')
                 ->class('btn btn-sm btn-primary')
-                ->dispatch('editSale', ['id' => $row->id]),
+                ->dispatch('editSale', ['saleId' => $row->id]),
+
+            Button::add('add-payment')
+                ->slot('<i class="fa fa-money-bill"></i>')
+                ->class('btn btn-sm btn-success')
+                ->dispatch('addPayment', ['saleId' => $row->id]),
 
             Button::add('print')
                 ->slot('<i class="fa fa-print"></i>')
@@ -118,15 +120,18 @@ final class PendingSalesTable extends PowerGridComponent
         ];
     }
 
-    /*
     public function actionRules($row): array
     {
-       return [
-            // Hide button edit for ID 1
+        return [
             Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
+                ->when(fn($row) =>
+                    !($row->status === 'pending' && $row->created_at->isToday())
+                )
+                ->hide(),
+
+            Rule::button('add-payment')
+                ->when(fn($row) => $row->status !== 'pending' && $row->balance <= 0)
                 ->hide(),
         ];
     }
-    */
 }
