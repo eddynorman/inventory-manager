@@ -3,17 +3,24 @@
 <head>
     <title>Sale Receipt</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: monospace;
-            width: 80mm;
-            margin: 0 auto;
-            text-align: center;
+            width: 76mm; /* safer than 80mm */
+            margin: 0;
+            padding: 4px; /* small inner padding */
+            font-size: 14px; /* bigger for thermal */
+            line-height: 1.4;
         }
 
         .logo {
-            max-width: 120px;
-            max-height:100px;
-            margin: 0 auto 5px;
+            max-width: 140px;
+            max-height: 100px;
+            margin: 0 auto 6px;
+            display: block;
         }
 
         .divider {
@@ -23,11 +30,12 @@
 
         table {
             width: 100%;
-            font-size: 12px;
+            border-collapse: collapse;
         }
 
         td {
             padding: 2px 0;
+            vertical-align: top;
         }
 
         .left { text-align: left; }
@@ -35,12 +43,23 @@
 
         .bold { font-weight: bold; }
 
-        .small { font-size: 11px; }
+        .small { font-size: 13px; } /* not too small */
 
+        /* 🔥 PRINT FIXES */
         @media print {
+            @page {
+                size: 80mm auto; /* dynamic height */
+                margin: 0;       /* remove printer margins */
+            }
+
             body {
-                margin: auto;
-                align-items:center;
+                margin: 0;
+                padding: 2mm;
+                text-align:center;
+            }
+
+            html, body {
+                height: auto;
             }
         }
     </style>
@@ -52,7 +71,7 @@
     @endif
 
     {{-- ORGANIZATION INFO --}}
-    <div class="bold">{{ $organisation['name'] ?? '' }}</div>
+    <div class="bold small">{{ $organisation['name'] ?? '' }}</div>
     <div class="small">{{ $organisation['street'] ?? '' }},{{ $organisation['city'] ?? '' }},{{ $organisation['country'] ?? '' }}</div>
     <div class="small">{{ $organisation['phone1'] ?? '' }}/{{ $organisation['phone2'] ?? '' }}</div>
     <div class="small">{{ $organisation['email'] ?? '' }}</div>
@@ -73,7 +92,7 @@
     <table>
         @foreach($sale['items'] as $item)
             <tr>
-                <td colspan="2" class="left">
+                <td colspan="2" class="left bold">
                     {{ $item['name'] }}
                 </td>
             </tr>
