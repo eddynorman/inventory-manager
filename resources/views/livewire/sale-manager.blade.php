@@ -557,7 +557,7 @@
     @if($showAddPaymentForm)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
             style="background: rgba(0,0,0,0.5); z-index:2100;"
-            wire:click="$set('showConfirmSale', false)">
+            wire:click="$set('showAddPaymentForm', false)">
 
             <div class="card shadow-lg w-100"
                 style="max-width: 500px;"
