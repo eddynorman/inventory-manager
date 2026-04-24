@@ -31,27 +31,96 @@
 
     <style>
         /* PowerGrid Table Custom Styles */
+        /* ===== POS STYLE POWERGRID TABLE ===== */
+
         table.power-grid-table {
-            border: 1px solid #858585 !important;
-            border-collapse: collapse !important;
+            width: 100%;
+            border-collapse: separate !important;
+            border-spacing: 0;
+            font-size: 14px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
         }
-        table.power-grid-table th,
-        table.power-grid-table td {
-            border: 1px solid #858585 !important;
-        }
+
+        /* HEADER */
         table.power-grid-table thead th {
-            background-color: #000 !important;
-            color: #fff !important;
-            text-align: center !important;
+            background: #f4f6f9 !important;
+            color: #6c757d !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #dee2e6 !important;
+            padding: 10px;
+            text-align: left !important;
         }
+
+        /* SORT ICON */
         table.power-grid-table thead th svg {
-            width: 1.3rem !important;
-            height: 1.3rem !important;
-            color: orange !important;
+            width: 15px !important;
+            height: 15px !important;
+            color: #adb5bd !important;
             float: right;
         }
+
+        /* BODY */
         table.power-grid-table tbody td {
-            text-align: center !important;
+            padding: 10px;
+            border-bottom: 1px solid #f1f3f5 !important;
+            vertical-align: middle;
+        }
+
+        /* ROW HOVER */
+        table.power-grid-table tbody tr:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+
+        /* STRIPED EFFECT */
+        table.power-grid-table tbody tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        /* REMOVE HARD BORDERS */
+        table.power-grid-table th,
+        table.power-grid-table td {
+            border: none !important;
+        }
+
+        /* ACTION BUTTONS */
+        table.power-grid-table .btn {
+            padding: 3px 8px;
+            font-size: 12px;
+        }
+
+        /* AMOUNT ALIGNMENT */
+        .amount-positive {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* CHECKBOX ALIGNMENT */
+        table.power-grid-table input[type="checkbox"] {
+            transform: scale(1.1);
+        }
+
+        /* PAGINATION AREA */
+        .pg-footer {
+            border-top: 1px solid #dee2e6;
+            padding-top: 8px;
+        }
+
+        /* SEARCH INPUT */
+        .pg-search input {
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            padding: 5px 10px;
         }
         .custom-modal-width-sm { max-width: 30rem; }
         .custom-modal-width-md { max-width: 40rem; }
@@ -59,6 +128,7 @@
         .custom-modal-width-xl { max-width: 60rem; }
         .custom-modal-width-2xl { max-width: 70rem; }
     </style>
+    <link rel="icon" type="image/x-icon" href="{{ asset('icons/favicon.png') }}">
 </head>
 <body class="font-sans antialiased mx-0">
 <div class="min-vh-100 bg-light d-flex flex-column" style="padding-bottom: 3rem">
@@ -156,6 +226,11 @@
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
 @yield('scripts')
+<script>
+    window.addEventListener('scrollToTop', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+</script>
 
 {{-- <script>
     function initDataTables() {
