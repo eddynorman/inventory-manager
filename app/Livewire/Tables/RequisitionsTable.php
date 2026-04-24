@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Tables;
 
+use App\Models\Department;
 use App\Models\Requisition;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,8 +39,14 @@ final class RequisitionsTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Requisition::query()
-            ->with(['requestedBy', 'department'])
-            ;
+            ->with(['department', 'requestedBy']) // keep relationships
+            ->join('departments', 'requisitions.department_id', '=', 'departments.id')
+            ->leftJoin('users', 'requisitions.requested_by_id', '=', 'users.id')
+            ->select([
+                'requisitions.*',
+                'departments.name as department_name',
+                'users.name as requested_by_name',
+            ]);
     }
 
     public function relationSearch(): array
@@ -82,11 +89,11 @@ final class RequisitionsTable extends PowerGridComponent
             ->sortable()
             ->searchable(),
 
-            Column::make('Department', 'department')
+            Column::make('Department', 'department_name')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Requested By', 'requested_by')
+            Column::make('Requested By', 'requested_by','requested_by_name')
                 ->sortable()
                 ->searchable(),
 
