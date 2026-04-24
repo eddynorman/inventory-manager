@@ -82,6 +82,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('settings', function(){
         return view('livewire.index_pages.settings-index');
     })->name('settings');
+    Route::get('banking', function(){
+        return view('livewire.index_pages.banking-index');
+    })->name('banking');
 });
 
 require __DIR__.'/auth.php';
