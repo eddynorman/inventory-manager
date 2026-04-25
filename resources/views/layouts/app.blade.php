@@ -187,7 +187,7 @@
                     <a href="{{ route('departments') }}" class="list-group-item list-group-item-action {{ request()->routeIs('departments') ? 'active' : '' }}">Departments</a>
                     <a href="#" class="list-group-item list-group-item-action">Notifications</a>
                     <a href="{{ route('item-kits') }}" class="list-group-item list-group-item-action {{ request()->routeIs('item-kits') ? 'active' : '' }}">Item Kits</a>
-                    <a href="#" class="list-group-item list-group-item-action">Inventory</a>
+                    <a href="{{ route('expenses') }}" class="list-group-item list-group-item-action {{ request()->routeIs('expenses') ? 'active' : '' }}">Expenses</a>
                     <a href="{{ route('banking') }}" class="list-group-item list-group-item-action {{ request()->routeIs('banking') ? 'active' : '' }}">Banking</a>
                     <a href="{{ route('settings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('settings') ? 'active' : '' }}">Settings</a>
                     <a href="{{ route('users') }}" class="list-group-item list-group-item-action {{ request()->routeIs('users') ? 'active' : '' }}">User Management</a>
