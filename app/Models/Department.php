@@ -40,6 +40,10 @@ class Department extends Model
         return $this->items()->hightock();
     }
 
+    public function expenses(){
+        return $this->hasMany(Expense::class,'department_id');
+    }
+
     public function __toString()
     {
         return strtoupper($this->name);
