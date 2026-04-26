@@ -79,15 +79,18 @@ Route::middleware(['auth','verified'])->group(function () {
         $sale = $saleService->getPrintSaleData($saleId);
         return view('print.sale-receipt2', compact('sale','organisation'));
     });
-    Route::get('settings', function(){
+    Route::get('/settings', function(){
         return view('livewire.index_pages.settings-index');
     })->name('settings');
-    Route::get('banking', function(){
+    Route::get('/banking', function(){
         return view('livewire.index_pages.banking-index');
     })->name('banking');
-    Route::get('expenses', function(){
+    Route::get('/expenses', function(){
         return view('livewire.index_pages.expense-index');
     })->name('expenses');
+    Route::get('/closing-stock', function(){
+        return view('livewire.index_pages.closing-stock-index');
+    })->name('closing-stock');
 });
 
 require __DIR__.'/auth.php';

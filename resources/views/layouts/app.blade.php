@@ -172,6 +172,7 @@
                 <div class="list-group list-group-flush">
                     <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('items') }}" class="list-group-item list-group-item-action {{ request()->routeIs('items') ? 'active' : '' }}">Items</a>
+                    <a href="{{ route('closing-stock') }}" class="list-group-item list-group-item-action {{ request()->routeIs('closing-stock') ? 'active' : '' }}">Closing Stock</a>
                     <a href="{{ route('sales') }}" class="list-group-item list-group-item-action {{ request()->routeIs('sales') ? 'active' : '' }}">Sales</a>
                     <a href="{{ route('purchases') }}" class="list-group-item list-group-item-action {{ request()->routeIs('purchases') ? 'active' : '' }}">Purchases</a>
                     <a href="{{ route('receivings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('receivings') ? 'active' : '' }}">Receivings</a>
