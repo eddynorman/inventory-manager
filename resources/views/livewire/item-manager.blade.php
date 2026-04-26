@@ -102,10 +102,22 @@
                             <label for="selling-includes-tax" class="form-check-label">Selling Price Includes Tax</label>
                         </div>
                     </div>
-                    <div class="col-md-6 mt-3">
+                    <div class="col-md-4 mt-3">
                         <div class="form-check form-switch">
                             <input id="is-sale-item" class="form-check-input" type="checkbox" wire:model.defer="isSaleItem">
                             <label for="is-sale-item" class="form-check-label">Sale Item</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <div class="form-check form-switch">
+                            <input id="is-stock-item" class="form-check-input" type="checkbox" wire:model.defer="isStockItem">
+                            <label for="is-stock-item" class="form-check-label">Stock Item</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mt-3">
+                        <div class="form-check form-switch">
+                            <input id="is-auto-tracked" class="form-check-input" type="checkbox" wire:model.defer="isAutoTracked">
+                            <label for="is-auto-tracked" class="form-check-label">Auto Track</label>
                         </div>
                     </div>
                     <div class="col-12 mt-2">

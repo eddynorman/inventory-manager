@@ -33,11 +33,13 @@ class ItemManager extends Component
     public ?int $smallestUnitId = null;
     public ?float $buyingPrice = null;
     public ?float $sellingPrice = null;
-    public bool $buyingPriceIncludesTax = false;
-    public bool $sellingPriceIncludesTax = false;
+    public bool $buyingPriceIncludesTax = true;
+    public bool $sellingPriceIncludesTax = true;
 
     public bool $isActive = true;
     public bool $isSaleItem = true;
+    public bool $isAutoTracked = true;
+    public bool $isStockItem = true;
 
     public array $categories = [];
     public array $suppliers = [];

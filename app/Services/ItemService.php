@@ -46,8 +46,10 @@ class ItemService
             'sellingPrice' => ['required', 'numeric', 'gt:buyingPrice'],
             'buyingPriceIncludesTax' => ['boolean'],
             'sellingPriceIncludesTax' => ['boolean'],
-            'isSaleItem' => ['boolean'],
-            'isActive' => ['boolean'],
+            'isSaleItem' => ['required','boolean'],
+            'isStockItem' => ['required','boolean'],
+            'isAutoTracked' => ['required','boolean'],
+            'isActive' => ['required','boolean'],
         ];
     }
 
@@ -79,6 +81,8 @@ class ItemService
                     'current_stock' => $itemId ? Item::find($itemId)->current_stock ?? 0 : 0,
                     'reorder_level' => $data['reorderLevel'],
                     'is_sale_item' => $data['isSaleItem'] ?? true,
+                    'is_sale_item' => $data['isStockItem'] ?? true,
+                    'is_sale_item' => $data['isAutoTracked'] ?? true,
                     'is_active' => $data['isActive'] ?? true,
                 ]
             );
