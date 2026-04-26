@@ -81,8 +81,8 @@ class ItemService
                     'current_stock' => $itemId ? Item::find($itemId)->current_stock ?? 0 : 0,
                     'reorder_level' => $data['reorderLevel'],
                     'is_sale_item' => $data['isSaleItem'] ?? true,
-                    'is_sale_item' => $data['isStockItem'] ?? true,
-                    'is_sale_item' => $data['isAutoTracked'] ?? true,
+                    'is_stock_item' => $data['isStockItem'] ?? true,
+                    'is_auto_tracked' => $data['isAutoTracked'] ?? true,
                     'is_active' => $data['isActive'] ?? true,
                 ]
             );
