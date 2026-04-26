@@ -135,6 +135,8 @@ class ItemManager extends Component
         }
 
         $this->isActive = (bool)$item->is_active;
+        $this->isStockItem = (bool)$item->is_stock_item;
+        $this->isAutoTracked = (bool)$item->is_auto_tracked;
         $this->isSaleItem = (bool)$item->is_sale_item;
 
         $this->showModal = true;
