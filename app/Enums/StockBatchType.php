@@ -11,6 +11,7 @@ enum StockBatchType: string
     case ADJUSTMENT = 'adjustment';
     case ADJUSTMENT_NEGATIVE = 'adjustment_negative';
     case TRANSFER = 'transfer';
+    case CLOSING_STOCK = 'closing_stock';
     // Optional: label for UI
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum StockBatchType: string
             self::ADJUSTMENT => 'Adjustment',
             self::ADJUSTMENT_NEGATIVE => 'Adjustment Negative',
             self::TRANSFER => 'Transfer',
+            self::CLOSING_STOCK => 'Closing Stock'
         };
     }
 }
