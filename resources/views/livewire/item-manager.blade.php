@@ -104,19 +104,19 @@
                     </div>
                     <div class="col-md-4 mt-3">
                         <div class="form-check form-switch">
-                            <input id="is-sale-item" class="form-check-input" type="checkbox" wire:model.defer="isSaleItem">
+                            <input id="is-sale-item" class="form-check-input" type="checkbox" wire:model.live="isSaleItem">
                             <label for="is-sale-item" class="form-check-label">Sale Item</label>
                         </div>
                     </div>
                     <div class="col-md-4 mt-3">
                         <div class="form-check form-switch">
-                            <input id="is-stock-item" class="form-check-input" type="checkbox" wire:model.defer="isStockItem">
+                            <input id="is-stock-item" class="form-check-input" type="checkbox" wire:model.live="isStockItem">
                             <label for="is-stock-item" class="form-check-label">Stock Item</label>
                         </div>
                     </div>
                     <div class="col-md-4 mt-3">
                         <div class="form-check form-switch">
-                            <input id="is-auto-tracked" class="form-check-input" type="checkbox" wire:model.defer="isAutoTracked">
+                            <input id="is-auto-tracked" class="form-check-input" type="checkbox" wire:model.live="isAutoTracked">
                             <label for="is-auto-tracked" class="form-check-label">Auto Track</label>
                         </div>
                     </div>

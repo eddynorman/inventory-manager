@@ -68,6 +68,11 @@ class ItemService
                     'categoryId' => 'Category does not exist. Please create a category first.',
                 ]);
             }
+            //ensure non stock items are not autotracked
+
+            if($data['isStockItem'] == false){
+                $data['isAutoTracked'] = false;
+            }
 
             $item = Item::updateOrCreate(
                 ['id' => $itemId],

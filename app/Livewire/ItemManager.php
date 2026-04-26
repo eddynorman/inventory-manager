@@ -87,10 +87,21 @@ class ItemManager extends Component
             'itemId','name','barcode','categoryId','supplierId','locationId',
             'initialStock','reorderLevel','smallestUnit','buyingPrice','sellingPrice',
             'buyingPriceIncludesTax','sellingPriceIncludesTax',
-            'isActive','isSaleItem',
+            'isActive','isSaleItem','isAutoTracked','isStockItem',
             'bulkCategoryId','bulkSupplierId','bulkLocationId','selectedIds'
         ]);
         $this->resetValidation();
+    }
+
+    public function updatedIsStockItem(){
+        if($this->isStockItem == false){
+            $this->isAutoTracked = false;
+        }
+    }
+    public function updatedIsAutoTracked(){
+        if($this->isStockItem == false){
+            $this->isAutoTracked = false;
+        }
     }
 
     public function create()
