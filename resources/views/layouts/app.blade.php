@@ -177,7 +177,7 @@
                     <a href="{{ route('purchases') }}" class="list-group-item list-group-item-action {{ request()->routeIs('purchases') ? 'active' : '' }}">Purchases</a>
                     <a href="{{ route('receivings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('receivings') ? 'active' : '' }}">Receivings</a>
                     <a href="#" class="list-group-item list-group-item-action">Transfers</a>
-                    <a href="#" class="list-group-item list-group-item-action">Issues</a>
+                    <a href="{{ route('issues') }}" class="list-group-item list-group-item-action {{ request()->routeIs('issues') ? 'active' : '' }}">Issues</a>
                     <a href="{{ route('requisitions') }}" class="list-group-item list-group-item-action {{ request()->routeIs('requisitions') ? 'active' : '' }}">Requisitions</a>
                     <a href="{{ route('locations') }}" class="list-group-item list-group-item-action {{ request()->routeIs('locations') ? 'active' : '' }}">Locations</a>
                     <a href="{{ route('units') }}" class="list-group-item list-group-item-action {{ request()->routeIs('units') ? 'active' : '' }}">Units</a>
