@@ -94,6 +94,9 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/issues', function(){
         return view('livewire.index_pages.issues-index');
     })->name('issues');
+    Route::get('/transfers', function(){
+        return view('livewire.index_pages.transfer-index');
+    })->name('transfers');
 });
 
 require __DIR__.'/auth.php';
