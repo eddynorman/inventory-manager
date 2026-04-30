@@ -15,7 +15,8 @@ use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 final class StockAdjustmentTable extends PowerGridComponent
 {
     public string $tableName = 'stock-adjustment-table-qovu0z-table';
-
+    public string $sortField = 'created_at';
+    public string $sortDirection = 'desc';
     public function setUp(): array
     {
         $this->showCheckBox();
