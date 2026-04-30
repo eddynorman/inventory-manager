@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transfer extends Model
 {
-    protected $fillable = ['transfer_date', 'from_location_id', 'to_location_id', 'user_id', 'description','status'];
+    protected $fillable = ['transfer_date', 'from_location_id', 'to_location_id', 'user_id','issue_id', 'description','status'];
 
     public function user()
     {
