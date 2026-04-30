@@ -6,6 +6,8 @@ use App\Models\Location;
 use App\Models\Unit;
 use App\Services\IssueService;
 use App\Services\ItemService;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class IssueManager extends Component
@@ -13,6 +15,8 @@ class IssueManager extends Component
     public string $search = '';
     public array $searchItems = [];
     public array $locations = [];
+    public ?int $user_id = null;
+    public ?int $current_user_id = null;
     public ?int $issueId = null;
     public ?int $locationId = null;
     public ?int $destinationId = null;
@@ -20,10 +24,12 @@ class IssueManager extends Component
     public array $viewIssue = [];
 
     public string $description = '';
+    public string $rejectionReason ="";
 
     public bool $showIndex = true;
     public bool $showCreatePage = false;
     public bool $showViewIssue = false;
+    public bool $showRejectIssue = false;
 
     private IssueService $service;
     protected ItemService $itemService;
@@ -36,6 +42,7 @@ class IssueManager extends Component
         $this->service = $service;
         $this->itemService = $itemService;
         $this->locations = Location::all()->toArray();
+        $this->current_user_id = Auth::id();
     }
 
     public function updatedSearch(){
@@ -65,6 +72,12 @@ class IssueManager extends Component
     public function updatedShowCreatePage(){
         if($this->showCreatePage == false){
             $this->reset(['issueItems','locationId','destinationId']);
+        }
+    }
+
+    public function updatedShowViewIssue(){
+        if($this->showViewIssue == false){
+            $this->reset(['viewIssue','issueId','user_id']);
         }
     }
 
@@ -136,6 +149,8 @@ class IssueManager extends Component
 
     public function showIssueInfo(int $issueId){
         $issue = $this->service->getById($issueId);
+        $this->issueId = $issueId;
+        $this->user_id = $issue->user_id;
         $this->viewIssue['next'] = match ($issue->status) {
             'pending'   => 'Awaiting Processing',
             'processed'  => 'completed',
@@ -154,14 +169,14 @@ class IssueManager extends Component
         $this->viewIssue['destination'] = $issue->toLocation->name;
         $this->viewIssue['requested_by'] = $issue->user->name;
         $this->viewIssue['requested_at'] = optional($issue->created_at)->format('d/m/Y H:i');
-        if($issue->processedBy){
+        if($issue->processedBy != null){
             $this->viewIssue['processed_by'] = $issue->processedBy->name;
-            $this->viewIssue['processed_at'] = optional($issue->processed_at)->format('d/m/Y H:i');
+            $this->viewIssue['processed_at'] = Carbon::parse($issue->processed_at)->format('d/m/Y H:i');
         }
-
-        if($issue->rejectedBy){
+        //dd($issue->rejected_at);
+        if($issue->rejectedBy != null){
             $this->viewIssue['rejected_by'] = $issue->rejectedBy->name;
-            $this->viewIssue['rejected_at'] = optional($issue->rejected_at)->format('d/m/Y H:i');
+            $this->viewIssue['rejected_at'] = Carbon::parse($issue->rejected_at)->format('d/m/Y H:i');
             $this->viewIssue['rejection_reason'] = $issue->rejection_reason;
         }
         $this->viewIssue['items'] = [];
@@ -174,6 +189,33 @@ class IssueManager extends Component
             $this->viewIssue['items'][] = $temp;
         }
         $this->showViewIssue = true;
+    }
+    public function updatedShowRejectIssue(){
+        if($this->showRejectIssue == true){
+            $this->showViewIssue = false;
+            $this->viewIssue = [];
+        }
+    }
+    public function rejectIssue(){
+        if(trim($this->rejectionReason != "")){
+            $this->resetErrorBag('rejectionReason');
+            if($this->issueId != null && $this->issueId != ""){
+                try {
+                    $this->service->rejectIssue($this->issueId,$this->rejectionReason);
+                    $this->reset(['issueId','showRejectIssue','rejectionReason','locationId','user_id']);
+                    session()->flash('success','Issue Marked As Rejected');
+                    $this->dispatch('flash');
+                } catch (\Throwable $th) {
+                    session()->flash('error',$th->getMessage());
+                    $this->dispatch('flash');
+                }
+
+            }else{
+                //dd($this->issueId);
+            }
+        }else{
+            $this->addError('rejectionReason','Reason is required');
+        }
     }
 
     public function save(){

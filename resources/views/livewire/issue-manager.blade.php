@@ -218,12 +218,41 @@
                                 <small class="text-muted">On {{ $viewIssue['rejected_at'] }}</small>
                             @endif
                         </div>
+                        <div class="col-md-12 text-danger">
+                            @if(isset($viewIssue['rejected_by']))
+                                {{ $viewIssue['rejection_reason'] }}
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showViewIssue', false)">Close</button>
+                    @if (!(isset($viewIssue['processed_by']) || isset($viewIssue['rejected_by'])) && $user_id != $current_user_id )
+                        <button type="button" class="btn btn-danger" wire:click="$set('showRejectIssue', true)">Reject</button>
+                    @endif
+                </div>
             </div>
         </div>
     @endif
 
+    <!-- Rejection Reason Modal -->
+    @if($showRejectIssue)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.5); z-index:1050;" wire:click="$set('showRejectIssue', false)">
+
+            <div class="card shadow-lg w-100" style="max-width: 600px; height: auto; padding:0px; border-width:0px" wire:click.stop>
+                <!-- Header -->
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0">Enter Rejection reason</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="$set('showRejectIssue', false)"></button>
+                </div>
+                <div class="card-body">
+                    <textarea name="rejection-reason" id="rejection-reason" class="form-control" wire:model.defer='rejectionReason' placeholder="Enter Reason..."></textarea>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2 bg-light">
+                    <button type="button" class="btn btn-secondary" wire:click="$set('showRejectIssue', false)">Cancel</button>
+                    <button type="button" class="btn btn-danger" wire:click="rejectIssue">Reject</button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

@@ -8,6 +8,7 @@ use App\Models\Item;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class IssueService
 {
@@ -65,6 +66,19 @@ class IssueService
 
     public function getById(int $id):Issue{
         return Issue::with(['items.item','processedBy','rejectedBy','user','fromLocation','toLocation'])->findOrFail($id);
+    }
+
+    public function rejectIssue($issueId,$reason){
+        $issue = Issue::find($issueId);
+        if($issue->user_id == Auth::id()){
+            throw new Exception("You are not allowed to reject this issue!");
+        }
+        $issue = Issue::find($issueId);
+        $issue->rejected_at = Carbon::now();
+        $issue->rejected_by = Auth::id();
+        $issue->rejection_reason = $reason;
+        $issue->status = 'rejected';
+        $issue->save();
     }
 
     public function save(array $data, ?int $issueId = null){
