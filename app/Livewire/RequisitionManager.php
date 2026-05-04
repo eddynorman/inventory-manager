@@ -63,6 +63,10 @@ class RequisitionManager extends Component
     public bool $showRejectionReasonModal = false;
     public bool $showFundAmountEntryModal = false;
     public bool $showFundAmountError = false;
+    public bool $canReview = false;
+    public bool $canApprove = false;
+    public bool $canFund = false;
+    public bool $canReject = false;
 
     protected DepartmentService $departmentService;
     protected RequisitionService $requisitionService;
@@ -88,6 +92,7 @@ class RequisitionManager extends Component
     {
         $this->reset(['reqId','cost','status','description','date_requested','date_approved','requested_by_id','reviewed_by','approved_by_id','funded_by','reviewed_on','funded_on','rejected_at','search','items','department_id']);
         $this->reset(['reviewed_by_name','approved_by_name','funded_by_name','items']);
+        $this->reset(['canReview','canApprove','canReject','canFund']);
         $this->status = 'pending';
         $this->resetValidation();
     }
@@ -242,6 +247,8 @@ class RequisitionManager extends Component
     }
 
     public function view(int $id){
+        $this->canReview = $this->requisitionService->canReview($id);
+        $this->canReject = $this->requisitionService->canReject($id);
         $this->reqId = $id;
         $r = $this->requisitionService->getById($id);
         $this->department_id = $r->department_id;
@@ -254,14 +261,16 @@ class RequisitionManager extends Component
         $this->requested_by_id = $r->requested_by_id;
         $this->requested_by_name = $r->requestedBy()->get('name')[0]->name;
         $this->currentStep = $this->steps[$r->status];
-        $this->funded_to_id = $this->users[0]['id'];
+        $this->funded_to_id = $r->funded_to ?? null;
         $reqItems = $r->items;
         if($this->status == 'reviewed'){
+            $this->canApprove = $this->requisitionService->canApprove($id);
             $this->reviewed_by_name = $r->reviewedBy()->get('name')[0]->name;
             $this->reviewed_on = Carbon::parse($r->reviewed_on)->format('d/m/Y H:i');
         }
 
         if($this->status == 'approved'){
+            $this->canFund = $this->requisitionService->canFund($id);
             $this->reviewed_by_name = $r->reviewedBy()->get('name')[0]->name;
             $this->reviewed_on = Carbon::parse($r->reviewed_on)->format('d/m/Y H:i');
             $this->approved_by_name = $r->approvedBy()->get('name')[0]->name;
@@ -401,19 +410,31 @@ class RequisitionManager extends Component
     }
 
     public function markAsReviewed(){
-        $this->requisitionService->review($this->reqId,Auth::id());
-        $this->showViewPage = false;
-        $this->showListTable = true;
-        session()->flash('success','Requisition Marked as Reviewed!');
-        $this->dispatch('flash');
+        try {
+            $this->requisitionService->review($this->reqId,Auth::id());
+            $this->showViewPage = false;
+            $this->showListTable = true;
+            $this->resetForm();
+            session()->flash('success','Requisition Marked as Reviewed!');
+            $this->dispatch('flash');
+        } catch (\Throwable $th) {
+            session()->flash('error',$th->getMessage());
+            $this->dispatch('flash');
+        }
     }
 
     public function approve(){
-        $this->requisitionService->approve($this->reqId,Auth::id());
-        $this->showViewPage = false;
-        $this->showListTable = true;
-        session()->flash('success','Requisition Marked as Approved!');
-        $this->dispatch('flash');
+        try {
+            $this->requisitionService->approve($this->reqId,Auth::id());
+            $this->showViewPage = false;
+            $this->showListTable = true;
+            $this->resetForm();
+            session()->flash('success','Requisition Marked as Approved!');
+            $this->dispatch('flash');
+        } catch (\Throwable $th) {
+            session()->flash('error',$th->getMessage());
+            $this->dispatch('flash');
+        }
     }
 
     public function enterRejectionReason(){
@@ -425,12 +446,19 @@ class RequisitionManager extends Component
             session()->flash('error','Rejection Reason Required!');
             $this->dispatch('flash');
         }else{
-            $this->requisitionService->reject($this->reqId,Auth::id(),$this->rejectionReason);
-            $this->showRejectionReasonModal = false;
-            $this->showViewPage = false;
-            $this->showListTable = true;
-            session()->flash('success','Requisition Marked as Rejected!');
-            $this->dispatch('flash');
+            try {
+                $this->requisitionService->reject($this->reqId,Auth::id(),$this->rejectionReason);
+                $this->showRejectionReasonModal = false;
+                $this->showViewPage = false;
+                $this->showListTable = true;
+                $this->resetForm();
+                session()->flash('success','Requisition Marked as Rejected!');
+                $this->dispatch('flash');
+            } catch (\Throwable $th) {
+                session()->flash('error',$th->getMessage());
+                $this->dispatch('flash');
+            }
+
         }
     }
 
@@ -448,20 +476,26 @@ class RequisitionManager extends Component
             $this->fundErrorMessage = "Amount should be equal to or greater than requisition cost!";
             $this->showFundAmountError = true;
         }else if($this->fund_amount >= $this->cost){
-            $this->showFundAmountError = true;
-            $this->showFundAmountEntryModal = false;
-            $this->requisitionService -> fund($this->reqId,Auth::id(),$this->fund_amount,$this->funded_to_id);
-            $this->showViewPage = false;
-            $this->showListTable = true;
-            session()->flash('success','Requisition Marked as Funded!');
-            $this->dispatch('flash');
+            try {
+                $this->showFundAmountError = true;
+                $this->showFundAmountEntryModal = false;
+                $this->requisitionService -> fund($this->reqId,Auth::id(),$this->fund_amount,$this->funded_to_id);
+                $this->showViewPage = false;
+                $this->showListTable = true;
+                $this->resetForm();
+                session()->flash('success','Requisition Marked as Funded!');
+                $this->dispatch('flash');
+            } catch (\Throwable $th) {
+                session()->flash('error',$th->getMessage());
+                $this->dispatch('flash');
+            }
         }else{
             $this->fundErrorMessage = "Please Enter a valid amount!";
             $this->showFundAmountError = true;
         }
     }
 
-     protected function messages(): array
+    protected function messages(): array
     {
         return [
             'items.required' => "At least one item is required!",

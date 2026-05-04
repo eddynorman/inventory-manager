@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Requisition;
 use App\Models\RequisitionItem;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -107,9 +109,24 @@ class RequisitionService
     | Workflow Actions
     |--------------------------------------------------------------------------
     */
+    public function canReview(int $id):bool{
+        $req = Requisition::find($id);
+        if($req->status == 'pending'){
+            if($req->requested_by_id != Auth::id()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
 
     public function review(int $requisitionId, int $userId): void
     {
+        if(!$this->canReview($requisitionId)){
+            throw new Exception('You are not allowed to review this requisition');
+        }
         DB::transaction(function () use ($requisitionId, $userId) {
 
             $requisition = Requisition::findOrFail($requisitionId);
@@ -124,8 +141,24 @@ class RequisitionService
         });
     }
 
+    public function canApprove(int $id):bool{
+        $req = Requisition::find($id);
+        if($req->status == 'reviewed'){
+            if($req->requested_by_id != Auth::id() && $req->reviewed_by != Auth::id()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
     public function approve(int $requisitionId, int $userId): void
     {
+        if(!$this->canApprove($requisitionId)){
+            throw new Exception('You are not allowed to approve this requisition');
+        }
         DB::transaction(function () use ($requisitionId, $userId) {
 
             $requisition = Requisition::findOrFail($requisitionId);
@@ -140,8 +173,24 @@ class RequisitionService
         });
     }
 
+    public function canFund(int $id):bool{
+        $req = Requisition::find($id);
+        if($req->status == 'approved'){
+            if($req->requested_by_id != Auth::id() && $req->reviewed_by != Auth::id() && $req->approved_by_id != Auth::id()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
     public function fund(int $requisitionId, int $userId, float $fundAmount, int $fundedTo): void
     {
+        if(!$this->canFund($requisitionId)){
+            throw new Exception('You are not allowed to fund this requisition');
+        }
         DB::transaction(function () use ($requisitionId, $userId, $fundAmount,$fundedTo) {
 
             $requisition = Requisition::with('items')->findOrFail($requisitionId);
@@ -166,8 +215,24 @@ class RequisitionService
         });
     }
 
+    public function canReject(int $id):bool{
+        $req = Requisition::find($id);
+        if($req->status != 'funded'){
+            if($req->requested_by_id != Auth::id() && $req->reviewed_by != Auth::id() && $req->approved_by_id != Auth::id()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
+
     public function reject(int $requisitionId, int $userId, string $reason): void
     {
+        if(!$this->canReject($requisitionId)){
+            throw new Exception('You are not allowed to reject this requisition');
+        }
         DB::transaction(function () use ($requisitionId, $userId, $reason) {
 
             $requisition = Requisition::findOrFail($requisitionId);

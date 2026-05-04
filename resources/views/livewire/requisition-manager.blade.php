@@ -290,16 +290,16 @@
 
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showViewPage', false)">Close</button>
-                    @if ($status != 'rejected' && $status != 'funded')
+                    @if ($canReject)
                         <button type="button" class="btn btn-danger" wire:click="enterRejectionReason">Reject</button>
                     @endif
-                    @if ($status == 'pending')
+                    @if ($canReview)
                         <button type="button" class="btn btn-info" wire:click="markAsReviewed">Mark as Reviewed</button>
                     @endif
-                    @if ($status == 'reviewed')
+                    @if ($canApprove)
                         <button type="button" class="btn btn-primary" wire:click="approve">Approve</button>
                     @endif
-                    @if ($status == 'approved')
+                    @if ($canFund)
                         <button type="button" class="btn btn-success" wire:click="showFundAmountModal">Fund</button>
                     @endif
                 </div>
