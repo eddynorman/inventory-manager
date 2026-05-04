@@ -476,7 +476,8 @@ class SaleService
                 $stock = $this->getItemStock($item->id, $locationIds);
 
                 return [
-                    'type' => 'item',
+                    'type' => $item->is_stock_item == true ? 'item' : 'service',
+                    'is_stock_item' =>$item->is_stock_item,
                     'item_id' => $item->id,
                     'name' => $item->name,
                     'category' => $item->category?->name,
@@ -515,12 +516,15 @@ class SaleService
         // ITEMS
         $items = Item::with('category')
             ->where('name', 'like', "%{$search}%")
+            ->where('is_sale_item',true)
+            ->where('is_active',true)
             ->get()
             ->map(function ($item) use ($locationIds) {
                 $stock = $this->getItemStock($item->id, $locationIds);
 
                 return [
-                    'type' => 'item',
+                    'type' => $item->is_stock_item == true ? 'item' : 'service',
+                    'is_stock_item' =>$item->is_stock_item,
                     'item_id' => $item->id,
                     'name' => $item->name,
                     'category' => $item->category?->name,
@@ -541,6 +545,7 @@ class SaleService
 
                 return [
                     'type' => 'kit',
+                    'is_stock_item' => true,
                     'kit_id' => $kit->id,
                     'name' => $kit->name,
                     'category' => 'Kit',
