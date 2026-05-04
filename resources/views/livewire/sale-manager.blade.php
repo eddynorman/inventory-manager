@@ -111,7 +111,13 @@
                                             @forelse ($sale['items'] ?? [] as $index => $item)
                                                 <tr>
                                                     <td>{{ $item['name'] }}</td>
-                                                    <td>{{ $item['stock'] }}</td>
+                                                    <td>
+                                                        @if ($item['is_stock_item'] == false || $item['type'] == 'service' )
+                                                            Non Stock
+                                                        @else
+                                                            {{ $item['stock'] }}
+                                                        @endif
+                                                    </td>
 
                                                     <td>
                                                         <select class="form-select form-select-md"
@@ -132,8 +138,8 @@
                                                             </button>
                                                             <!-- INPUT -->
                                                             <input type="number"
-                                                                class="form-control text-center fw-bold qty-input"
-                                                                style="width:70px;"
+                                                                class="form-control text-center fw-bold qty-input @error("sale.items.$index.quantity") is-invalid @enderror "
+                                                                style="width:70px; @error("sale.items.$index.quantity") width: 100px; @enderror"
                                                                 data-index="{{ $index }}"
                                                                 max="{{ $item['stock'] }}"
                                                                 min="1"
@@ -147,6 +153,9 @@
                                                             </button>
 
                                                         </div>
+                                                        @error("sale.items.$index.quantity")
+                                                            <small class="text-danger">{{ $message }}</small>
+                                                        @enderror
                                                     </td>
 
                                                     <td>{{ number_format($item['selling_price']) }}</td>
@@ -273,7 +282,7 @@
                                 class="form-control mb-2"
                                 placeholder="Amount"
                                 wire:model.live.debounce.300ms="paymentAmount"
-                                {{ $sale['balance'] == 0?'disabled':'' }}
+                                {{ ($sale['balance'] ?? 0) == 0?'disabled':'' }}
                                 >
                             <div class="w-100 row">
                                 <div class="col-md-10">
@@ -301,7 +310,7 @@
                     <div class="d-grid gap-2">
                         @if (count($sale['items']) > 0)
                             <button class="btn btn-success btn-lg"
-                                wire:click="$set('showConfirmSale', true)">
+                                wire:click="checkValidity">
                                 Save Sale
                             </button>
                         @endif

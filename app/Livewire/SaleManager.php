@@ -167,6 +167,18 @@ class SaleManager extends Component
             array_filter($this->locationIds, fn($i) => $i != $id)
         );
         $this->selectedLocations = collect($this->locations)->whereIn('id',$this->locationIds)->values()->toArray();
+        if(count($this->locationIds) == 0){
+            $this->sale['served_by'] = [];
+            $this->sale['items'] = [];
+            $this->sale['paid'] = 0;
+            $this->sale['balance'] = 0;
+            $this->sale['total'] = 0;
+            $this->payments = [];
+            $this->paymentAmount = 0;
+
+        }else{
+            $this->checkAllStock();
+        }
     }
 
     public function loadDefaultLocations(){
@@ -207,10 +219,10 @@ class SaleManager extends Component
 
         $foundIndex = null;
 
-        if ($item['type'] == 'item') {
+        if ($item['type'] == 'item' || $item['type'] == 'service') {
 
             foreach ($this->sale['items'] as $i => $sale_item) {
-                if ($sale_item['item_id'] == $item['item_id']) {
+                if (isset($sale_item['item_id']) && $sale_item['item_id'] == $item['item_id']) {
 
                     $unit_price = 0;
 
@@ -226,6 +238,9 @@ class SaleManager extends Component
                         $this->sale['items'][$i]['quantity'] * $unit_price;
 
                     $foundIndex = $i;
+                    if($sale_item['type'] == 'item'){
+                        $this->checkStock($i,$this->sale['items'][$i]['quantity'],$item['item_id'],'item');
+                    }
                     break;
                 }
             }
@@ -252,6 +267,7 @@ class SaleManager extends Component
                         $this->sale['items'][$i]['quantity'] * $sale_item['selling_price'];
 
                     $foundIndex = $i;
+                    $this->checkStock($i,$this->sale['items'][$i]['quantity'],$item['kit_id'],'kit');
                     break;
                 }
             }
@@ -287,6 +303,7 @@ class SaleManager extends Component
     public function removeItem(int $index){
         array_splice($this->sale['items'],$index,1);
         $this->calculateTotal();
+        $this->checkAllStock();
     }
 
     public function increaseQty($index)
@@ -297,6 +314,7 @@ class SaleManager extends Component
         $this->updateItemTotal($index);
 
         $this->dispatch('focus-qty', index: $index);
+        $this->checkStock($index,$this->sale['items'][$index]['quantity'],$this->sale['items'][$index]['item_id'] ?? $this->sale['items'][$index]['kit_id'],$this->sale['items'][$index]['type']);
     }
 
     public function decreaseQty($index)
@@ -307,6 +325,7 @@ class SaleManager extends Component
             $this->updateItemTotal($index);
 
             $this->dispatch('focus-qty', index: $index);
+            $this->checkStock($index,$this->sale['items'][$index]['quantity'],$this->sale['items'][$index]['item_id'] ?? $this->sale['items'][$index]['kit_id'],$this->sale['items'][$index]['type']);
         }
     }
 
@@ -336,15 +355,24 @@ class SaleManager extends Component
         $name = explode('.', $key)[0];
         if($name == 'items'){
             $index = explode('.', $key)[1];
+            $field = explode('.', $key)[2];
             if($value != '' && $value != null){
+                if($field == 'quantity' && $value <= 0){
+                    $this->addError("sale.items.$index.quantity", "Must be greater than Zero");
+                }
+
+                if($field == 'quantity' || $field == 'selected_unit_id'){
+                    $this->resetErrorBag("sale.items.$index.quantity");
+                    $this->checkStock($index,$this->sale['items'][$index]['quantity'],$this->sale['items'][$index]['item_id'] ?? $this->sale['items'][$index]['kit_id'],$this->sale['items'][$index]['type']);
+                }
                 $this->updateItemTotal($index);
             }else{
                 $field = explode('.', $key)[2];
                 if($field == 'quantity'){
                     $this->sale['items'][$index]['total'] = 0;
+                    $this->addError("sale.items.$index.quantity", "Cannot be Empty");
                 }
             }
-
         }
 
     }
@@ -413,9 +441,61 @@ class SaleManager extends Component
         $this->reset('payments','paymentAmount');
     }
 
+    public function checkStock(int $index,float $quantity,int $id,string $type="item"){
+        $this->resetErrorBag("sale.items.$index.quantity");
+        if($type == 'item'){
+            $unit = Unit::find($this->sale['items'][$index]['selected_unit_id']);
+            $stock = $this->service->getItemStock($id,$this->locationIds);
+            if($quantity * $unit->smallest_units_number > $stock){
+                $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
+            }
+        }else if($type == 'kit'){
+            $stock = $this->service->getKitAvailableQty($id,$this->locationIds);
+            if($quantity > $stock){
+                $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
+            }
+        }
+    }
+
+    public function checkAllStock():bool{
+        $allIsWell = true;
+        foreach($this->sale['items'] as $index => $item){
+            if($item['type'] == 'item'){
+                $unit = Unit::find($item['selected_unit_id']);
+                $stock = $this->service->getItemStock($item['item_id'],$this->locationIds);
+                if($item['quantity'] * $unit->smallest_units_number > $stock){
+                    $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
+                    $allIsWell = false;
+                }
+            }else if($item['type'] == 'kit'){
+                $stock = $this->service->getKitAvailableQty($item['kit_id'],$this->locationIds);
+                if($item['quantity'] > $stock){
+                    $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
+                    $allIsWell = false;
+                }
+            }
+        }
+
+        return $allIsWell;
+    }
+
+    public function checkValidity(){
+        $hasError = !$this->checkAllStock();
+        if(count($this->locationIds) == 0){
+            $hasError = true;
+            session()->flash('error','Select at least one location!');
+            $this->dispatch('flash');
+        }
+        if($hasError){
+            return;
+        }
+        $this->validate($this->service->rules());
+        $this->showConfirmSale = true;
+    }
     public function saveSale(){
+        $this->showConfirmSale = false;
+        $data = $this->validate($this->service->rules());
         try {
-            $data = $this->validate($this->service->rules());
             $saleid = $this->service->save($data,$this->sale['id']??null,"upfront");
             session()->flash('Success',"Sale saved successfully!");
             $this->dispatch('flash');
@@ -428,7 +508,6 @@ class SaleManager extends Component
             session()->flash('error',$th->getMessage());
             $this->dispatch('flash');
         }
-        $this->showConfirmSale = false;
     }
 
     public function loadSale(int $saleId):array{
