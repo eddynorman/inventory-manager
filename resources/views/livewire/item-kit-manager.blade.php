@@ -74,15 +74,21 @@
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('showKitModal', false)"></button>
                 </div>
                 <div class="card-body overflow-auto p-3">
-                    <div class="mb-3">
-                        <label class="form-label">Items</label>
-                        <input type="text" class="form-control" wire:model.live="searchItem" placeholder="Search items to add...">
-                        <div style="z-index:2100">
-                            <ul class="list-group">
-                                @foreach ($searchItems as $item)
-                                    <li class="list-group-item" wire:click="addItem({{ $item['id'] }})">{{ $item['name'] }}</li>
-                                @endforeach
-                            </ul>
+                    <div class="position-relative mb-3">
+                        <div class="position-relative mb-3 w-50">
+                            <label for="items-search" class="form-label">Items</label>
+                            <input type="text" id="items-search" class="form-control " wire:model.live="searchItem" placeholder="Search items to add...">
+                            @if(!empty($searchItems))
+                                <div class="dropdown-menu show w-100 mt-1 shadow border-0">
+                                    @foreach ($searchItems as $index => $item)
+                                        <button
+                                            class="dropdown-item d-flex justify-content-between"
+                                            wire:click="addItem({{ $item['id'] }})">
+                                            <span>{{ $item['name'] }}</span>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                         <table class="table table-striped table-bordered mb-0">
                             <thead>
