@@ -34,7 +34,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h6 class="card-subtitle text-muted">Low Stock</h6>
-                    <h3 class="card-title">{{ \App\Models\Item::whereColumn('current_stock','<=','reorder_level')->count() }}</h3>
+                    <h3 class="card-title">{{ \App\Models\Item::whereColumn('current_stock','<=','reorder_level')->where('is_stock_item',true)->count() }}</h3>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
                             <tbody>
                                 @foreach(\App\Models\Sale::with('locations')->orderByDesc('id')->limit(5)->get() as $sale)
                                     <tr>
-                                        <td>{{ $sale->sale_date }}</td>
+                                        <td>{{ optional($sale->created_at)->format('d/m/Y H:i') }}</td>
                                         <td>{{ optional($sale->locations->first())->name ?? '-' }}</td>
                                         <td>{{ number_format($sale->total_amount,2) }}</td>
                                     </tr>
@@ -84,7 +84,7 @@
                             <tbody>
                                 @foreach(\App\Models\Purchase::with('supplier')->orderByDesc('id')->limit(5)->get() as $purchase)
                                     <tr>
-                                        <td>{{ $purchase->purchase_date }}</td>
+                                        <td>{{ optional($purchase->created_at)->format('d/m/Y H:i') }}</td>
                                         <td>{{ optional($purchase->supplier)->name ?? '-' }}</td>
                                         <td>{{ number_format($purchase->total_amount,2) }}</td>
                                     </tr>
