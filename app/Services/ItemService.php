@@ -116,7 +116,7 @@ class ItemService
                 ]);
 
             }
-            if($itemId == null){
+            if($itemId == null && $data['isStockItem'] == true){
                 $this->batchService->createBatch($item->id,$data['newLocationId'],$data['initialStock'],$data['buyingPrice'],'new_item',$item->id);
                 $this->movementService->createMovement($item->id,$data['newLocationId'],null,$data['initialStock'],'new_item',StockBatchType::NEW_ITEM,$item->id,Auth::id());
             }
