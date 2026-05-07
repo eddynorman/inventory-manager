@@ -90,12 +90,12 @@ class Item extends Model
     */
     public function scopeLowStock($query)
     {
-        return $query->whereColumn('current_stock', '<=', 'reorder_level');
+        return $query->whereColumn('current_stock', '<=', 'reorder_level')->where('is_stock_item',true);
     }
 
     public function scopeHighStock($query)
     {
-        return $query->whereColumn('current_stock', '>', 'reorder_level');
+        return $query->whereColumn('current_stock', '>', 'reorder_level')->where('is_stock_item',true);
     }
 
 }
