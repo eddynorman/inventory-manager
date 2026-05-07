@@ -116,12 +116,15 @@ class RequisitionManager extends Component
         }
     }
 
-    public function updatingSearch(){
+    public function updatedSearch(){
         if($this->department_id == null){
             session()->flash('error','Select Department First');
             $this->dispatch('flash');
         }else{
             $this->searchItems = $this->departmentService->searchItems($this->department_id,$this->search);
+        }
+        if($this->search == ""){
+            $this->searchItems = [];
         }
 
     }
