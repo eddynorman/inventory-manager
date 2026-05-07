@@ -111,24 +111,29 @@ class SaleService
             $movementData = [];
             foreach ($saleItems as $saleItem) {
                 $existing = $sale->items()->where('item_id', $saleItem['item_id'])->first();
+                $original_item = Item::find($saleItem['item_id']);
                 $unit = Unit::findOrFail($saleItem['selected_unit_id']);
                 $qty = $saleItem['quantity'] * $unit->smallest_units_number;
-
                 if ($existing) {
                     if($existing->quantity != $qty){
-                        $usages = $batchService->getBatchUsageForReverse($existing);
-                        $batchService->reverseConsumption($usages);
-                        $returned = $batchService->consumeBatches($saleItem['item_id'],$locationIds,$qty,StockBatchType::ITEM_SALE,$existing->id);
+                        if($original_item->is_stock_item == true){
+                            $usages = $batchService->getBatchUsageForReverse($existing);
+                            $batchService->reverseConsumption($usages);
+                            $returned = $batchService->consumeBatches($saleItem['item_id'],$locationIds,$qty,StockBatchType::ITEM_SALE,$existing->id);
 
-                        foreach($returned['qtys'] as $qty){
-                            $movementData[] = $qty;
+                            foreach($returned['qtys'] as $qty){
+                                $movementData[] = $qty;
+                            }
+                            $existing->cost_at_sale = $returned['total_cost'];
+                        }else{
+                            $existing->cost_at_sale = $unit->buying_price * $qty;
                         }
+
 
                         $existing->quantity = $saleItem['quantity'];
                         $existing->unit_id = $saleItem['selected_unit_id'];
                         $existing->unit_price = $unit->selling_price;
                         $existing->total = $saleItem['quantity'] * $unit->selling_price;
-                        $existing->cost_at_sale = $returned['total_cost'];
                         $existing->save();
                     }
                 } else {
@@ -140,23 +145,28 @@ class SaleService
                         'unit_id'        => $unit->id,
                         'quantity'       => $saleItem['quantity'],
                         'unit_price'     => $price,
-                        'cost_at_sale'   => 0,
+                        'cost_at_sale'   => $unit->buying_price * $saleItem['quantity'],
                         'total'          => $price * $saleItem['quantity'],
                         'number_of_items' => $qty,
                     ]);
 
-                    $batchData  = $batchService->consumeBatches($saleItem['item_id'],$locationIds,$qty,StockBatchType::ITEM_SALE,$newSaleItem->id);
+                    if($original_item->is_stock_item == true){
+                        $batchData  = $batchService->consumeBatches($saleItem['item_id'],$locationIds,$qty,StockBatchType::ITEM_SALE,$newSaleItem->id);
 
-                    foreach($batchData['qtys'] as $qty){
-                        $movementData[] = $qty;
+                        foreach($batchData['qtys'] as $qty){
+                            $movementData[] = $qty;
+                        }
+                        $newSaleItem->cost_at_sale = $batchData['total_cost'];
+                        $newSaleItem->save();
                     }
-                    $newSaleItem->cost_at_sale = $batchData['total_cost'];
-                    $newSaleItem->save();
                 }
 
             }
+
             $stockMovementService->saleItemsSync($movementData,$saleId,Auth::id(),StockBatchType::ITEM_SALE);
             $this->syncRemovedItem($saleId,$saleItems);
+
+
         });
     }
 
@@ -173,11 +183,14 @@ class SaleService
                 }
             }
             if($found == false){
-                $batchService = new StockBatchService();
-                $stockMovementService = new StockMovementService();
-                $usages = $batchService->getBatchUsageForReverse($currentItem);
-                $batchService->reverseConsumption($usages);
-                $stockMovementService->deleteSaleMovement($saleId,$currentItem->item_id,StockBatchType::ITEM_SALE);
+                $original_item = Item::find($saleItem['item_id']);
+                if($original_item->is_stock_item == true){
+                    $batchService = new StockBatchService();
+                    $stockMovementService = new StockMovementService();
+                    $usages = $batchService->getBatchUsageForReverse($currentItem);
+                    $batchService->reverseConsumption($usages);
+                    $stockMovementService->deleteSaleMovement($saleId,$currentItem->item_id,StockBatchType::ITEM_SALE);
+                }
                 $currentItem->delete();
             }
         }
@@ -533,7 +546,7 @@ class SaleService
                 ];
             })
             ->filter(function ($item) {
-                return $item['stock'] > 0;
+                return $item['stock'] >= 0;
             });
 
         // KITS
@@ -572,7 +585,7 @@ class SaleService
             $items = [];
             $kits = [];
             foreach($saleData['sale']['items'] as $item){
-                if($item['type'] == 'item'){
+                if($item['type'] == 'item' || $item['type'] == 'service'){
                     $items [] = $item;
                 }else if($item['type'] == 'kit'){
                     $kits [] = $item;
