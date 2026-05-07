@@ -58,6 +58,7 @@ class DepartmentService
             ->items()
             ->select('items.id', 'items.name', 'items.current_stock')
             ->where('items.name', 'like', '%' . $search . '%')
+            ->where('items.is_stock_item',true)
             ->get()
             ->toArray();
     }
