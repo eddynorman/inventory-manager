@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StockBatchType;
+use App\Models\Item;
 use App\Models\ItemKit;
 use App\Models\StockMovement;
 use App\Models\Unit;
@@ -27,6 +28,10 @@ class StockMovementService
     public function saleItemsSync(array $saleItems, int $saleId, int $userId, StockBatchType $type){
         return DB::transaction(function () use ($saleItems,$saleId, $userId,$type){
             foreach($saleItems as $item){
+                $original_item = Item::find($item['item_id']);
+                if($original_item->is_stock_item == false){
+                    continue;
+                }
                 $movement = StockMovement::where('reference_id',$saleId)->where('reference_type',$type->value)->where('item_id',$item['item_id'])->get()->first();
                 if($movement != null && $movement->quantity != -$item['quantity']){
                     $movement->quantity = -$item['quantity'];
