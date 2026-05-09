@@ -7,6 +7,9 @@
             <div class="card-tools">
                 @if(auth()->user()->hasAnyRole(['super','admin','manager']))
                     <button wire:click="create" class="btn btn-primary">New Item</button>
+                    <button wire:click="$set('showBulkCreateModal', true)" class="btn btn-primary">
+                        Bulk Upload Items
+                    </button>
                 @endif
             </div>
         </div>
@@ -227,4 +230,118 @@
     </div>
 @endif
 
+@if ($showBulkCreateModal)
+<div class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+     style="background: rgba(0,0,0,0.6); z-index:1050;"
+     wire:click="$set('showBulkCreateModal', false)">
+
+    <div class="card shadow-lg border-0 w-100"
+         style="max-width: 650px; border-radius: 12px;"
+         wire:click.stop>
+
+        {{-- Header --}}
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+             style="border-top-left-radius:12px; border-top-right-radius:12px;">
+            <div>
+                <h5 class="mb-0 fw-bold">Bulk Create Items</h5>
+                <small class="opacity-75">Upload items using Excel template</small>
+            </div>
+            <button class="btn-close btn-close-white"
+                    wire:click="$set('showBulkCreateModal', false)">
+            </button>
+        </div>
+
+        {{-- Body --}}
+        <div class="card-body p-4" style="max-height:75vh; overflow-y:auto;">
+
+            {{-- Step 1: Instructions --}}
+            <div class="mb-4">
+                <h6 class="fw-bold mb-2">📄 Instructions</h6>
+                <ul class="small text-muted mb-2">
+                    <li>Download the template and fill required fields.</li>
+                    <li><strong>Category:</strong> auto-created if not found.</li>
+                    <li><strong>Barcode & Supplier:</strong> optional.</li>
+                    <li><strong>Booleans:</strong> use <code>true</code>/<code>false</code> or <code>t</code>/<code>f</code>.</li>
+                    <li>Do not rename columns.</li>
+                </ul>
+
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        wire:click="downloadTemplate">
+                    ⬇ Download Template
+                </button>
+            </div>
+
+            <hr>
+
+            {{-- Step 2: Department --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">🏢 Department</label>
+                <select wire:model="departmentId" class="form-select">
+                    <option value="">Select Department</option>
+                    @foreach($departments as $dept)
+                        <option value="{{ $dept['id'] }}">{{ $dept['name'] }}</option>
+                    @endforeach
+                </select>
+                @error('departmentId')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
+            {{-- Step 3: File Upload --}}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">📤 Upload Excel File</label>
+                <input type="file" wire:model="bulkFile" class="form-control">
+
+                <div wire:loading wire:target="bulkFile" class="small text-primary mt-1">
+                    Uploading...
+                </div>
+
+                @error('bulkFile')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
+            {{-- Errors --}}
+            @if(!empty($bulkErrors))
+                <div class="alert alert-danger mt-3" style="border-radius:8px;">
+                    <div class="fw-bold mb-2">⚠ Import Errors</div>
+                    <ul class="mb-0 small">
+                        @foreach($bulkErrors as $error)
+                            <li>
+                                <strong>Row {{ $error['row'] }}:</strong> {{ $error['error'] }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+        </div>
+
+        {{-- Footer --}}
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center px-4 py-3"
+             style="border-bottom-left-radius:12px; border-bottom-right-radius:12px;">
+
+            <button class="btn btn-outline-secondary"
+                    wire:click="$set('showBulkCreateModal', false)">
+                Cancel
+            </button>
+
+            <button class="btn btn-success d-flex align-items-center gap-2"
+                    wire:click="bulkSave"
+                    wire:loading.attr="disabled">
+
+                <span wire:loading.remove wire:target="bulkSave">
+                    💾 Save Items
+                </span>
+
+                <span wire:loading wire:target="bulkSave">
+                    Processing...
+                </span>
+            </button>
+        </div>
+
+    </div>
+</div>
+@endif
 </div>

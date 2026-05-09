@@ -2,7 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Exports\ItemTemplateExport;
+use App\Imports\ItemImport;
 use App\Models\Category;
+use App\Models\Department;
 use App\Models\Location;
 use App\Models\Supplier;
 use App\Services\ItemService;
@@ -10,10 +13,14 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Validation\ValidationException;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
+use ZipStream\File;
 
 class ItemManager extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     public ?int $itemId = null;
     public string $name = '';
@@ -45,11 +52,17 @@ class ItemManager extends Component
     public array $suppliers = [];
     public array $locations = [];
 
+    public array $departments = [];
+    public ?int $departmentId = null;
+    public $bulkFile = null;
+    public $bulkErrors = [];
+
     public bool $showModal = false;
     public bool $showDeleteModal = false;
     public bool $showBulkDeleteModal = false;
     public bool $showAssignCategoryModal = false;
     public bool $showAssignSupplierModal = false;
+    public bool $showBulkCreateModal = false;
     public array $selectedIds = [];
 
     protected ItemService $service;
@@ -71,6 +84,7 @@ class ItemManager extends Component
         $this->categories = Category::orderBy('name')->get()->toArray();
         $this->suppliers = Supplier::orderBy('name')->get()->toArray();
         $this->locations = Location::orderBy('name')->get()->toArray();
+        $this->departments = Department::orderBy('name')->get()->toArray();
     }
 
     public function refreshTable(): void
@@ -289,6 +303,35 @@ class ItemManager extends Component
         session()->flash('success', 'Supplier assigned to selected items.');
         $this->dispatch('flash');
         $this->refreshTable();
+    }
+
+    //Excel bulk create
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new ItemTemplateExport, 'item_template.xlsx');
+    }
+
+    public function bulkSave(){
+        $this->validate([
+            'bulkFile' => ['required','file','mimes:xlsx,xls'],
+            'departmentId' => ['required','integer','exists:departments,id'],
+        ]);
+        $import = new ItemImport(app(ItemService::class), $this->departmentId);
+
+        Excel::import($import, $this->bulkFile);
+
+        $errors = $import->errors;
+
+        if (!empty($errors)) {
+            $this->bulkErrors = $errors;
+        } else {
+            $this->bulkErrors = [];
+            $this->reset(['bulkFile','departmentId','showBulkCreateModal']);
+            $this->refreshTable();
+            session()->flash('success', 'Items imported successfully!');
+            $this->dispatch('flash');
+        }
     }
 
     public function render()
