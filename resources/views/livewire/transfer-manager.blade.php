@@ -205,6 +205,7 @@
                     @if(!isset($viewTransfer['received_by']) && $user_id != $current_user_id)
                         <button type="button" class="btn btn-success" wire:click="receiveTransfer">Receive</button>
                     @endif
+                </div>
             </div>
         </div>
     @endif
