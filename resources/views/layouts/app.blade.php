@@ -54,6 +54,22 @@
             border-bottom: 1px solid #dee2e6 !important;
             padding: 10px;
             text-align: left !important;
+
+            white-space: nowrap; /* prevent wrapping */
+        }
+
+        /* FLEX CONTAINER INSIDE HEADER */
+        table.power-grid-table thead th > div {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        /* HEADER TEXT */
+        table.power-grid-table thead th span {
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* SORT ICON */
@@ -61,7 +77,7 @@
             width: 15px !important;
             height: 15px !important;
             color: #adb5bd !important;
-            float: right;
+            flex-shrink: 0;
         }
 
         /* BODY */
@@ -172,6 +188,7 @@
                 <div class="list-group list-group-flush">
                     <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('items') }}" class="list-group-item list-group-item-action {{ request()->routeIs('items') ? 'active' : '' }}">Items</a>
+                    <a href="{{ route('assets') }}" class="list-group-item list-group-item-action {{ request()->routeIs('assets') ? 'active' : '' }}">Assets</a>
                     <a href="{{ route('closing-stock') }}" class="list-group-item list-group-item-action {{ request()->routeIs('closing-stock') ? 'active' : '' }}">Closing Stock</a>
                     <a href="{{ route('sales') }}" class="list-group-item list-group-item-action {{ request()->routeIs('sales') ? 'active' : '' }}">Sales</a>
                     <a href="{{ route('purchases') }}" class="list-group-item list-group-item-action {{ request()->routeIs('purchases') ? 'active' : '' }}">Purchases</a>
