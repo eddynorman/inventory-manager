@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             GroupSeeder::class,
             UserSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
     }
 }
