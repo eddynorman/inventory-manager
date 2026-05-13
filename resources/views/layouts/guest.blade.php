@@ -38,9 +38,9 @@
         }
     </style>
 </head>
-<body class="bg-light container">
+<body class="bg-light container-fluid">
     <div class="d-flex justify-content-center align-items-center min-vh-100">
-        <div style="max-width: 30rem; width: 100%;">
+        <div style="width: 100%;">
             {{-- <div class="text-center mb-4 login-header">
                 <i class="bi bi-person-circle text-primary"></i>
                 <h2>{{ config('app.name', 'Inventory Manager') }}</h2>
