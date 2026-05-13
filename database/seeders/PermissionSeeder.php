@@ -31,6 +31,16 @@ class PermissionSeeder extends Seeder
                 'delete',
                 'assign_permissions',
             ],
+            'assets' => [
+                'view',
+                'create',
+                'edit',
+                'delete',
+                'purchase',
+                'mark_damaged',
+                'import',
+                'export',
+            ],
 
             'items' => [
                 'view',
@@ -43,6 +53,12 @@ class PermissionSeeder extends Seeder
             ],
 
             'item_kits' => [
+                'view',
+                'create',
+                'edit',
+                'delete',
+            ],
+            'units' => [
                 'view',
                 'create',
                 'edit',
@@ -169,6 +185,7 @@ class PermissionSeeder extends Seeder
                 'view_financial',
                 'view_stock',
                 'view_banking',
+                'close_day',
             ],
 
             'settings' => [
