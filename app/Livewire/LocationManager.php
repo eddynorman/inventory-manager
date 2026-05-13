@@ -18,8 +18,7 @@ class LocationManager extends Component
     public function boot(LocationService $service): void
     {
         $this->service = $service;
-        $this->users = User::where('role', '!=', 'super') // exclude super role
-            ->orderBy('name')
+        $this->users = User::orderBy('name')
             ->get(['id', 'name', 'email'])
             ->toArray();
     }
