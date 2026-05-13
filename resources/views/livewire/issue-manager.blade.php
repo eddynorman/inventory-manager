@@ -8,11 +8,12 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm"
-                    wire:click="newIssue">
-                    New Issue
-                </button>
-
+                @if(auth()->user()->canAccess('issues.create'))
+                    <button class="btn btn-outline-primary btn-sm"
+                        wire:click="newIssue">
+                        New Issue
+                    </button>
+                @endif
             </div>
         </div>
         <div class="card-body">
@@ -227,7 +228,7 @@
                 </div>
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showViewIssue', false)">Close</button>
-                    @if (!(isset($viewIssue['processed_by']) || isset($viewIssue['rejected_by'])) && $user_id != $current_user_id )
+                    @if (auth()->user()->canAccess('issues.reject') && !(isset($viewIssue['processed_by']) || isset($viewIssue['rejected_by'])) && $user_id != $current_user_id )
                         <button type="button" class="btn btn-danger" wire:click="$set('showRejectIssue', true)">Reject</button>
                     @endif
                 </div>

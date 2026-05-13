@@ -4,7 +4,9 @@
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title">Locations</h5>
-            <button wire:click="create" class="btn btn-primary">New Location</button>
+            @if(auth()->user()->canAccess('locations.create'))
+                <button wire:click="create" class="btn btn-primary">New Location</button>
+            @endif
         </div>
 
         <div class="card-body table-responsive">

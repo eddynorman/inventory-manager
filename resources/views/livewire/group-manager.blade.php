@@ -17,14 +17,18 @@
             </div>
 
             <div class="gap-2">
-                <button
-                    class="btn btn-dark rounded-3 px-4"
-                    wire:click="create">
+                @if(auth()->user()->canAccess('groups.create'))
+                    <button
+                        class="btn btn-dark rounded-3 px-4"
+                        wire:click="create">
 
-                    <i class="fa fa-plus me-2"></i>
-                    New Group
-                </button>
-                <a href="{{ route('users') }}"><button type="button" class="btn btn-primary rounded-3 px-4">Users</button></a>
+                        <i class="fa fa-plus me-2"></i>
+                        New Group
+                    </button>
+                @endif
+                @if(auth()->user()->canAccess('users.view'))
+                    <a href="{{ route('users') }}"><button type="button" class="btn btn-primary rounded-3 px-4">Users</button></a>
+                @endif
             </div>
         </div>
 
@@ -73,20 +77,22 @@
                             <td>
 
                                 <div class="d-flex gap-2 justify-content-end">
+                                    @if(auth()->user()->canAccess('groups.edit'))
+                                        <button
+                                            class="btn btn-sm btn-light"
+                                            wire:click="edit({{ $group->id }})">
 
-                                    <button
-                                        class="btn btn-sm btn-light"
-                                        wire:click="edit({{ $group->id }})">
+                                            Edit
+                                        </button>
+                                    @endif
+                                    @if(auth()->user()->canAccess('groups.delete'))
+                                        <button
+                                            class="btn btn-sm btn-danger"
+                                            wire:click="confirmDelete({{ $group->id }})">
 
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        class="btn btn-sm btn-danger"
-                                        wire:click="confirmDelete({{ $group->id }})">
-
-                                        Delete
-                                    </button>
+                                            Delete
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

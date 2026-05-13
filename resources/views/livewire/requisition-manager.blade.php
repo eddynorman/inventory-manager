@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Requisitions</h5>
-            @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+            @if(auth()->user()->canAccess('requisition.create'))
                 <button wire:click="create" class="btn btn-primary">New Requisition</button>
             @endif
         </div>
@@ -290,16 +290,16 @@
 
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showViewPage', false)">Close</button>
-                    @if ($canReject)
+                    @if ($canReject && auth()->user()->canAccess('requisitions.reject'))
                         <button type="button" class="btn btn-danger" wire:click="enterRejectionReason">Reject</button>
                     @endif
-                    @if ($canReview)
+                    @if ($canReview && auth()->user()->canAccess('requisitions.review'))
                         <button type="button" class="btn btn-info" wire:click="markAsReviewed">Mark as Reviewed</button>
                     @endif
-                    @if ($canApprove)
+                    @if ($canApprove && auth()->user()->canAccess('requisitions.approve'))
                         <button type="button" class="btn btn-primary" wire:click="approve">Approve</button>
                     @endif
-                    @if ($canFund)
+                    @if ($canFund && auth()->user()->canAccess('requisitions.fund'))
                         <button type="button" class="btn btn-success" wire:click="showFundAmountModal">Fund</button>
                     @endif
                 </div>

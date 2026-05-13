@@ -1,13 +1,13 @@
 <div>
     @include('layouts.flash')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Item Kits</h5>
-        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
-            <button wire:click="create" class="btn btn-primary">New Kit</button>
-        @endif
-    </div>
 
-    <div class="card">
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Item Kits</h5>
+            @if(auth()->user()->canAccess('item_kits.create'))
+                <button wire:click="create" class="btn btn-primary">New Kit</button>
+            @endif
+        </div>
         <div class="table-responsive p-3">
             <livewire:tables.item-kit-table/>
         </div>

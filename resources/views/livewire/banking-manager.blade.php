@@ -8,15 +8,19 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn btn-success btn-sm shadow-sm"
-                    wire:click="$set('showTxnForm', true)">
-                    <i class="fa fa-plus-circle me-1"></i> Transaction
-                </button>
+                @if(auth()->user()->canAccess('banking.deposit') || auth()->user()->canAccess('banking.withdraw'))
+                    <button class="btn btn-success btn-sm shadow-sm"
+                        wire:click="$set('showTxnForm', true)">
+                        <i class="fa fa-plus-circle me-1"></i> Transaction
+                    </button>
+                @endif
+                @if (auth()->user()->canAccess('banking.add_account'))
+                    <button class="btn btn-primary btn-sm shadow-sm"
+                        wire:click="$set('showAccountForm', true)">
+                        <i class="fa fa-university me-1"></i> Account
+                    </button>
+                @endif
 
-                <button class="btn btn-primary btn-sm shadow-sm"
-                    wire:click="$set('showAccountForm', true)">
-                    <i class="fa fa-university me-1"></i> Account
-                </button>
             </div>
         </div>
         <div class="card-body">

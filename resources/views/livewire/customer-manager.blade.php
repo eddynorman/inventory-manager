@@ -1,7 +1,7 @@
 <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Customers</h5>
-        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+        @if(auth()->user()->canAccess('customers.create'))
             <button wire:click="create" class="btn btn-primary">New Customer</button>
         @endif
     </div>
@@ -41,8 +41,10 @@
                             <td>{{ $c->email }}</td>
                             <td>{{ $c->city }}</td>
                             <td class="text-end">
-                                @if(auth()->user()->hasAnyRole(['super','admin']))
+                                @if(auth()->user()->canAccess('customers.edit'))
                                     <button class="btn btn-sm btn-outline-secondary" wire:click="edit({{ $c->id }})">Edit</button>
+                                @endif
+                                @if(auth()->user()->canAccess('customers.delete'))
                                     <button class="btn btn-sm btn-outline-danger" wire:click="confirmDelete({{ $c->id }})">Delete</button>
                                 @endif
                             </td>

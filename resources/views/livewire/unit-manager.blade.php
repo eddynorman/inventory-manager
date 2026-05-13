@@ -4,7 +4,9 @@
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title mb-0">Units</h5>
-            <button wire:click="create" class="btn btn-primary">New Unit</button>
+            @if (auth()->user()->canAccess('units.create'))
+                <button wire:click="create" class="btn btn-primary">New Unit</button>
+            @endif
         </div>
 
         <div class="card-body">

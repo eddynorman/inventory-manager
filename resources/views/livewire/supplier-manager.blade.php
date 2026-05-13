@@ -1,12 +1,12 @@
 <div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Suppliers</h5>
-        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
-            <button wire:click="create" class="btn btn-primary">New Supplier</button>
-        @endif
-    </div>
 
-    <div class="card mb-3">
+    <div class="card shadow-sm mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Suppliers</h5>
+            @if(auth()->user()->canAccess('suppliers.create'))
+                <button wire:click="create" class="btn btn-primary">New Supplier</button>
+            @endif
+        </div>
         <div class="card-body">
             <div class="row g-2 align-items-center">
                 <div class="col-auto">

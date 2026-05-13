@@ -5,8 +5,12 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">Users</h5>
             <div class="gap-2">
-                <button wire:click="create" class="btn btn-primary">New User</button>
-                <a href="{{ route('groups') }}"><button type="button" class="btn btn-primary">Groups</button></a>
+                @if (auth()->user()->canAccess('users.create'))
+                    <button wire:click="create" class="btn btn-primary">New User</button>
+                @endif
+                @if (auth()->user()->canAccess('groups.view'))
+                    <a href="{{ route('groups') }}"><button type="button" class="btn btn-primary">Groups</button></a>
+                @endif
             </div>
         </div>
 

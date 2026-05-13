@@ -1,13 +1,12 @@
 <div>
     @include('layouts.flash')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Categories</h5>
-        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
-            <button wire:click="create" class="btn btn-primary">New Category</button>
-        @endif
-    </div>
-
     <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Categories</h5>
+            @if(auth()->user()->canAccess('categories.create'))
+                <button wire:click="create" class="btn btn-primary">New Category</button>
+            @endif
+        </div>
         <div class=" card-body table-responsive px-2">
             @livewire('tables.category-table')
         </div>

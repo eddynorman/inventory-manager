@@ -8,10 +8,12 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm"
-                    wire:click="newTransfer">
-                    New Transfer
-                </button>
+                @if (auth()->user()->canAccess('transfers.create'))
+                    <button class="btn btn-outline-primary btn-sm"
+                        wire:click="newTransfer">
+                        New Transfer
+                    </button>
+                @endif
 
             </div>
         </div>
@@ -131,7 +133,9 @@
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
                     <button type="button" class="btn btn-secondary" wire:click="$set('showCreatePage', false)">Close</button>
                     @if (count($transferItems) > 0 && $user_id != $current_user_id)
-                        <button type="button" class="btn btn-danger" wire:click="$set('showRejectIssue', true)">Reject</button>
+                        @if (auth()->user()->canAccess('issues.reject'))
+                            <button type="button" class="btn btn-danger" wire:click="$set('showRejectIssue', true)">Reject</button>
+                        @endif
                         <button type="button" class="btn btn-primary" wire:click="save">Save</button>
                     @endif
 

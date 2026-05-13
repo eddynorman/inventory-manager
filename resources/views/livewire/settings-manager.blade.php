@@ -24,11 +24,12 @@
                         <div class="text-center py-4">
                             <i class="fa fa-building text-muted" style="font-size:40px;"></i>
                             <p class="text-muted mt-2">No organisation information recorded</p>
-
-                            <button class="btn btn-primary btn-sm"
-                                wire:click='recordOrganisation'>
-                                <i class="fa fa-plus"></i> Add Organisation
-                            </button>
+                            @if(auth()->user()->canAccess('settings.edit'))
+                                <button class="btn btn-primary btn-sm"
+                                    wire:click='recordOrganisation'>
+                                    <i class="fa fa-plus"></i> Add Organisation
+                                </button>
+                            @endif
                         </div>
                     @else
                         <div class="d-flex gap-3 align-items-start">

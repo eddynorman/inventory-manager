@@ -7,8 +7,10 @@
                 @if($showPurchases)
                     <h4>Purchases</h4>
                     <div class="gap-2">
-                        @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+                        @if(auth()->user()->canAccess('purchases.create'))
                             <button wire:click="createPurchase" class="btn btn-primary">New Purchase</button>
+                        @endif
+                        @if(auth()->user()->canAccess('orders.create'))
                             <button wire:click="createOrder" class="btn btn-primary">New Order</button>
                         @endif
                         <button type="button" class="btn btn-dark" wire:click='togglePurchaseOrderView'>Show Orders</button>

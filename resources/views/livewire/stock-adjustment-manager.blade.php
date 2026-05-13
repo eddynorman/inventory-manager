@@ -5,7 +5,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4>Stock Adjustments</h4>
                 <div class="gap-2">
-                    @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+                    @if(auth()->user()->canAccess('items.adjust_stock'))
                         <button wire:click="create" class="btn btn-primary">New Adjustment</button>
                     @endif
                 </div>

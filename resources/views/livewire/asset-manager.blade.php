@@ -7,12 +7,16 @@
                 <small class="text-muted">Record and manage Asset details and information.</small>
             </div>
             <div class="card-tools">
-                @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+                @if(auth()->user()->canAccess('assets.purchase'))
                     <button class="btn btn-dark align-items-center gap-2"
                             wire:click="$set('showPurchaseModal',true)">
                         <span>+</span> New Purchase
                     </button>
+                @endif
+                @if(auth()->user()->canAccess('purchases.create'))
                     <button wire:click="$set('showCreateModal', true)" class="btn btn-primary">New Item</button>
+                @endif
+                @if(auth()->user()->canAccess('assets.import'))
                     <button wire:click="$set('showImportModal', true)" class="btn btn-primary">
                         Import Assets
                     </button>

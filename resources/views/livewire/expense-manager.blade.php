@@ -8,15 +8,16 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn btn-primary"
-                    wire:click="$set('showCreateExpense', true)">
-                    <i class="fa fa-plus"></i> New Expense
-                </button>
-
-                <button class="btn btn-secondary"
-                    wire:click="$set('showCreateCategory', true)">
-                    <i class="fa fa-tags"></i> Categories
-                </button>
+                @if (auth()->user()->canAccess('expenses.create'))
+                    <button class="btn btn-primary"
+                        wire:click="$set('showCreateExpense', true)">
+                        <i class="fa fa-plus"></i> New Expense
+                    </button>
+                    <button class="btn btn-secondary"
+                        wire:click="$set('showCreateCategory', true)">
+                        <i class="fa fa-tags"></i> Categories
+                    </button>
+                @endif
             </div>
         </div>
         <div class="card-body">
