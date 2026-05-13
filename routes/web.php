@@ -17,11 +17,7 @@ use App\Models\Sale;
 use App\Services\SaleService;
 use App\Services\StockBatchService;
 
-Route::view('/', 'welcome')->name('welcome');
-
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified','permission:users.view'])
-    ->name('dashboard');
+Route::redirect('/', '/login');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -31,7 +27,7 @@ Route::post('logout', function (){
 
     (new Logout())->__invoke();
 
-    return redirect()->route('welcome');
+    return redirect()->route('login');
 })->middleware(['auth'])->name('logout');
 
 Route::middleware(['auth', 'verified'])->group(function () {
