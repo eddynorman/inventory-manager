@@ -1,69 +1,676 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Inventory Manager ERP System
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="350" alt="Laravel Logo">
 </p>
 
-## About Laravel
+<p align="center">
+    <strong>Professional Multi-Location ERP & Inventory Management System</strong><br>
+    Built with Laravel, Livewire, PowerGrid & Bootstrap
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# 📦 About The Project
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Inventory Manager is a professional ERP-style inventory and business management system built for **MTOMAWE COMPANY LIMITED**.
 
-## Learning Laravel
+The system is designed to support:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* Multi-location inventory management
+* Purchases & receivings
+* Sales & credit sales
+* Internal requisitions & transfers
+* FIFO costing
+* Asset management
+* User groups & permissions
+* ERP-style navigation & workflows
+* Audit-friendly stock architecture
+* Restaurant / Bar / Zoo operational workflows
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+The application follows real ERP principles including:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* Separation of purchasing and receiving
+* Stock movement tracking
+* Permission-based module access
+* Multi-department workflows
+* Composite item kits
+* Internal stock issue requests
+* Credit and cash sales support
+* Professional ERP UI/UX architecture
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 🚀 Core Features
 
-### Premium Partners
+## 📦 Inventory Management
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+* Item management
+* Categories
+* Departments
+* Multi-location stock
+* Stock adjustments
+* Closing stock
+* FIFO costing
+* Item kits / composite products
+* Stock movement architecture
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🛒 Purchase & Receiving System
 
-## Code of Conduct
+* Requisitions
+* Purchase workflows
+* Supplier purchases
+* Cash purchases
+* Receiving module
+* Supplier tracking
+* Purchase cost history
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 💰 Sales System
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* Cash sales
+* Credit sales
+* Customer management
+* Payment tracking
+* Profit calculation
+* Cost snapshotting at sale time
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# inventory-manager
+## 🔄 Internal Operations
 
+* Internal issue requests
+* Stock transfers between locations
+* Approval workflows
+* Departmental inventory tracking
 
-You can now:
+---
+
+## 🖥 Asset Management
+
+* Asset inventory
+* Asset purchases
+* Damaged asset tracking
+* Weighted average asset costing
+* Asset valuation reporting
+
+---
+
+## 👥 User & Permission System
+
+* Group-based permissions
+* Permission-aware sidebar
+* ERP-style role architecture
+* Secure module access
+* Professional user management
+
+---
+
+# 🧠 ERP Architecture Highlights
+
+This system follows professional ERP architecture patterns including:
+
+* Service-layer business logic
+* Transaction-safe inventory operations
+* Multi-location stock management
+* Weighted Average Costing (WAC)
+* Stock movement audit trails
+* Permission-aware navigation
+* Modular ERP layout system
+* Scalable enterprise-ready structure
+
+---
+
+# 🏗 Technology Stack
+
+## Backend
+
+* PHP 8+
+* Laravel
+* Livewire
+
+## Frontend
+
+* Bootstrap 5
+* PowerGrid
+* Alpine.js
+* Font Awesome
+* Bootstrap Icons
+
+## Database
+
+* MySQL / MariaDB
+
+## Development Tools
+
+* Composer
+* NPM
+* Vite
+
+---
+
+# 📂 Project Structure
+
+```bash
+app/
+├── Http/
+├── Livewire/
+├── Models/
+├── Services/
+├── PowerGrid/
+├── Providers/
+
+database/
+├── migrations/
+├── seeders/
+
+resources/
+├── views/
+├── css/
+├── js/
+```
+
+---
+
+# ⚙️ System Requirements
+
+Before installing, ensure your system has:
+
+| Requirement   | Version   |
+| ------------- | --------- |
+| PHP           | 8.2+      |
+| Composer      | Latest    |
+| Node.js       | 18+       |
+| NPM           | Latest    |
+| MySQL/MariaDB | Supported |
+| Git           | Latest    |
+
+---
+
+# 📥 Installation Guide
+
+## 1️⃣ Clone The Repository
+
+```bash
+git clone <repository-url>
+```
+
+Example:
+
+```bash
+git clone https://github.com/your-username/inventory-manager.git
+```
+
+---
+
+## 2️⃣ Enter The Project Directory
+
+```bash
+cd inventory-manager
+```
+
+---
+
+## 3️⃣ Install PHP Dependencies
+
+```bash
+composer install
+```
+
+---
+
+## 4️⃣ Install Frontend Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 5️⃣ Create Environment File
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## 6️⃣ Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+---
+
+# 🗄 Database Configuration
+
+Open the `.env` file and configure your database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=inventory_manager
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+---
+
+# 🧱 Run Migrations & Seeders
+
+```bash
 php artisan migrate --seed
-Login with super@example.com / password
+```
 
+This will:
 
+* Create all database tables
+* Seed permissions
+* Seed default user groups
+* Seed default payment methods
+* Create the super administrator account
+
+---
+
+# 🔐 Default Login Credentials
+
+After seeding:
+
+| Role                | Email                                         | Password |
+| ------------------- | --------------------------------------------- | -------- |
+| Super Administrator | [super@example.com](mailto:super@example.com) | password |
+
+⚠️ Change the password immediately in production.
+
+---
+
+# ▶️ Running The Application
+
+## Start Laravel Server
+
+```bash
+php artisan serve
+```
+
+Application URL:
+
+```bash
+http://127.0.0.1:8000
+```
+
+---
+
+## Start Vite Development Server
+
+In another terminal:
+
+```bash
+npm run dev
+```
+
+---
+
+# 🧹 Useful Artisan Commands
+
+## Run Migrations
+
+```bash
+php artisan migrate
+```
+
+---
+
+## Refresh Database
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## Clear Application Cache
+
+```bash
+php artisan optimize:clear
+```
+
+---
+
+## Cache Configuration
+
+```bash
+php artisan config:cache
+```
+
+---
+
+## Cache Routes
+
+```bash
+php artisan route:cache
+```
+
+---
+
+## Cache Views
+
+```bash
+php artisan view:cache
+```
+
+---
+
+# 📦 Important Installed Packages
+
+This project uses several important Laravel ecosystem packages.
+
+## Livewire
+
+```bash
+composer require livewire/livewire
+```
+
+---
+
+## PowerGrid
+
+```bash
+composer require power-components/livewire-powergrid
+```
+
+Publish PowerGrid:
+
+```bash
+php artisan vendor:publish --tag=livewire-powergrid-config
+```
+
+---
+
+## Laravel Excel
+
+```bash
+composer require maatwebsite/excel
+```
+
+Used for:
+
+* Imports
+* Exports
+* Bulk uploads
+* Reporting
+
+---
+
+## Bootstrap Icons
+
+```bash
+npm install bootstrap-icons
+```
+
+---
+
+## Font Awesome
+
+Loaded via CDN.
+
+---
+
+# 🧱 ERP Layout Features
+
+The system includes a professional ERP interface with:
+
+* Responsive sidebar
+* Mobile overlay navigation
+* Permission-aware menus
+* Modular ERP navigation groups
+* Professional PowerGrid styling
+* ERP dashboard architecture
+* Independent sidebar scrolling
+* Responsive modal sizing
+
+---
+
+# 📊 Inventory Logic
+
+## Weighted Average Costing (WAC)
+
+The system uses:
+
+```text
+Weighted Average Costing
+```
+
+Average cost is recalculated during receiving.
+
+---
+
+## Multi-Location Stock
+
+Stock is tracked per location using:
+
+```text
+locations
+location_items
+stock_movements
+```
+
+---
+
+## Item Kits
+
+Composite items:
+
+* reduce component stock
+* calculate dynamic kit cost
+* support recipe-style inventory logic
+
+---
+
+# 🔒 Permission System
+
+The application uses a permission-based access control system.
+
+Example permissions:
+
+```text
+items.view
+sales.view
+purchases.view
+users.view
+groups.view
+reports.view_financial
+```
+
+Navigation automatically adapts based on permissions.
+
+---
+
+# 🧪 Development Notes
+
+## Recommended Development Workflow
+
+```bash
+git pull
+composer install
+npm install
+php artisan migrate
+npm run dev
+php artisan serve
+```
+
+---
+
+## Recommended Coding Practices
+
+* Use service classes for business logic
+* Avoid direct stock manipulation
+* Use stock movement records
+* Never delete transactional records
+* Prefer inactive flags over hard deletes
+* Keep historical accounting data immutable
+
+---
+
+# 🏛 ERP Business Flow
+
+## Purchase Flow
+
+```text
+Requisition
+    ↓
+Purchase
+    ↓
+Receiving
+    ↓
+Stock Available
+```
+
+---
+
+## Internal Transfer Flow
+
+```text
+Issue Request
+    ↓
+Approval
+    ↓
+Transfer
+    ↓
+Stock Movement
+```
+
+---
+
+## Sales Flow
+
+```text
+Sale
+    ↓
+Payment
+    ↓
+Stock Reduction
+    ↓
+Profit Tracking
+```
+
+---
+
+# 📸 UI/UX Features
+
+* ERP-style responsive dashboard
+* Professional sidebar architecture
+* Permission-aware navigation
+* Bootstrap 5 modern UI
+* Livewire dynamic components
+* PowerGrid professional tables
+* Responsive modals
+* Mobile-friendly design
+
+---
+
+# 🛡 Security Recommendations
+
+For production deployment:
+
+* Change default admin password
+* Set `APP_ENV=production`
+* Set `APP_DEBUG=false`
+* Use HTTPS
+* Configure proper database backups
+* Use queue workers for heavy operations
+* Configure proper file permissions
+
+---
+
+# 📈 Future Expansion
+
+The system architecture is prepared for future modules such as:
+
+* Accounting & ledgers
+* Payroll
+* HR management
+* Room booking integration
+* Notifications
+* Audit logs
+* Advanced analytics
+* Financial reporting
+* Multi-branch support
+
+---
+
+# 👨‍💻 Developer Notes
+
+This project was designed with:
+
+* scalability
+* maintainability
+* ERP workflow accuracy
+* professional architecture
+* operational accountability
+
+in mind.
+
+It is intended to evolve into a full business management platform for hospitality, restaurant, retail, and operational environments.
+
+---
+
+# 🤝 Contributing
+
+## Contribution Workflow
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+Commit changes:
+
+```bash
+git commit -m "feat: add new feature"
+```
+
+Push branch:
+
+```bash
+git push origin feature/your-feature-name
+```
+
+---
+
+# 📝 Recommended Commit Convention
+
+```text
+feat: add purchase receiving workflow
+fix: resolve stock adjustment bug
+refactor: improve stock movement service
+ui: redesign ERP sidebar navigation
+```
+
+---
+
+# 📄 License
+
+This project is proprietary software developed for internal ERP and inventory management operations.
+
+---
+
+# 🙌 Acknowledgements
+
+Built using:
+
+* [Laravel](https://laravel.com?utm_source=chatgpt.com)
+* [Livewire](https://livewire.laravel.com?utm_source=chatgpt.com)
+* [PowerGrid](https://livewire-powergrid.com?utm_source=chatgpt.com)
+* [Bootstrap](https://getbootstrap.com?utm_source=chatgpt.com)
+
+---
+
+# 👨‍💻 Author
+
+Developed by Eddy for **MTOMAWE COMPANY LIMITED**.
+
+Professional ERP architecture for real-world operational management.
