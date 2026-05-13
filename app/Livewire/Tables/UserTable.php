@@ -35,7 +35,6 @@ final class UserTable extends PowerGridComponent
             ->add('name')
             ->add('email')
             ->add('type')
-            ->add('role')
             ->add('is_active')
             ->add('is_active_formatted',function($user){
                 return $user->is_active ? 'Yes' : 'No';
@@ -48,7 +47,6 @@ final class UserTable extends PowerGridComponent
             Column::make('Name', 'name')->sortable()->searchable(),
             Column::make('Email', 'email')->sortable()->searchable(),
             Column::make('Type', 'type')->sortable()->searchable(),
-            Column::make('Role', 'role')->sortable()->searchable(),
             Column::make('Active', 'is_active_formatted', 'is_active'),
             Column::make('Created', 'created_at')->sortable(),
             Column::action('Actions')
