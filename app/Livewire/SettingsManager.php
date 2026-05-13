@@ -26,7 +26,8 @@ class SettingsManager extends Component
         $this->organisationService = new OrganisationService();
         $this->locations = Location::all()->toArray();
         $this->loadDefaultLocations();
-        $this->organisationInfo = $this->organisationService->getOrganisation()->toArray();
+        $temp = $this->organisationService->getOrganisation();
+        $this->organisationInfo = $temp == null ? [] :$temp->toArray();
     }
 
     public function boot(OrganisationService $organisationService){
