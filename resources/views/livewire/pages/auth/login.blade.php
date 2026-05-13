@@ -17,6 +17,18 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
+        $user = auth()->user();
+
+        if (! $user->canAccess('dashboard.view')) {
+
+            $this->redirect(
+                route('restricted', absolute: false),
+                navigate: true
+            );
+
+            return;
+        }
+
         $this->redirectIntended(default: route('dashboard', absolute: false));
     }
 };

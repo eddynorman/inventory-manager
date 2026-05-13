@@ -23,6 +23,9 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Route::view('/restricted', 'livewire.index_pages.restricted-index')
+    ->name('restricted');
+
 Route::post('logout', function (){
 
     (new Logout())->__invoke();
