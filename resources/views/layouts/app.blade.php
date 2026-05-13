@@ -140,9 +140,17 @@
         .erp-sidebar{
             width: 280px;
             background: var(--erp-sidebar);
-            min-height: calc(100vh - 70px);
+            height: calc(100vh - 70px);
             border-right: 1px solid rgba(255,255,255,.05);
+
             overflow-y: auto;
+            overflow-x: hidden;
+
+            position: sticky;
+            top: 70px;
+
+            flex-shrink: 0;
+
             transition: all .3s ease;
         }
 
@@ -158,11 +166,17 @@
         .erp-main{
             flex: 1;
             min-width: 0;
+
             background: #f1f5f9;
+
+            height: calc(100vh - 70px);
+
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .erp-content{
-            padding: 1.5rem;
+            padding: 0.5rem;
         }
 
         .sidebar-section{
@@ -238,11 +252,21 @@
         @media (max-width: 991px){
 
             .erp-sidebar{
+
                 position: fixed;
+
                 top: 70px;
                 left: -100%;
+
                 width: 290px;
+                height: calc(100vh - 70px);
+
                 z-index: 1040;
+
+                overflow-y: auto;
+                overflow-x: hidden;
+
+                transition: all .3s ease;
             }
 
             .erp-sidebar.show{
@@ -255,6 +279,7 @@
                 background: rgba(0,0,0,.5);
                 z-index: 1035;
                 display: none;
+                backdrop-filter: blur(2px);
             }
 
             .erp-overlay.show{
