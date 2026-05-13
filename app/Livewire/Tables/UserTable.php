@@ -25,7 +25,7 @@ final class UserTable extends PowerGridComponent
 
     public function datasource()
     {
-        return User::query()->where('role', '!=', 'super');
+        return User::query();
     }
 
     public function fields(): PowerGridFields
