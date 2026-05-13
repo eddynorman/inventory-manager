@@ -81,7 +81,7 @@ class OrganisationService
             }
 
             // UPDATE OR CREATE
-            dd(optional($organisation)->id);
+            //dd(optional($organisation)->id);
             $organisation = Organization::updateOrCreate(
                 ['id' => optional($organisation)->id],
                 $data['organisation']
