@@ -5,8 +5,10 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <div class="card-title">Items</div>
             <div class="card-tools">
-                @if(auth()->user()->hasAnyRole(['super','admin','manager']))
+                @if(auth()->user()->canAccess('items.create'))
                     <button wire:click="create" class="btn btn-primary">New Item</button>
+                @endif
+                @if(auth()->user()->canAccess('items.import'))
                     <button wire:click="$set('showBulkCreateModal', true)" class="btn btn-primary">
                         Bulk Upload Items
                     </button>
