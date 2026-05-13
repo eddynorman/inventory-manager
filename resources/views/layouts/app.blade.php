@@ -438,6 +438,13 @@
                         <span>Items</span>
                     </a>
                 @endif
+                @if($user->canAccess('units.view'))
+                    <a href="{{ route('units') }}"
+                       class="sidebar-link {{ request()->routeIs('units') ? 'active' : '' }}">
+                        <i class="bi bi-box-seam"></i>
+                        <span>Units</span>
+                    </a>
+                @endif
 
                 @if($user->canAccess('item_kits.view'))
                     <a href="{{ route('item-kits') }}"
@@ -471,7 +478,7 @@
                     </a>
                 @endif
 
-                @if($user->canAccess('stock.view'))
+                @if($user->canAccess('stock.close_day'))
                     <a href="{{ route('closing-stock') }}"
                        class="sidebar-link {{ request()->routeIs('closing-stock') ? 'active' : '' }}">
                         <i class="bi bi-boxes"></i>
