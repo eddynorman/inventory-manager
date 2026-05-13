@@ -4,17 +4,18 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Services\AuditLogService;
 
 class UserService
 {
     public function rules(?int $id = null): array
     {
         return [
+            'selectedGroups' => ['required','array','min:1',],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email' . ($id ? ",$id" : '')],
             'password' => $id ? ['nullable', Password::default()] : ['required', Password::default()],
             'type' => ['required', 'in:staff,customer,supplier,accountant,other'],
-            'role' => ['required', 'in:super,admin,manager'],
             'isActive' => ['required', 'boolean'],
         ];
     }
@@ -22,20 +23,53 @@ class UserService
     public function save(?int $id, array $data): User
     {
         if (!empty($data['password'])) {
+
             $data['password'] = Hash::make($data['password']);
+
         } else {
+
             unset($data['password']);
         }
 
         $data['is_active'] = $data['isActive'];
-        unset($data['isActive']);
-        return User::updateOrCreate(['id' => $id], $data);
 
+        unset($data['isActive']);
+
+        $groups = $data['selectedGroups'];
+
+        unset($data['selectedGroups']);
+
+        $user = User::updateOrCreate(
+            [
+                'id' => $id
+            ],
+            $data
+        );
+
+        $user->groups()->sync($groups);
+
+        AuditLogService::log(
+            $id ? 'updated' : 'created',
+            'User',
+            $user->id,
+            'User ' . ($id ? 'updated' : 'created') . ': ' . $user->name,
+            [
+                'groups' => $groups,
+            ]
+        );
+
+        return $user;
     }
 
     public function delete(int $id): void
     {
         User::where('id', $id)->delete();
+        AuditLogService::log(
+            'deleted',
+            'User',
+            $id,
+            'Deleted user ID: ' . $id
+        );
     }
 
     public function bulkDelete(array $ids): void

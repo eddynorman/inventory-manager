@@ -1,6 +1,7 @@
 <?php
 namespace App\Livewire;
 
+use App\Models\Group;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Validation\Rules\Password;
@@ -17,6 +18,7 @@ class UserManager extends Component
     public function boot(UserService $service): void
     {
         $this->service = $service;
+        $this->groups = Group::orderBy('name')->get()->toArray();
     }
 
     // Form State
@@ -25,8 +27,9 @@ class UserManager extends Component
     public string $email = '';
     public string $password = '';
     public string $type = 'staff';
-    public string $role = 'manager';
     public bool $isActive = true;
+    public array $selectedGroups = [];
+    public array $groups = [];
 
     // Bulk selection
     public array $selectedUsers = [];
@@ -43,9 +46,8 @@ class UserManager extends Component
     }
     public function resetForm(): void
     {
-        $this->reset(['userId','name','email','password','type','role','isActive']);
+        $this->reset(['userId','name','email','password','type','role','isActive','selectedGroups','groups']);
         $this->type = 'staff';
-        $this->role = 'manager';
         $this->isActive = true;
         $this->resetValidation();
     }
@@ -64,9 +66,12 @@ class UserManager extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->type = $user->type;
-        $this->role = $user->role;
         $this->isActive = $user->is_active;
         $this->password = '';
+        $this->selectedGroups = $user
+            ->groups
+            ->pluck('id')
+            ->toArray();
         $this->showModal = true;
     }
 

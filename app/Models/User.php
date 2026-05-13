@@ -70,10 +70,23 @@ class User extends Authenticatable
         return in_array($this->role, $roles, true);
     }
 
-    public function hasPermission(string $permissionName): bool
+    public function hasPermission(string $permission): bool
     {
-        return $this->groups()->whereHas('permissions', function ($q) use ($permissionName) {
-            $q->where('name', $permissionName);
-        })->exists();
+        return $this->all_permissions
+            ->contains($permission);
+    }
+
+    public function getAllPermissionsAttribute()
+    {
+        return $this->groups
+            ->load('permissions')
+            ->pluck('permissions')
+            ->flatten()
+            ->pluck('name')
+            ->unique();
+    }
+    public function canAccess(string $permission): bool
+    {
+        return $this->hasPermission($permission);
     }
 }

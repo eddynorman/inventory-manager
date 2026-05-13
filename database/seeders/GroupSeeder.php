@@ -11,46 +11,137 @@ class GroupSeeder extends Seeder
     public function run(): void
     {
         $groups = [
-            'Super Administrators' => [
-                'all' => true,
-                'description' => 'Full access to all features',
+
+            [
+                'name' => 'Super Administrators',
+                'description' => 'Full unrestricted system access',
+                'permissions' => ['*'],
             ],
-            'Administrators' => [
-                'allow' => [
-                    'items.*', 'sales.*', 'purchases.*', 'receivings.*', 'transfers.*', 'issues.*', 'requisitions.*', 'suppliers.*', 'customers.*', 'stock.*', 'users.view', 'settings.view', 'settings.edit'
+
+            [
+                'name' => 'General Managers',
+                'description' => 'Manage overall business operations',
+                'permissions' => [
+                    'dashboard.*',
+                    'reports.*',
+                    'sales.*',
+                    'purchases.*',
+                    'stock.*',
+                    'requisitions.*',
+                    'issues.*',
+                    'transfers.*',
+                    'receivings.*',
+                    'customers.*',
+                    'suppliers.*',
                 ],
-                'description' => 'Manage core operations',
             ],
-            'Managers' => [
-                'allow' => [
-                    'items.view', 'sales.view', 'purchases.view', 'receivings.view', 'transfers.view', 'issues.view', 'requisitions.view', 'suppliers.view', 'customers.view', 'stock.view'
+
+            [
+                'name' => 'Inventory Controllers',
+                'description' => 'Manage inventory and stock movement',
+                'permissions' => [
+                    'items.*',
+                    'item_kits.*',
+                    'stock.*',
+                    'transfers.*',
+                    'issues.*',
+                    'receivings.*',
+                    'requisitions.view',
                 ],
-                'description' => 'Read-only core operations',
+            ],
+
+            [
+                'name' => 'Procurement Officers',
+                'description' => 'Handle purchasing and supplier management',
+                'permissions' => [
+                    'purchases.*',
+                    'orders.*',
+                    'suppliers.*',
+                    'receivings.view',
+                    'requisitions.*',
+                ],
+            ],
+
+            [
+                'name' => 'Cashiers',
+                'description' => 'Manage sales',
+                'permissions' => [
+                    'dashboard.view',
+                    'sales.view',
+                    'sales.create',
+                    'sales.edit',
+                    'reports.view_sales',
+                    'customers.view',
+                ],
+            ],
+
+
+            [
+                'name' => 'Accountants',
+                'description' => 'Manage expenses and financial reports',
+                'permissions' => [
+                    'banking.*',
+                    'expenses.*',
+                    'reports.view_financial',
+                    'reports.view_expenses',
+                    'sales.view',
+                    'purchases.view',
+                ],
+            ],
+
+            [
+                'name' => 'Auditors',
+                'description' => 'View reports and audit logs',
+                'permissions' => [
+                    'reports.*',
+                    'audit_logs.view',
+                ],
             ],
         ];
 
-        foreach ($groups as $name => $config) {
-            $group = Group::firstOrCreate(['name' => $name], ['description' => $config['description'] ?? null]);
+        foreach ($groups as $data) {
 
-            if (!empty($config['all'])) {
-                $permIds = Permission::pluck('id')->all();
-                $group->permissions()->sync($permIds);
-                continue;
-            }
+            $group = Group::updateOrCreate(
+                [
+                    'name' => $data['name']
+                ],
+                [
+                    'description' => $data['description']
+                ]
+            );
 
-            $allow = $config['allow'] ?? [];
-            $ids = [];
-            foreach ($allow as $pattern) {
-                if (str_ends_with($pattern, '.*')) {
-                    $category = substr($pattern, 0, -2);
-                    $ids = array_merge($ids, Permission::where('category', $category)->pluck('id')->all());
-                } else {
-                    $ids = array_merge($ids, Permission::where('name', $pattern)->pluck('id')->all());
+            $permissionIds = [];
+
+            foreach ($data['permissions'] as $permission) {
+
+                if ($permission === '*') {
+
+                    $permissionIds = Permission::pluck('id')->toArray();
+                    break;
+                }
+
+                if (str_ends_with($permission, '.*')) {
+
+                    $category = str_replace('.*', '', $permission);
+
+                    $permissionIds = array_merge(
+                        $permissionIds,
+                        Permission::where('category', $category)
+                            ->pluck('id')
+                            ->toArray()
+                    );
+
+                    continue;
+                }
+
+                $perm = Permission::where('name', $permission)->first();
+
+                if ($perm) {
+                    $permissionIds[] = $perm->id;
                 }
             }
-            $group->permissions()->sync(array_unique($ids));
+
+            $group->permissions()->sync(array_unique($permissionIds));
         }
     }
 }
-
-

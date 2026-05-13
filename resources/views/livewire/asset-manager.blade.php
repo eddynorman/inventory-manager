@@ -28,7 +28,7 @@
 
     @if($showCreateModal)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            style="background: rgba(15,23,42,0.65); z-index:1050; backdrop-filter: blur(5px);"
             wire:click="$set('showCreateModal', false)">
 
             <div class=" card shadow-lg w-100 p-0 " style="max-width: 500px; border: transparent;"
@@ -95,7 +95,7 @@
 
     @if($showPurchaseModal)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            style="background: rgba(15,23,42,0.65); z-index:1050; backdrop-filter: blur(5px);"
             wire:click="$set('showPurchaseModal', false)">
 
             <div class=" card shadow-lg w-100 p-0 " style="max-width: 800px; border: transparent;"
@@ -192,7 +192,7 @@
 
     @if($showDamageModal)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            style="background: rgba(15,23,42,0.65); z-index:1050; backdrop-filter: blur(5px);"
             wire:click="$set('showPurchaseModal', false)">
 
             <div class=" card shadow-lg w-100 p-0 " style="max-width: 500px; border: transparent;"
@@ -242,7 +242,7 @@
 
     @if($showImportModal)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            style="background: rgba(15,23,42,0.65); z-index:1050; backdrop-filter: blur(5px);"
             wire:click="$set('showImportModal', false)">
 
             <div class="card shadow-lg w-100 p-0"
@@ -250,7 +250,7 @@
                 wire:click.stop>
 
                 {{-- HEADER --}}
-                <div class="card-header d-flex bg-primary align-items-center justify-content-between">
+                <div class="card-header py-3 d-flex bg-primary align-items-center justify-content-between">
                     <h4 class="text-white mb-0">
                         Bulk Import Assets
                     </h4>
@@ -335,7 +335,7 @@
     @endif
     @if($showViewModal && $viewItem)
         <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            style="background: rgba(15,23,42,0.65); z-index:1050; backdrop-filter: blur(5px);"
             wire:click="$set('showViewModal', false)">
 
             <div class="card shadow-lg w-100 p-0"

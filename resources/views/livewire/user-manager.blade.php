@@ -4,7 +4,10 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title">Users</h5>
-            <button wire:click="create" class="btn btn-primary">New User</button>
+            <div class="gap-2">
+                <button wire:click="create" class="btn btn-primary">New User</button>
+                <a href="{{ route('groups') }}"><button type="button" class="btn btn-primary">Groups</button></a>
+            </div>
         </div>
 
         <div class="card-body">
@@ -51,14 +54,48 @@
                         @error('type')<div class="text-danger small">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Role</label>
-                        <select class="form-select" wire:model.defer="role">
-                            <option value="super">Super</option>
-                            <option value="admin">Admin</option>
-                            <option value="manager">Manager</option>
-                        </select>
-                        @error('role')<div class="text-danger small">{{ $message }}</div>@enderror
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+                            Access Groups
+                        </label>
+
+                        <div class="row">
+
+                            @foreach($groups as $group)
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label class="border rounded-4 p-3 w-100 d-flex gap-3 align-items-start">
+
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input mt-1"
+                                            value="{{ $group->id }}"
+                                            wire:model="selectedGroups">
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                {{ $group->name }}
+                                            </div>
+
+                                            <small class="text-muted">
+                                                {{ $group->description }}
+                                            </small>
+                                        </div>
+                                    </label>
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+                        @error('selectedGroups')
+                            <small class="text-danger">
+                                {{ $message }}
+                            </small>
+                        @enderror
                     </div>
 
                     <div class="form-check form-switch mb-3">
