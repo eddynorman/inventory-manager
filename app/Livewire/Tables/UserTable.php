@@ -3,10 +3,12 @@
 namespace App\Livewire\Tables;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class UserTable extends PowerGridComponent
@@ -65,6 +67,16 @@ final class UserTable extends PowerGridComponent
                 ->slot('<i class="fa fa-trash"></i>')
                 ->class('btn btn-danger')
                 ->dispatch('confirmDelete', ['id' => $row->id]),
+        ];
+    }
+
+    public function actionRules($row): array
+    {
+       return [
+            // Hide button edit for ID 1
+            Rule::button('delete')
+                ->when(fn($row) => $row->id == Auth::id())
+                ->hide(),
         ];
     }
 }
