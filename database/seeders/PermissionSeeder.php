@@ -178,12 +178,13 @@ class PermissionSeeder extends Seeder
             ],
 
             'reports' => [
+                'view',
                 'view_sales',
                 'view_inventory',
-                'view_profit',
+                'view_purchases',
                 'view_expenses',
                 'view_financial',
-                'view_stock',
+                'view_assets',
                 'view_banking',
                 'close_day',
             ],
