@@ -113,7 +113,7 @@
                                                     <tr>
                                                         <td>{{ $item['name'] }}</td>
                                                         <td>
-                                                            @if ($item['is_stock_item'] == false || $item['type'] == 'service' )
+                                                            @if ($item['type'] == 'service' )
                                                                 Non Stock
                                                             @else
                                                                 {{ $item['stock'] }}
