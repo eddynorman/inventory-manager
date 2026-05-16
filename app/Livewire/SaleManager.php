@@ -260,7 +260,7 @@ class SaleManager extends Component
         } else {
 
             foreach ($this->sale['items'] as $i => $sale_item) {
-                if ($sale_item['kit_id'] == $item['kit_id']) {
+                if (isset($sale_item['kit_id']) && $sale_item['kit_id'] == $item['kit_id']) {
 
                     $this->sale['items'][$i]['quantity'] += 1;
                     $this->sale['items'][$i]['total'] =
@@ -427,6 +427,7 @@ class SaleManager extends Component
             $this->showAddPaymentMethod = false;
             $this->methodName = '';
             $this->referenceNumber = '';
+            $this->paymentMethods = PaymentMethod::all()->toArray();
         }
     }
 
@@ -504,7 +505,7 @@ class SaleManager extends Component
             $this->printSale($saleid);
             $this->dispatch('refreshSales');
         } catch (\Throwable $th) {
-            //dd($th);
+            dd($th);
             session()->flash('error',$th->getMessage());
             $this->dispatch('flash');
         }
@@ -565,6 +566,7 @@ class SaleManager extends Component
                 'kit_id' => $saleKit->kit->id,
                 'name' => $saleKit->kit->name,
                 'unit_name' => "Kit",
+                'stock' => $stock,
                 'selling_price' => $saleKit->selling_price,
                 'quantity' => $saleKit->quantity,
                 'units' => [
