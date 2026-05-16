@@ -212,9 +212,10 @@ class SaleService
                 $existing = $sale->kits()->where('item_kit_id', $kitt['kit_id'])->first();
                 $kit = ItemKit::find($kitt['kit_id']);
                 if ($existing) {
+                    $cost_at_sale = 0;
                     if($existing->quantity != $kitt['quantity']){
                         $kit_items = $kit->kitItems()->get();
-                        $sold_kit_items = SaleItemKitItem::where('sale_item_kit_id',$existing->id);
+                        $sold_kit_items = SaleItemKitItem::where('sale_item_kit_id',$existing->id)->get();
                         foreach($kit_items as $k){
                             $saleItemKitItemId = null;
                             $unit = Unit::find($k->unit_id);
@@ -228,34 +229,34 @@ class SaleService
                                     $usages = $batchService->getBatchUsageForReverse($ski);
                                     $batchService->reverseConsumption($usages);
                                     $returned = $batchService->consumeBatches($k->item_id,$locationIds,$qty,StockBatchType::KIT_SALE,$saleItemKitItemId,$kit->name);
+                                    $cost_at_sale =+ $returned['total_cost'];
                                     foreach($returned['qtys'] as $rq){
                                         $movementData[] = $rq;
                                     }
                                 }
                             }
                         }
-
+                        $existing->cost_at_sale = $cost_at_sale;
                         $existing->quantity = $kitt['quantity'];
-                        $existing->unit_price = $unit->unit_price;
                         $existing->total = $kitt['quantity'] * $kit->selling_price;
                         $existing->save();
                     }
                 } else {
                     $kit_items = $kit->kitItems()->get();
+                    $saleKit = SaleItemKit::create([
+                        'sale_id' => $saleId,
+                        'item_kit_id'=> $kit->id,
+                        'quantity' => $kitt['quantity'],
+                        'cost_at_sale' => 0,
+                        'selling_price' => $kit->selling_price,
+                        'total' => $kit->selling_price * $kitt['quantity'],
+                    ]);
+                    $cost_at_sale = 0;
                     foreach($kit_items as $k){
                         $saleItemKitItemId = null;
                         $unit = Unit::find($k->unit_id);
                         $qty = $k->quantity * $unit->smallest_units_number * $kitt['quantity'];
                         $price = $unit->selling_price;
-
-                        $saleKit = SaleItemKit::create([
-                            'sale_id' => $saleId,
-                            'item_kit_id'=> $kit->id,
-                            'quantity' => $qty,
-                            'cost_at_sale' => 0,
-                            'selling_price' => $kit->selling_price,
-                            'total' => $kit->selling_price * $kitt['quantity'],
-                        ]);
 
                         $saleItemKitItem = SaleItemKitItem::create([
                             'sale_id'        => $saleId,
@@ -270,9 +271,12 @@ class SaleService
                         foreach($returned['qtys'] as $rq){
                             $movementData[] = $rq;
                         }
+                        $cost_at_sale =+ $returned['total_cost'];
                         $saleItemKitItem->cost_at_sale = $returned['total_cost'];
                         $saleItemKitItem->save();
                     }
+                    $saleKit->cost_at_sale = $cost_at_sale;
+                    $saleKit->save();
                 }
 
             }
@@ -286,7 +290,7 @@ class SaleService
         foreach($currentKits as $currentKit){
             $found = false;
             foreach($saleKits as $saleKit){
-                if($saleKit['id'] == $currentKit->id){
+                if($saleKit['kit_id'] == $currentKit->item_kit_id){
                     $found = true;
                     break;
                 }
@@ -294,7 +298,7 @@ class SaleService
             if($found == false){
                 $batchService = new StockBatchService();
                 $stockMovementService = new StockMovementService();
-                $sold_kit_items = SaleItemKitItem::where('sale_item_kit_id',$currentKit->id);
+                $sold_kit_items = SaleItemKitItem::where('sale_item_kit_id',$currentKit->id)->get();
                 foreach($sold_kit_items as $ski){
                     $usages = $batchService->getBatchUsageForReverse($ski);
                     $batchService->reverseConsumption($usages);
@@ -526,52 +530,92 @@ class SaleService
 
     public function search(string $search, array $locationIds)
     {
-        // ITEMS
         $items = Item::with('category')
             ->where('name', 'like', "%{$search}%")
-            ->where('is_sale_item',true)
-            ->where('is_active',true)
+            ->where('is_sale_item', true)
+            ->where('is_active', true)
             ->get()
             ->map(function ($item) use ($locationIds) {
-                $stock = $this->getItemStock($item->id, $locationIds);
+
+                $stock = $this->getItemStock(
+                    $item->id,
+                    $locationIds
+                );
 
                 return [
-                    'type' => $item->is_stock_item == true ? 'item' : 'service',
-                    'is_stock_item' =>$item->is_stock_item,
+                    'type' => $item->is_stock_item
+                        ? 'item'
+                        : 'service',
+
+                    'is_stock_item' => $item->is_stock_item,
+
                     'item_id' => $item->id,
+
                     'name' => $item->name,
+
                     'category' => $item->category?->name,
+
                     'stock' => $stock,
-                    'is_available' => $stock > 0,
+
+                    'is_available' => !$item->is_stock_item
+                        ? true
+                        : $stock > 0,
                 ];
             })
             ->filter(function ($item) {
-                return $item['stock'] >= 0;
-            });
 
-        // KITS
+                /*
+                |--------------------------------------------------------------------------
+                | Services should always appear
+                |--------------------------------------------------------------------------
+                */
+
+                if ($item['is_stock_item'] == false) {
+                    return true;
+                }
+
+                return $item['stock'] >= 0;
+            })
+            ->values();
+
         $kits = ItemKit::with('kitItems')
             ->where('name', 'like', "%{$search}%")
             ->get()
             ->map(function ($kit) use ($locationIds) {
-                $availableQty = $this->getKitAvailableQty($kit->id, $locationIds);
+
+                $availableQty = $this->getKitAvailableQty(
+                    $kit->id,
+                    $locationIds
+                );
 
                 return [
+
                     'type' => 'kit',
+
                     'is_stock_item' => true,
+
                     'kit_id' => $kit->id,
+
                     'name' => $kit->name,
+
                     'category' => 'Kit',
+
                     'stock' => $availableQty,
+
                     'selling_price' => $kit->selling_price,
+
                     'is_available' => $availableQty > 0,
                 ];
             })
             ->filter(function ($kit) {
-                return $kit['stock'] > 0;
-            });
 
-        return $items->merge($kits)->values();
+                return $kit['stock'] > 0;
+            })
+            ->values();
+
+        return $items
+            ->concat($kits)
+            ->values();
     }
 
     public function save(array $saleData,?int $saleId,string $type = "upfront"){
