@@ -578,7 +578,7 @@
 
                             <div class="col-md-6">
 
-                                <a href="{{'#' }}"
+                                <a href="{{ route('reports') }}"
                                    class="quick-action-btn">
 
                                     <div class="quick-action-icon">
