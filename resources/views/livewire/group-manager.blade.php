@@ -143,9 +143,10 @@
                     </button>
                 </div>
 
-                <div class="card-body p-0">
+                <div class="card-body p-0"
+                  style="max-height: 70vh; overflow: scroll;">
 
-                    <div class="row g-0 mb-1">
+                    <div class="row g-0 mb-2">
 
                         {{-- LEFT --}}
                         <div class="col-lg-4 border-end">
@@ -177,7 +178,7 @@
                                     </label>
 
                                     <textarea
-                                        rows="5"
+                                        rows="3"
                                         class="form-control rounded-3"
                                         wire:model.defer="description"></textarea>
 
