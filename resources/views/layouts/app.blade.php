@@ -415,7 +415,9 @@
                 @if($user->canAccess('dashboard.view'))
 
                     <a href="{{ route('dashboard') }}"
-                       class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                        id="{{ request()->routeIs('dashboard') ? 'activeSidebarLink' : '' }}"
+                       class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                       >
 
                         <i class="bi bi-grid"></i>
                         <span>Dashboard</span>
@@ -433,6 +435,7 @@
 
                 @if($user->canAccess('items.view'))
                     <a href="{{ route('items') }}"
+                    id="{{ request()->routeIs('items') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('items') ? 'active' : '' }}">
                         <i class="bi bi-box-seam"></i>
                         <span>Items</span>
@@ -440,6 +443,7 @@
                 @endif
                 @if($user->canAccess('units.view'))
                     <a href="{{ route('units') }}"
+                    id="{{ request()->routeIs('units') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('units') ? 'active' : '' }}">
                         <i class="bi bi-box-seam"></i>
                         <span>Units</span>
@@ -448,6 +452,7 @@
 
                 @if($user->canAccess('item_kits.view'))
                     <a href="{{ route('item-kits') }}"
+                    id="{{ request()->routeIs('item-kits') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('item-kits') ? 'active' : '' }}">
                         <i class="bi bi-collection"></i>
                         <span>Item Kits</span>
@@ -456,6 +461,7 @@
 
                 @if($user->canAccess('categories.view'))
                     <a href="{{ route('categories') }}"
+                        id="{{ request()->routeIs('categories') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('categories') ? 'active' : '' }}">
                         <i class="bi bi-tags"></i>
                         <span>Categories</span>
@@ -464,6 +470,7 @@
 
                 @if($user->canAccess('departments.view'))
                     <a href="{{ route('departments') }}"
+                    id="{{ request()->routeIs('departments') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('departments') ? 'active' : '' }}">
                         <i class="bi bi-diagram-3"></i>
                         <span>Departments</span>
@@ -472,6 +479,7 @@
 
                 @if($user->canAccess('locations.view'))
                     <a href="{{ route('locations') }}"
+                        id="{{ request()->routeIs('locations') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('locations') ? 'active' : '' }}">
                         <i class="bi bi-geo-alt"></i>
                         <span>Locations</span>
@@ -480,6 +488,7 @@
 
                 @if($user->canAccess('stock.close_day'))
                     <a href="{{ route('closing-stock') }}"
+                    id="{{ request()->routeIs('closing-stock') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('closing-stock') ? 'active' : '' }}">
                         <i class="bi bi-boxes"></i>
                         <span>Closing Stock</span>
@@ -488,6 +497,7 @@
 
                 @if($user->canAccess('stock.adjust'))
                     <a href="{{ route('adjustments') }}"
+                    id="{{ request()->routeIs('adjustments') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('adjustments') ? 'active' : '' }}">
                         <i class="bi bi-sliders"></i>
                         <span>Stock Adjustments</span>
@@ -496,6 +506,7 @@
 
                 @if($user->canAccess('items.view'))
                     <a href="{{ route('assets') }}"
+                    id="{{ request()->routeIs('assets') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('assets') ? 'active' : '' }}">
                         <i class="bi bi-pc-display"></i>
                         <span>Assets</span>
@@ -512,6 +523,7 @@
 
                 @if($user->canAccess('sales.view'))
                     <a href="{{ route('sales') }}"
+                        id="{{ request()->routeIs('sales') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('sales') ? 'active' : '' }}">
                         <i class="bi bi-cart-check"></i>
                         <span>Sales</span>
@@ -520,6 +532,7 @@
 
                 @if($user->canAccess('purchases.view'))
                     <a href="{{ route('purchases') }}"
+                    id="{{ request()->routeIs('purchases') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('purchases') ? 'active' : '' }}">
                         <i class="bi bi-bag-check"></i>
                         <span>Purchases</span>
@@ -528,6 +541,7 @@
 
                 @if($user->canAccess('receivings.view'))
                     <a href="{{ route('receivings') }}"
+                    id="{{ request()->routeIs('receivings') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('receivings') ? 'active' : '' }}">
                         <i class="bi bi-box-arrow-in-down"></i>
                         <span>Receivings</span>
@@ -536,6 +550,7 @@
 
                 @if($user->canAccess('issues.view'))
                     <a href="{{ route('issues') }}"
+                        id="{{ request()->routeIs('issues') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('issues') ? 'active' : '' }}">
                         <i class="bi bi-exclamation-diamond"></i>
                         <span>Issues</span>
@@ -544,6 +559,7 @@
 
                 @if($user->canAccess('transfers.view'))
                     <a href="{{ route('transfers') }}"
+                        id="{{ request()->routeIs('transfers') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('transfers') ? 'active' : '' }}">
                         <i class="bi bi-arrow-left-right"></i>
                         <span>Transfers</span>
@@ -552,6 +568,7 @@
 
                 @if($user->canAccess('requisitions.view'))
                     <a href="{{ route('requisitions') }}"
+                    id="{{ request()->routeIs('requisitions') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('requisitions') ? 'active' : '' }}">
                         <i class="bi bi-file-earmark-text"></i>
                         <span>Requisitions</span>
@@ -568,6 +585,7 @@
 
                 @if($user->canAccess('customers.view'))
                     <a href="{{ route('customers') }}"
+                    id="{{ request()->routeIs('customers') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('customers') ? 'active' : '' }}">
                         <i class="bi bi-people"></i>
                         <span>Customers</span>
@@ -576,6 +594,7 @@
 
                 @if($user->canAccess('suppliers.view'))
                     <a href="{{ route('suppliers') }}"
+                    id="{{ request()->routeIs('suppliers') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('suppliers') ? 'active' : '' }}">
                         <i class="bi bi-truck"></i>
                         <span>Suppliers</span>
@@ -584,6 +603,7 @@
 
                 @if($user->canAccess('expenses.view'))
                     <a href="{{ route('expenses') }}"
+                    id="{{ request()->routeIs('expenses') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('expenses') ? 'active' : '' }}">
                         <i class="bi bi-cash-stack"></i>
                         <span>Expenses</span>
@@ -592,6 +612,7 @@
 
                 @if($user->canAccess('reports.view_financial'))
                     <a href="{{ route('banking') }}"
+                    id="{{ request()->routeIs('banking') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('banking') ? 'active' : '' }}">
                         <i class="bi bi-bank"></i>
                         <span>Banking</span>
@@ -608,6 +629,7 @@
 
                 @if($user->canAccess('users.view'))
                     <a href="{{ route('users') }}"
+                    id="{{ request()->routeIs('users') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('users') ? 'active' : '' }}">
                         <i class="bi bi-people-fill"></i>
                         <span>Users</span>
@@ -616,6 +638,7 @@
 
                 @if($user->canAccess('groups.view'))
                     <a href="{{ route('groups') }}"
+                    id="{{ request()->routeIs('groups') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('groups') ? 'active' : '' }}">
                         <i class="bi bi-shield-lock"></i>
                         <span>Groups & Permissions</span>
@@ -624,11 +647,31 @@
 
                 @if($user->canAccess('settings.view'))
                     <a href="{{ route('settings') }}"
+                    id="{{ request()->routeIs('settings') ? 'activeSidebarLink' : '' }}"
                        class="sidebar-link {{ request()->routeIs('settings') ? 'active' : '' }}">
                         <i class="bi bi-gear"></i>
                         <span>Settings</span>
                     </a>
                 @endif
+            </div>
+            <!-- REPORTS -->
+            <div class="sidebar-section pb-4">
+
+                <div class="sidebar-title">
+                    Reports
+                </div>
+                @if($user->canAccess('reports.view'))
+                    <a href="{{ route('reports') }}"
+                    id="{{ request()->routeIs('reports') ? 'activeSidebarLink' : '' }}"
+                    class="sidebar-link {{ request()->routeIs('reports') ? 'active' : '' }}">
+
+                        <i class="bi bi-graph-up-arrow"></i>
+
+                        <span>Reports</span>
+                    </a>
+
+                @endif
+
             </div>
         </aside>
 
@@ -670,6 +713,29 @@
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
 @yield('scripts')
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const activeLink =
+            document.getElementById('activeSidebarLink');
+
+        if(activeLink){
+
+            activeLink.scrollIntoView({
+
+                behavior: 'smooth',
+
+                block: 'center'
+
+            });
+
+        }
+
+    });
+
+</script>
 
 <script>
 

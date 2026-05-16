@@ -239,6 +239,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | REPORTS
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/reports', function () {
+        return view('livewire.index_pages.reports.reports-index-wrapper');
+
+    })
+        ->middleware('permission:reports.view')
+        ->name('reports');
+
+    /*
+    |--------------------------------------------------------------------------
     | SETTINGS
     |--------------------------------------------------------------------------
     */
