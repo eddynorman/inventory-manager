@@ -354,18 +354,24 @@ new #[Layout('layouts.guest')] class extends Component
                         </div>
 
                         {{-- LOGIN FORM (UNCHANGED) --}}
-                        <form wire:submit="login">
+                        <form wire:submit="login" autocomplete="on">
 
                             {{-- EMAIL --}}
                             <div class="mb-3">
 
-                                <label class="form-label fw-semibold">Email</label>
+                                <label class="form-label fw-semibold" for="email">
+                                    Email
+                                </label>
 
                                 <div class="erp-input-group">
                                     <span><i class="bi bi-envelope"></i></span>
 
-                                    <input wire:model="form.email"
+                                    <input
+                                        wire:model="form.email"
                                         type="email"
+                                        id="email"
+                                        name="email"
+                                        autocomplete="username"
                                         class="form-control erp-input"
                                         placeholder="you@example.com"
                                         autofocus>
@@ -376,13 +382,19 @@ new #[Layout('layouts.guest')] class extends Component
                             {{-- PASSWORD --}}
                             <div class="mb-3">
 
-                                <label class="form-label fw-semibold">Password</label>
+                                <label class="form-label fw-semibold" for="password">
+                                    Password
+                                </label>
 
                                 <div class="erp-input-group">
                                     <span><i class="bi bi-lock"></i></span>
 
-                                    <input wire:model="form.password"
+                                    <input
+                                        wire:model="form.password"
                                         type="password"
+                                        id="password"
+                                        name="password"
+                                        autocomplete="current-password"
                                         class="form-control erp-input"
                                         placeholder="••••••••">
                                 </div>
