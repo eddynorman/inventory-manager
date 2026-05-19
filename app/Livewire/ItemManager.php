@@ -71,11 +71,10 @@ class ItemManager extends Component
         'edit' => 'edit',
         'confirmDelete' => 'confirmDelete',
         'refresh-table' => 'refreshTable',
-        'bulk-delete-items' => 'confirmBulkDelete',
-        'bulk-toggle-active-items' => 'confirmBulkToggleActive',
-        'bulk-assign-category-items' => 'assignCategory',
-        'bulk-assign-supplier-items' => 'assignSupplier',
-        'bulk-assign-location-items' => 'assignLocation',
+        'bulkDelete' => 'confirmBulkDelete',
+        'bulkToggleActive' => 'confirmBulkToggleActive',
+        'bulkAssignCategory' => 'assignCategory',
+        'bulkAssignSupplier' => 'assignSupplier',
     ];
 
     public function boot(ItemService $service): void
