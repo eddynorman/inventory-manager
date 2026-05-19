@@ -31,7 +31,29 @@ final class ItemTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Item::with('category', 'supplier')->where('is_active', true);
+        return Item::query()
+
+            ->leftJoin(
+                'categories',
+                'items.category_id',
+                '=',
+                'categories.id'
+            )
+
+            ->leftJoin(
+                'suppliers',
+                'items.supplier_id',
+                '=',
+                'suppliers.id'
+            )
+
+            ->select(
+                'items.*',
+                'categories.name as category_name',
+                'suppliers.name as supplier_name'
+            )
+
+            ->where('items.is_active', true);
     }
 
     public function relationSearch(): array
@@ -44,13 +66,9 @@ final class ItemTable extends PowerGridComponent
         return PowerGrid::fields()
             ->add('name')
             ->add('category_id')
-            ->add('category',function($item){
-                return $item->category->name ?? '-';
-            })
+            ->add('category_name')
             ->add('supplier_id')
-            ->add('supplier',function($item){
-                return $item->supplier->name ?? '-';
-            })
+            ->add('supplier_name')
             ->add('initial_stock')
             ->add('current_stock')
             ->add('reorder_level')
@@ -67,10 +85,10 @@ final class ItemTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Category', 'category')
+            Column::make('Category', 'category_name', 'categories.name')
                 ->sortable()
                 ->searchable(),
-            Column::make('Supplier', 'supplier')
+            Column::make('Supplier', 'supplier_name', 'suppliers.name')
                 ->sortable()
                 ->searchable(),
 
