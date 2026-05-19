@@ -38,7 +38,6 @@ class UserManager extends Component
     public bool $showModal = false;
     public bool $showDeleteModal = false;
     public bool $showBulkDeleteModal = false;
-    public bool $showBulkRoleModal = false;
 
     public function refreshTable(): void
     {
@@ -46,7 +45,7 @@ class UserManager extends Component
     }
     public function resetForm(): void
     {
-        $this->reset(['userId','name','email','password','type','role','isActive','selectedGroups','groups']);
+        $this->reset(['userId','name','email','password','type','isActive','selectedGroups','groups']);
         $this->type = 'staff';
         $this->isActive = true;
         $this->resetValidation();
@@ -115,15 +114,6 @@ class UserManager extends Component
         $this->refreshTable();
     }
 
-    public function bulkAssignRole(string $role): void
-    {
-        $this->service->bulkAssignRoles($this->selectedUsers, $role);
-        $this->showBulkRoleModal = false;
-        $this->selectedUsers = [];
-        session()->flash('success', 'Roles assigned successfully.');
-        $this->dispatch('flash');
-        $this->refreshTable();
-    }
 
     public function render()
     {
