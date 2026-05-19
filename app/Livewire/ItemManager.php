@@ -251,9 +251,8 @@ class ItemManager extends Component
         }
     }
 
-    public function confirmBulkToggleActive( $ids): void
+    public function confirmBulkToggleActive(array $ids): void
     {
-        dd($ids);
         $this->selectedIds = $ids;
         // toggle modal could ask user to choose active/inactive; we'll call toggle active directly for simplicity
         // Here we'll set them active if any are inactive (simple heuristic)
