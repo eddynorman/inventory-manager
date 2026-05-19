@@ -532,8 +532,8 @@ class SaleService
     {
         $items = Item::with('category')
             ->where('name', 'like', "%{$search}%")
-            // ->where('is_sale_item', true)
-            // ->where('is_active', true)
+            ->where('is_sale_item', true)
+            ->where('is_active', true)
             ->get()
             ->map(function ($item) use ($locationIds) {
 
