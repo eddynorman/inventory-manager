@@ -38,7 +38,7 @@ class ItemService
             'supplierId' => ['nullable', 'integer', 'exists:suppliers,id'],
             'locationId' => ['nullable','integer','exists:locations,id'],
             'newLocationId' => ['required','integer','exists:locations,id'],
-            'initialStock' => ['required', 'integer', 'min:0'],
+            'initialStock' => ['required', 'numeric', 'min:0'],
             'reorderLevel' => ['required', 'integer', 'min:0'],
             'smallestUnitId' => ['nullable','integer','exists:units,id'],
             'smallestUnit' => ['required', 'string', 'max:255'],
