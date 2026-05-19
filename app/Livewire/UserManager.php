@@ -54,6 +54,7 @@ class UserManager extends Component
     public function create(): void
     {
         $this->resetForm();
+        $this->groups = Group::orderBy('name')->get()->toArray();
         $this->showModal = true;
     }
 
