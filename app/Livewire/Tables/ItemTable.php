@@ -51,9 +51,9 @@ final class ItemTable extends PowerGridComponent
                 'items.*',
                 'categories.name as category_name',
                 'suppliers.name as supplier_name'
-            )
+            );
 
-            ->where('items.is_active', true);
+            //->where('items.is_active', true);
     }
 
     public function relationSearch(): array
