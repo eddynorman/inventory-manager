@@ -118,19 +118,19 @@ final class ItemTable extends PowerGridComponent
             Button::add('bulk-assign-category')
                 ->slot('<i class="fa-solid fa-folder"></i> Bulk Assign Category')
                 ->class('btn btn-primary btn-sm')
-                ->dispatch('bulkAssignCategory', ['table' => $this->tableName]),
+                ->dispatch('bulkAssignCategory', ['ids' => $this->checkboxValues]),
             Button::add('bulk-assign-supplier')
                 ->slot('<i class="fa-solid fa-folder"></i> Bulk Assign Supplier')
                 ->class('btn btn-primary btn-sm')
-                ->dispatch('bulkAssignSupplier', ['table' => $this->tableName]),
+                ->dispatch('bulkAssignSupplier', ['table' => $this->checkboxValues]),
             Button::add('bulk-toggle-active')
                 ->slot('<i class="fa-solid fa-toggle-on"></i> Bulk Toggle Active')
                 ->class('btn btn-primary btn-sm')
-                ->dispatch('bulkToggleActive', ['table' => $this->tableName]),
+                ->dispatch('bulkToggleActive', ['table' => $this->checkboxValues]),
             Button::add('bulk-delete')
                 ->slot('<i class="fa-solid fa-trash"></i> Bulk Delete')
                 ->class('btn btn-danger btn-sm')
-                ->dispatch('bulkDelete', ['table' => $this->tableName]),
+                ->dispatch('bulkDelete', ['table' => $this->checkboxValues]),
         ];
     }
 
