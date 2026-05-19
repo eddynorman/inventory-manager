@@ -75,17 +75,17 @@
                                         <input
                                             type="checkbox"
                                             class="form-check-input mt-1"
-                                            value="{{ $group->id }}"
+                                            value="{{ $group['id'] }}"
                                             wire:model="selectedGroups">
 
                                         <div>
 
                                             <div class="fw-semibold">
-                                                {{ $group->name }}
+                                                {{ $group['name'] }}
                                             </div>
 
                                             <small class="text-muted">
-                                                {{ $group->description }}
+                                                {{ $group['description'] }}
                                             </small>
                                         </div>
                                     </label>
