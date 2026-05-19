@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Item;
 use App\Models\Location;
 use App\Models\PaymentMethod;
 use App\Models\Unit;
@@ -545,8 +546,11 @@ class SaleManager extends Component
         foreach($sale->items as $saleItem){
             $stock = $this->service->getItemStock($saleItem->item->id,$loc_ids);
             $unit = Unit::find($saleItem->unit_id)->toArray();
+            $item = Item::find($saleItem->item->id);
             $i = [
-                'type' => "item",
+                'type' => $item->is_stock_item
+                        ? 'item'
+                        : 'service',
                 'item_id' => $saleItem->item->id,
                 'name' => $saleItem->item->name,
                 'unit_name' =>$unit['name'],
