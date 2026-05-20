@@ -580,10 +580,23 @@ class SalesReportService
             ->get();
     }
 
-    public function departmentSalesSummary(array $filters = [])
+   public function departmentSalesSummary(array $filters = [])
     {
         $from = Carbon::parse($filters['from_date']);
         $to = Carbon::parse($filters['to_date']);
+
+        /*
+        |--------------------------------------------------------------------------
+        | SOLD NORMAL ITEMS
+        |--------------------------------------------------------------------------
+        |
+        | Revenue:
+        | - direct item sales
+        |
+        | Cost:
+        | - direct item inventory cost
+        |
+        */
 
         $soldItems = SaleItem::query()
 
@@ -617,69 +630,164 @@ class SalesReportService
 
             ->get();
 
-        // $soldKits = SaleItemKit::query()
+        /*
+        |--------------------------------------------------------------------------
+        | SOLD KITS REVENUE
+        |--------------------------------------------------------------------------
+        |
+        | IMPORTANT:
+        | Revenue from kits only.
+        |
+        | DO NOT USE kit cost here.
+        | Kit costs come from ingredient consumption.
+        |
+        */
 
-        //     ->join('sales', 'sale_item_kits.sale_id', '=', 'sales.id')
+        $soldKits = SaleItemKit::query()
 
-        //     ->join('item_kits', 'sale_item_kits.item_kit_id', '=', 'item_kits.id')
+            ->join('sales', 'sale_item_kits.sale_id', '=', 'sales.id')
 
-        //     ->join('categories', 'item_kits.category_id', '=', 'categories.id')
+            ->join('item_kits', 'sale_item_kits.item_kit_id', '=', 'item_kits.id')
 
-        //     ->join('departments', 'categories.department_id', '=', 'departments.id')
+            ->join('categories', 'item_kits.category_id', '=', 'categories.id')
 
-        //     ->whereBetween('sales.created_at', [$from, $to])
+            ->join('departments', 'categories.department_id', '=', 'departments.id')
 
-        //     ->selectRaw('
-        //         departments.id as department_id,
-        //         departments.name as department_name,
+            ->whereBetween('sales.created_at', [$from, $to])
 
-        //         SUM(
-        //             sale_item_kits.quantity * sale_item_kits.selling_price
-        //         ) as total_sales,
+            ->selectRaw('
+                departments.id as department_id,
+                departments.name as department_name,
 
-        //         SUM(
-        //             sale_item_kits.cost_at_sale
-        //         ) as total_cost
-        //     ')
+                SUM(
+                    sale_item_kits.quantity
+                    *
+                    sale_item_kits.selling_price
+                ) as total_sales,
 
-        //     ->groupBy(
-        //         'departments.id',
-        //         'departments.name'
-        //     )
+                0 as total_cost
+            ')
 
-        //     ->get();
+            ->groupBy(
+                'departments.id',
+                'departments.name'
+            )
 
-        $merged = collect()
+            ->get();
 
-            ->concat($soldItems)
+        /*
+        |--------------------------------------------------------------------------
+        | USED ITEMS COST
+        |--------------------------------------------------------------------------
+        |
+        | Includes:
+        | - kit ingredient consumption
+        | - operational usage
+        | - manual closing usage
+        |
+        */
+
+        $usedItems = $this->usedItemsReport($filters)
 
             ->groupBy('department_id')
 
             ->map(function ($rows) {
 
-                $sales = $rows->sum('total_sales');
-
-                $cost = $rows->sum('total_cost');
-
-                $profit = $sales - $cost;
-
                 return (object)[
+
+                    'department_id' =>
+                        $rows->first()->department_id,
 
                     'department_name' =>
                         $rows->first()->department_name,
 
+                    'total_sales' => 0,
+
+                    'total_cost' =>
+                        $rows->sum('total_cost'),
+                ];
+            })
+
+            ->values();
+
+        /*
+        |--------------------------------------------------------------------------
+        | MERGE EVERYTHING
+        |--------------------------------------------------------------------------
+        */
+
+        $merged = collect()
+
+            ->concat($soldItems)
+
+            ->concat($soldKits)
+
+            ->concat($usedItems)
+
+            ->groupBy('department_id')
+
+            ->map(function ($rows) {
+
+                $sales = (float) $rows->sum('total_sales');
+
+                $cost = (float) $rows->sum('total_cost');
+
+                $profit = $sales - $cost;
+
+                $margin =
+                    $sales > 0
+                        ? ($profit / $sales) * 100
+                        : 0;
+
+                return (object)[
+
+                    'department_id' =>
+                        $rows->first()->department_id,
+
+                    'department_name' =>
+                        $rows->first()->department_name,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | SALES
+                    |--------------------------------------------------------------------------
+                    */
+
                     'total_sales' => $sales,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | INVENTORY COST
+                    |--------------------------------------------------------------------------
+                    */
 
                     'total_cost' => $cost,
 
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PROFITABILITY
+                    |--------------------------------------------------------------------------
+                    */
+
                     'profit' => $profit,
 
-                    'profit_percentage' =>
+                    'profit_percentage' => $margin,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | EXTRA ERP ANALYTICS
+                    |--------------------------------------------------------------------------
+                    */
+
+                    'cost_percentage' =>
+
                         $sales > 0
-                            ? ($profit / $sales) * 100
+                            ? ($cost / $sales) * 100
                             : 0,
                 ];
             })
+
+            ->sortByDesc('total_sales')
 
             ->values();
 
