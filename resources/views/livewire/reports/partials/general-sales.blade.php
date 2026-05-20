@@ -1,7 +1,7 @@
 <div>
     <div class="row g-4 mb-4">
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Total Sales
@@ -13,7 +13,34 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
+            <div class="erp-page-card p-4 h-100">
+
+                <div class="text-muted small mb-2">
+                    Total Paid
+                </div>
+
+                <h3 class="fw-bold text-primary">
+                    {{ number_format($generalSummary->total_paid, 2) }}
+                </h3>
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="erp-page-card p-4 h-100">
+
+                <div class="text-muted small mb-2">
+                    Unpaid Sales
+                </div>
+
+                <h3 class="fw-bold text-warning">
+                    {{ number_format($generalSummary->total_pending, 2) }}
+                </h3>
+
+            </div>
+        </div>
+
+        <div class="col-md-2">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Total Cost
@@ -25,7 +52,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Gross Profit
@@ -37,7 +64,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Profit Margin
