@@ -99,7 +99,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($issueItems as $index => $item)
-                                <tr wire:key="item-{{ $item['item_id'] }}">
+                                <tr>
                                     <td>{{ $item['name'] }}</td>
                                     <td>{{ $item['stock'] }}</td>
                                     <td style="width:120px;">
