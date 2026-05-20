@@ -367,11 +367,59 @@ class SalesReportService
 
         /*
         |--------------------------------------------------------------------------
+        | NORMALIZE DATA
+        |--------------------------------------------------------------------------
+        */
+
+        $kitUsage = $kitUsage->map(function ($row) {
+
+            return (object)[
+
+                'department_id' => $row->department_id,
+
+                'department_name' => $row->department_name,
+
+                'item_id' => $row->item_id,
+
+                'item_name' => $row->item_name,
+
+                'total_quantity' => (float) $row->total_quantity,
+
+                'total_cost' => (float) $row->total_cost,
+
+                'source' => $row->source,
+            ];
+        });
+
+        $manualUsage = $manualUsage->map(function ($row) {
+
+            return (object)[
+
+                'department_id' => $row->department_id,
+
+                'department_name' => $row->department_name,
+
+                'item_id' => $row->item_id,
+
+                'item_name' => $row->item_name,
+
+                'total_quantity' => (float) $row->total_quantity,
+
+                'total_cost' => (float) $row->total_cost,
+
+                'source' => $row->source,
+            ];
+        });
+
+        /*
+        |--------------------------------------------------------------------------
         | MERGE & SORT
         |--------------------------------------------------------------------------
         */
 
-        return $kitUsage
+        return collect()
+
+            ->concat($kitUsage)
 
             ->concat($manualUsage)
 
