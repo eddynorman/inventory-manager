@@ -445,15 +445,34 @@ class SaleManager extends Component
 
     public function checkStock(int $index,float $quantity,int $id,string $type="item"){
         $this->resetErrorBag("sale.items.$index.quantity");
+        $oldSale = null;
+        if(isset($this->sale['id']) && $this->sale['id'] > 0){
+            $oldSale = $this->service->getSale($this->sale['id']);
+        }
+        $existing = 0;
         if($type == 'item'){
+            if($oldSale != null){
+                foreach($oldSale->items as $sit){
+                    if($sit->item_id == $id){
+                        $existing = $sit->quantity;
+                        break;
+                    }
+                }
+            }
             $unit = Unit::find($this->sale['items'][$index]['selected_unit_id']);
             $stock = $this->service->getItemStock($id,$this->locationIds);
-            if($quantity * $unit->smallest_units_number > $stock){
+            if($quantity * $unit->smallest_units_number > ($stock + $existing)){
                 $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
             }
         }else if($type == 'kit'){
+            foreach($oldSale->kits as $skt){
+                if($skt->kit_id == $id){
+                    $existing = $skt->quantity;
+                    break;
+                }
+            }
             $stock = $this->service->getKitAvailableQty($id,$this->locationIds);
-            if($quantity > $stock){
+            if($quantity > ($stock + $existing)){
                 $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
             }
         }
@@ -461,17 +480,38 @@ class SaleManager extends Component
 
     public function checkAllStock():bool{
         $allIsWell = true;
+        $oldSale = null;
+        if(isset($this->sale['id']) && $this->sale['id'] > 0){
+            $oldSale = $this->service->getSale($this->sale['id']);
+        }
         foreach($this->sale['items'] as $index => $item){
+            $existing = 0;
             if($item['type'] == 'item'){
+                if($oldSale != null){
+                    foreach($oldSale->items as $sit){
+                        if($sit->item_id == $item['item_id']){
+                            $existing = $sit->quantity;
+                            break;
+                        }
+                    }
+                }
                 $unit = Unit::find($item['selected_unit_id']);
                 $stock = $this->service->getItemStock($item['item_id'],$this->locationIds);
-                if($item['quantity'] * $unit->smallest_units_number > $stock){
+                if($item['quantity'] * $unit->smallest_units_number > ($stock + $existing)){
                     $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
                     $allIsWell = false;
                 }
             }else if($item['type'] == 'kit'){
+                if($oldSale != null){
+                    foreach($oldSale->kits as $skt){
+                        if($skt->kit_id == $item['kit_id']){
+                            $existing = $skt->quantity;
+                            break;
+                        }
+                    }
+                }
                 $stock = $this->service->getKitAvailableQty($item['kit_id'],$this->locationIds);
-                if($item['quantity'] > $stock){
+                if($item['quantity'] > ($stock + $existing)){
                     $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
                     $allIsWell = false;
                 }
