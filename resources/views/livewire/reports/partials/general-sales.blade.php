@@ -1,7 +1,7 @@
 <div>
     <div class="row g-4 mb-4">
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Total Sales
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
 
                 <div class="text-muted small mb-2">
@@ -26,7 +26,7 @@
 
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
 
                 <div class="text-muted small mb-2">
@@ -40,7 +40,7 @@
             </div>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Total Cost
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Gross Profit
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-md-4">
             <div class="erp-page-card p-4 h-100">
                 <div class="text-muted small mb-2">
                     Profit Margin
