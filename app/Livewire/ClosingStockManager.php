@@ -51,6 +51,7 @@ class ClosingStockManager extends Component
     public function loadItems()
     {
         $this->items = Item::where('is_auto_tracked', false)
+            ->where('is_stock_item',true)
             ->whereHas('locationItems', function ($q) {
                 $q->where('location_id', $this->locationId);
             })
