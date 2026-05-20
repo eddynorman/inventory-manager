@@ -128,7 +128,7 @@
                             <tr>
                                 <th>Item</th>
                                 <th>Stock</th>
-                                <th>Actions</th>
+                                {{-- <th>Actions</th> --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -136,16 +136,16 @@
                                 <tr>
                                     <td>{{ $itemLocation['item']['name'] ?? 'Unknown' }}</td>
                                     <td>{{ $itemLocation['stock'] ?? 0 }}</td>
-                                    <td>
+                                    {{-- <td>
                                         <button class="btn btn-sm btn-outline-primary"
                                                 wire:click="openMoveModal({{ $itemLocation['id'] }})">
                                             Move
                                         </button>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center">No items found.</td>
+                                    <td colspan="2" class="text-center">No items found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

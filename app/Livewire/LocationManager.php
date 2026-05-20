@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\ItemLocation;
 use App\Models\User;
 use App\Models\Location;
 use App\Services\LocationService;
@@ -146,10 +147,11 @@ class LocationManager extends Component
         $this->email = (string)($location->email ?? '');
         $this->staffResponsible = $location->staff_responsible;
         $this->description = (string)($location->description ?? '');
-        $this->items = $location->items->map(fn($il) => [
+        $this->items = ItemLocation::with('item')->where('location_id',$location->id)->get()->map(fn($il) => [
+
             'id' => $il->id,
             'item' => ['id' => $il->item->id, 'name' => $il->item->name],
-            'stock' => $il->current_tock,
+            'stock' => $il->quantity,
         ])->toArray();
 
         $this->showViewModal = true;
