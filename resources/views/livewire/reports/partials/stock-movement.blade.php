@@ -20,6 +20,10 @@
                             Received
                         </th>
 
+                        <th class="text-end text-info">
+                            Transfer In
+                        </th>
+
                         <th class="text-end">
                             Adjustments
                         </th>
@@ -30,6 +34,10 @@
 
                         <th class="text-end">
                             Used/Sold
+                        </th>
+
+                        <th class="text-end text-warning">
+                            Transfer Out
                         </th>
 
                         <th class="text-end">
@@ -62,6 +70,10 @@
                                 {{ number_format($row->received_quantity,2) }}
                             </td>
 
+                            <td class="text-end text-info">
+                                {{ number_format($row->transfer_in_quantity,2) }}
+                            </td>
+
                             <td class="text-end text-warning">
                                 {{ number_format($row->adjustment_quantity,2) }}
                             </td>
@@ -74,6 +86,10 @@
                                 {{ number_format($row->used_quantity,2) }}
                             </td>
 
+                            <td class="text-end text-warning">
+                                {{ number_format($row->transfer_out_quantity,2) }}
+                            </td>
+
                             <td class="text-end fw-bold">
                                 {{ number_format($row->closing_stock,2) }}
                             </td>
@@ -84,7 +100,7 @@
 
                         <tr>
 
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
 
                                 No stock movement found
 

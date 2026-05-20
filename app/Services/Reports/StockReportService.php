@@ -115,7 +115,6 @@ class StockReportService
                     $locationId,
                     fn ($q) =>
                     $q->where('from_location', $locationId)
-                        ->orWhere('to_location', $locationId)
                 )
 
                 ->whereBetween('created_at', [$from, $to])
@@ -138,7 +137,6 @@ class StockReportService
                     $locationId,
                     fn ($q) =>
                     $q->where('from_location', $locationId)
-                        ->orWhere('to_location', $locationId)
                 )
 
                 ->whereBetween('created_at', [$from, $to])
@@ -166,7 +164,6 @@ class StockReportService
                         $locationId,
                         fn ($q) =>
                         $q->where('from_location', $locationId)
-                            ->orWhere('to_location', $locationId)
                     )
 
                     ->whereBetween('created_at', [$from, $to])
@@ -174,6 +171,51 @@ class StockReportService
                     ->sum('quantity')
             );
 
+            /*
+            |--------------------------------------------------------------------------
+            | TRANSFER IN
+            |--------------------------------------------------------------------------
+            */
+
+            $transferIn = StockMovement::query()
+
+                ->where('item_id', $item->id)
+
+                ->where('type', 'transfer receiving')
+
+                ->when(
+                    $locationId,
+                    fn ($q) =>
+                    $q->where('to_location', $locationId)
+                )
+
+                ->whereBetween('created_at', [$from, $to])
+
+            ->sum('quantity');
+
+            /*
+            |--------------------------------------------------------------------------
+            | TRANSFER OUT
+            |--------------------------------------------------------------------------
+            */
+
+            $transferOut = abs(
+                StockMovement::query()
+
+                    ->where('item_id', $item->id)
+
+                    ->where('type', 'transfer')
+
+                    ->when(
+                        $locationId,
+                        fn ($q) =>
+                        $q->where('from_location', $locationId)
+                    )
+
+                    ->whereBetween('created_at', [$from, $to])
+
+                    ->sum('quantity')
+            );
             /*
             |--------------------------------------------------------------------------
             | CLOSING
@@ -185,9 +227,13 @@ class StockReportService
                 +
                 $received
                 +
+                $transferIn
+                +
                 $adjustments
                 -
-                $used;
+                $used
+                -
+                $transferOut;
 
             return (object)[
 
@@ -207,10 +253,16 @@ class StockReportService
 
                 'adjustment_quantity' => $adjustments,
 
+                'transfer_in_quantity' => $transferIn,
+
+                'transfer_out_quantity' => $transferOut,
+
                 'total_available' =>
                     $opening
                     +
                     $received
+                    +
+                    $transferIn
                     +
                     $adjustments,
 
