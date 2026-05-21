@@ -465,10 +465,12 @@ class SaleManager extends Component
                 $this->addError("sale.items.$index.quantity", "Cannot exceed stock");
             }
         }else if($type == 'kit'){
-            foreach($oldSale->kits as $skt){
-                if($skt->kit_id == $id){
-                    $existing = $skt->quantity;
-                    break;
+            if($oldSale != null){
+                foreach($oldSale->kits as $skt){
+                    if($skt->kit_id == $id){
+                        $existing = $skt->quantity;
+                        break;
+                    }
                 }
             }
             $stock = $this->service->getKitAvailableQty($id,$this->locationIds);
