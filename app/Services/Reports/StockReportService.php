@@ -157,7 +157,6 @@ class StockReportService
                     ->whereIn('type', [
                         'Item Sale',
                         'closing-stock',
-                        'transfer',
                     ])
 
                     ->when(
