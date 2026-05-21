@@ -520,10 +520,18 @@ class SalesReportService
             -
             $totalCost;
 
+        $profitPercentage = 0;
+
+        if($totalCost == 0){
+            $profitPercentage = 100;
+        }else{
+
+        }
+
         $profitPercentage =
-            ($sales->total_sales ?? 0) > 0 && ($totalCost ?? 0) > 0
+            ($sales->total_sales ?? 0) > 0
                 ? ($profit / $totalCost) * 100
-                : (($sales->total_sales ?? 0) > 0 ? 100 : 0);
+                : 0;
 
         return (object)[
 
@@ -580,7 +588,7 @@ class SalesReportService
             ->get();
     }
 
-   public function departmentSalesSummary(array $filters = [])
+    public function departmentSalesSummary(array $filters = [])
     {
         $from = Carbon::parse($filters['from_date']);
         $to = Carbon::parse($filters['to_date']);
@@ -733,11 +741,15 @@ class SalesReportService
                 $cost = (float) $rows->sum('total_cost');
 
                 $profit = $sales - $cost;
-
-                $margin =
-                    $sales > 0 && $cost > 0
+                $margin = 0;
+                if($cost == 0){
+                    $margin = 100;
+                }else{
+                    $margin =
+                    $sales > 0
                         ? ($profit / $cost) * 100
-                        : (($sales ?? 0) > 0 ? 100 : 0);
+                        : 0;
+                }
 
                 return (object)[
 
