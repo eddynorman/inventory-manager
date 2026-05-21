@@ -521,8 +521,8 @@ class SalesReportService
             $totalCost;
 
         $profitPercentage =
-            ($sales->total_sales ?? 0) > 0
-                ? ($profit / $sales->total_sales) * 100
+            ($sales->total_sales ?? 0) > 0 && ($totalCost ?? 0) > 0
+                ? ($profit / $totalCost) * 100
                 : 0;
 
         return (object)[
@@ -735,8 +735,8 @@ class SalesReportService
                 $profit = $sales - $cost;
 
                 $margin =
-                    $sales > 0
-                        ? ($profit / $sales) * 100
+                    $sales > 0 && $cost > 0
+                        ? ($profit / $cost) * 100
                         : 0;
 
                 return (object)[
