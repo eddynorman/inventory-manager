@@ -2,13 +2,18 @@
 
 namespace App\Livewire\Reports;
 
+use App\Models\Item;
+use App\Models\Unit;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Services\Reports\SalesReportService;
 use App\Services\Reports\StockReportService;
+use App\Services\SaleService;
 
 class ReportsIndex extends Component
 {
+    public array $saleView = [];
+    public bool $showViewSale = false;
     /*
     |--------------------------------------------------------------------------
     | FILTERS
@@ -388,6 +393,92 @@ class ReportsIndex extends Component
 
                 break;
         }
+    }
+
+    public function loadSale(int $saleId):array{
+        $sale = app(SaleService::class)->getSale($saleId);
+        $saleData = [];
+
+        //load locations
+        $saleData['locations'] = $sale->locations->toArray();
+        $loc_ids = [];
+        foreach($saleData['locations'] as $sl){
+            $loc_ids[] =$sl['id'];
+        }
+
+        //load payments
+        $saleData['payments'] = [];
+        foreach($sale->payments as $payment){
+            $saleData['payments'][] = ['id' => $payment->id,'amount' => $payment->amount, 'method' => $payment->method->toArray()];
+        }
+
+        //load servers
+        $saleData['served_by'] = $sale->servedBy->toArray();
+        $saleData['recorded_by'] = $sale->createdBy->name;
+
+        //load payment summary and info
+        $saleData['total'] = $sale->total_amount;
+        $saleData['paid'] = $sale->total_paid;
+        $saleData['balance'] = $sale->balance;
+        $saleData['created_at'] = $sale->created_at->toDateTimeString();
+        $saleData['id'] = $sale->id;
+        $saleData['status'] = $sale->status;
+
+        //load items
+        $saleData['items'] = [];
+        foreach($sale->items as $saleItem){
+            $stock = app(SaleService::class)->getItemStock($saleItem->item->id,$loc_ids);
+            $unit = Unit::find($saleItem->unit_id)->toArray();
+            $item = Item::find($saleItem->item->id);
+            $i = [
+                'type' => $item->is_stock_item
+                        ? 'item'
+                        : 'service',
+                'item_id' => $saleItem->item->id,
+                'name' => $saleItem->item->name,
+                'unit_name' =>$unit['name'],
+                'stock' => $stock,
+                'selling_price' => $saleItem->unit_price,
+                'quantity' => $saleItem->quantity,
+                'units' => $saleItem->item->units()->get()->toArray(),
+                'selected_unit_id' => $saleItem->unit_id,
+                'total' => $saleItem->total,
+            ];
+            $saleData['items'][] = $i;
+        }
+        foreach($sale->kits as $saleKit){
+            $stock = $this->service->getKitAvailableQty($saleKit->kit->id,$loc_ids);
+            $i = [
+                'type' => "kit",
+                'kit_id' => $saleKit->kit->id,
+                'name' => $saleKit->kit->name,
+                'unit_name' => "Kit",
+                'stock' => $stock,
+                'selling_price' => $saleKit->selling_price,
+                'quantity' => $saleKit->quantity,
+                'units' => [
+                    ['id' => 0, 'name' => 'kit','selling_price' => $saleKit->selling_price,'smallest_units_number' => 1]
+                ],
+                'selected_unit_id' => 0,
+                'total' => $saleKit->total,
+            ];
+            $saleData['items'][] = $i;
+        }
+        return $saleData;
+    }
+    public function viewSale(int $saleId){
+        $this->saleView = $this->loadSale($saleId);
+        $this->showViewSale = true;
+    }
+
+    public function updatedShowViewSale(){
+        if($this->showViewSale == false){
+            $this->saleView = [];
+        }
+    }
+
+    public function printSale(int $id){
+        $this->dispatch('print-sale', saleId: $id);
     }
 
     public function render()

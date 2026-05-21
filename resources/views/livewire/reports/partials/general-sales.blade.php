@@ -276,15 +276,14 @@
                                 <div class="d-flex justify-content-end gap-2">
 
                                     <a
-                                        href="#"
+                                        wire:click="viewSale({{ $sale->id }})"
                                         class="btn btn-sm btn-light rounded-3">
 
                                         <i class="bi bi-eye"></i>
                                     </a>
 
                                     <a
-                                        href="#"
-                                        target="_blank"
+                                        wire:click="$dispatch('print-sale', { saleId: {{ $sale->id }} })"
                                         class="btn btn-sm btn-dark rounded-3">
 
                                         <i class="bi bi-printer"></i>
@@ -317,4 +316,115 @@
         </div>
 
     </div>
+    @if ($showViewSale)
+        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+            style="background: rgba(0,0,0,0.5); z-index:1050;"
+            wire:click="$set('showViewSale', false)">
+
+            <div class="card shadow-lg w-100"
+                style="max-width: 750px;"
+                wire:click.stop>
+
+                <!-- HEADER -->
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                    <div>
+                        <div class="fw-bold">Sale Details</div>
+                        <small class="text-light">
+                            {{ \Carbon\Carbon::parse($saleView['created_at'])->format('d M Y, H:i') }}
+                        </small>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+
+                        <!-- PRINT -->
+                        <button class="btn btn-sm btn-light"
+                            wire:click="$dispatch('print-sale', { saleId: {{ $saleView['id'] }} })">
+                            <i class="fa fa-print"></i> Print
+                        </button>
+                        <button class="btn-close btn-close-white"
+                            wire:click="$set('showViewSale', false)">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body overflow-auto">
+
+                    <!-- 🔹 META INFO -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">Recorded By</small><br>
+                            <strong>{{ $saleView['recorded_by'] }}</strong>
+                        </div>
+
+                        <div class="col-md-6">
+                            <small class="text-muted">Served By</small><br>
+                            @forelse($saleView['served_by'] as $user)
+                                <span class="badge bg-dark">{{ $user['name'] }}</span>
+                            @empty
+                                <span class="text-muted">N/A</span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- 🔹 SUMMARY -->
+                    <div class="border rounded p-2 mb-3 bg-light">
+                        <div class="d-flex justify-content-between">
+                            <span>Total</span>
+                            <strong>{{ number_format($saleView['total']) }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between text-success">
+                            <span>Paid</span>
+                            <strong>{{ number_format($saleView['paid']) }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between text-danger">
+                            <span>Balance</span>
+                            <strong>{{ number_format($saleView['balance']) }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- 🔹 ITEMS -->
+                    <table class="table table-sm table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item</th>
+                                <th width="100">Unit</th>
+                                <th width="80">Qty</th>
+                                <th width="120">Price</th>
+                                <th width="120">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($saleView['items'] as $item)
+                                <tr>
+                                    <td>{{ $item['name'] }}</td>
+                                    <td>{{ $item['unit_name'] }}</td>
+                                    <td>{{ $item['quantity'] }}</td>
+                                    <td>{{ number_format($item['selling_price']) }}</td>
+                                    <td class="fw-bold">{{ number_format($item['total']) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <!-- 🔹 PAYMENTS -->
+                    <div class="mt-3 mb-3">
+                        <h6 class="fw-bold border-bottom pb-1">Payments</h6>
+
+                        @forelse ($saleView['payments'] as $p)
+                            <div class="d-flex justify-content-between">
+                                <span>{{ $p['method']['name'] }}</span>
+                                <strong>{{ number_format($p['amount']) }}</strong>
+                            </div>
+                        @empty
+                            <small class="text-danger">No payments recorded</small>
+                        @endforelse
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    @endif
 </div>
