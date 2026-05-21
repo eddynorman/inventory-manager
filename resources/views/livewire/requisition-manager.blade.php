@@ -4,7 +4,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Requisitions</h5>
-            @if(auth()->user()->canAccess('requisition.create'))
+            @if(auth()->user()->canAccess('requisitions.create'))
                 <button wire:click="create" class="btn btn-primary">New Requisition</button>
             @endif
         </div>
