@@ -6,12 +6,18 @@
                 <h5 class="mb-0 fw-semibold">Stock Closing</h5>
                 <small class="text-muted">Record closing stock for a given location.</small>
             </div>
-            <select wire:model.live="locationId" class="form-select w-auto">
-                <option value="">Select Location</option>
-                @foreach($locations as $loc)
-                    <option value="{{ $loc->id }}">{{ $loc->name }}</option>
-                @endforeach
-            </select>
+            <div>
+                <select wire:model.live="locationId" class="form-select w-auto @error('locationId') is-invalid @endif">
+                    <option value="">Select Location</option>
+                    @foreach($locations as $loc)
+                        <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                    @endforeach
+                </select>
+                @error('locationId')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
         </div>
         <div class="card-body">
             <div class="container-fluid">

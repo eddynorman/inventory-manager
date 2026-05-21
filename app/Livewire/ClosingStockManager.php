@@ -31,6 +31,7 @@ class ClosingStockManager extends Component
     protected function messages()
     {
         return [
+            'locationId.required' => 'Location is Required',
             'items.*.closing_stock.required' => 'Enter closing stock',
             'items.*.closing_stock.numeric' => 'Must be a number',
         ];
@@ -50,6 +51,7 @@ class ClosingStockManager extends Component
 
     public function loadItems()
     {
+        $this->items = [];
         $this->items = Item::where('is_auto_tracked', false)
             ->where('is_stock_item',true)
             ->whereHas('locationItems', function ($q) {
@@ -129,8 +131,12 @@ class ClosingStockManager extends Component
 
     public function save()
     {
-        $this->validate();
-
+        $this->validate($this->rules(),$this->messages());
+        if(count($this->items) == 0){
+            session()->flash('error', 'No items found!');
+            $this->dispatch('flash');
+            return;
+        }
         app(ClosingStockService::class)->process(
             $this->items,
             $this->locationId,
