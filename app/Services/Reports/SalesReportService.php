@@ -737,7 +737,7 @@ class SalesReportService
                 $margin =
                     $sales > 0 && $cost > 0
                         ? ($profit / $cost) * 100
-                        : 0;
+                        : (($sales ?? 0) > 0 ? 100 : 0);
 
                 return (object)[
 
