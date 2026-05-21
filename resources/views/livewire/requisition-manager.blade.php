@@ -83,13 +83,13 @@
                                 <td>{{ $item['name'] }}</td>
                                 <td>{{ $item['current_stock'] }}</td>
                                 <td>
-                                    <input type="number" name="quantity" wire:model.live.debounce.500ms="items.{{ $index }}.quantity" class="form-control" min="1" >
+                                    <input type="number" name="quantity" wire:model.live.debounce.500ms="items.{{ $index }}.quantity" class="form-control @error("items.$index.quantity") is-invalid @endif" min="1" >
                                     @error("items.$index.quantity")
-                                        <div class="danger text-small">{{ $message }}</div>
+                                        <div class="text-danger text-small">{{ $message }}</div>
                                     @enderror
                                 </td>
                                 <td>
-                                    <select class="form-select"
+                                    <select class="form-select @error("items.$index.selected_unit_id")  @endif"
                                             wire:model.live.debounce.500ms="items.{{ $index }}.selected_unit_id">
                                         @foreach($item['units'] as $unit)
                                             <option value="{{ $unit['id'] }}">
@@ -102,9 +102,9 @@
                                     @enderror
                                 </td>
                                 <td>
-                                    <input type="number" name="unit_price" wire:model.live.debounce.500ms="items.{{ $index }}.unit_price" class="form-control" min="1" >
+                                    <input type="number" name="unit_price" wire:model.live.debounce.500ms="items.{{ $index }}.unit_price" class="form-control @error("items.$index.unit_price") is-invalid @endif" min="1" >
                                     @error("items.$index.unit_price")
-                                        <div class="danger text-small">{{ $message }}</div>
+                                        <div class="text-danger text-small">{{ $message }}</div>
                                     @enderror
                                 </td>
                                 <td>{{ number_format($item['total'],2) }}</td>
