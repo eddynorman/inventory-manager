@@ -453,7 +453,7 @@ class SaleManager extends Component
         if($type == 'item'){
             if($oldSale != null){
                 foreach($oldSale->items as $sit){
-                    if($sit->item_id == $id){
+                    if($sit->item->id == $id){
                         $existing = $sit->quantity;
                         break;
                     }
@@ -467,7 +467,7 @@ class SaleManager extends Component
         }else if($type == 'kit'){
             if($oldSale != null){
                 foreach($oldSale->kits as $skt){
-                    if($skt->kit_id == $id){
+                    if($skt->kit->id == $id){
                         $existing = $skt->quantity;
                         break;
                     }
@@ -491,7 +491,7 @@ class SaleManager extends Component
             if($item['type'] == 'item'){
                 if($oldSale != null){
                     foreach($oldSale->items as $sit){
-                        if($sit->item_id == $item['item_id']){
+                        if($sit->item->id == $item['item_id']){
                             $existing = $sit->quantity;
                             break;
                         }
@@ -506,7 +506,7 @@ class SaleManager extends Component
             }else if($item['type'] == 'kit'){
                 if($oldSale != null){
                     foreach($oldSale->kits as $skt){
-                        if($skt->kit_id == $item['kit_id']){
+                        if($skt->kit->id == $item['kit_id']){
                             $existing = $skt->quantity;
                             break;
                         }
