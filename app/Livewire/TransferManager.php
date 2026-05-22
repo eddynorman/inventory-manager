@@ -211,6 +211,7 @@ class TransferManager extends Component
             $this->showViewTransfer = false;
             $this->viewTransfer = [];
             $this->transferId = null;
+            $this->refreshTable();
             session()->flash('success',"Transfer Received!");
             $this->dispatch('flash');
         } catch (\Throwable $th) {
