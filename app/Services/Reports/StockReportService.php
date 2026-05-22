@@ -79,22 +79,38 @@ class StockReportService
                 $opening = StockMovement::query()
                     ->where('item_id', $item->id)
                     ->where('reference_type', StockBatchType::NEW_ITEM->value)
+                    ->when(
+                        $locationId,
+                        fn ($q) =>
+                        $q->where('from_location', $locationId)
+                    )
                     ->sum('quantity');
 
             } else {
 
                 $opening = StockMovement::query()
+                ->where('item_id', $item->id)
+                ->where('created_at', '<', $from)
+                ->when($locationId, function ($q) use ($locationId) {
+                    $q->where(function ($sub) use ($locationId) {
 
-                    ->where('item_id', $item->id)
-                    ->where('created_at', '<', $from)
-                    ->when(
-                        $locationId,
-                        fn ($q) =>
-                        $q->where('from_location', $locationId)
-                            ->orWhere('to_location', $locationId)
-                    )
+                        // 1. Standard movements OR things leaving this location
+                        $sub->where(function ($query) use ($locationId) {
+                            $query->where('from_location', $locationId)
+                                ->where('type', '!=', 'transfer receiving');
+                                // ^ Ignores the +20 row when we are looking at the sender side
+                        })
 
-                    ->sum('quantity');
+                        // 2. Things arriving at this location
+                        ->orWhere(function ($query) use ($locationId) {
+                            $query->where('to_location', $locationId)
+                                ->where('type', 'transfer receiving');
+                                // ^ Only catches the +20 row when we are looking at the receiver side
+                        });
+
+                    });
+                })
+                ->sum('quantity');
             }
 
             /*
