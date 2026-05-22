@@ -41,7 +41,7 @@
                                         {{ $item['name'] }}
                                     </td>
 
-                                    <td>{{ $item['opening_stock'] }}</td>
+                                    <td>{{ number_format($item['opening_stock'],2) }}</td>
 
                                     <td class="fw-bold text-danger">
                                         {{ $item['used'] }}
@@ -49,7 +49,7 @@
 
                                     <td>
                                         <input type="number" min="0"
-                                            wire:model.lazy="items.{{ $index }}.closing_stock"
+                                            wire:model.live.debounce.300="items.{{ $index }}.closing_stock"
                                             class="form-control text-center @error("items.$index.closing_stock") is-invalid @enderror">
 
                                         @error("items.$index.closing_stock")

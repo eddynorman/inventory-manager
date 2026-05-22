@@ -63,7 +63,7 @@ class ClosingStockManager extends Component
             ->get()
             ->map(function ($item) {
 
-                $stock = $item->locationItems->first()->quantity;
+                $stock = (float)$item->locationItems->first()->quantity;
 
                 return [
                     'item_id' => $item->id,
