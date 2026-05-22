@@ -107,6 +107,7 @@ class TransferService
             $issue = Issue::find($data['selectedIssue']);
             $issue->processed_at = Carbon::now();
             $issue->processed_by = Auth::id();
+            $issue->status = 'processed';
             $issue->save();
             return $transfer;
         });
