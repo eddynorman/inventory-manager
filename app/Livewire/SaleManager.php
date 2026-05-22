@@ -437,6 +437,7 @@ class SaleManager extends Component
         $this->sale['items'] = [];
         $this->sale['paid'] = 0;
         $this->sale['balance'] = 0;
+        $this->sale['id'] = null;
         $this->servers = [];
         $this->selected_user_id = "";
         $this->calculateTotal();
@@ -548,7 +549,6 @@ class SaleManager extends Component
             $this->printSale($saleid);
             $this->dispatch('refreshSales');
         } catch (\Throwable $th) {
-            dd($th);
             session()->flash('error',$th->getMessage());
             $this->dispatch('flash');
         }
