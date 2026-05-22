@@ -20,7 +20,7 @@ class ItemKitService
             'items' => ['required','array'],
             'items.*.id' => ['nullable','exists:item_kit_items,id'],
             'items.*.item_id' => ['required','exists:items,id'],
-            'items.*.quantity' => ['required','numeric','min:0.1'],
+            'items.*.quantity' => ['required','numeric','gt:0'],
             'items.*.selected_unit_id' => ['required','exists:units,id'],
         ];
     }
