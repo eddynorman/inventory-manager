@@ -354,6 +354,27 @@ new #[Layout('layouts.guest')] class extends Component
                         </div>
 
                         {{-- LOGIN FORM (UNCHANGED) --}}
+                        {{-- AUTH ERRORS --}}
+                        @if ($errors->any())
+
+                            <div class="alert alert-danger border-0 rounded-4 mb-4">
+
+                                <div class="fw-semibold mb-1">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Login Failed
+                                </div>
+
+                                @foreach ($errors->all() as $error)
+
+                                    <div class="small">
+                                        {{ $error }}
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        @endif
                         <form wire:submit="login" autocomplete="on">
 
                             {{-- EMAIL --}}
