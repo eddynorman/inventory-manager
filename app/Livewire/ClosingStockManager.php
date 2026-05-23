@@ -15,6 +15,11 @@ class ClosingStockManager extends Component
 
     public $items = [];
     public $locations;
+    public $totals = [
+        'opening' => 0,
+        'used' => 0,
+        'closing' => 0,
+    ];
 
     public function boot(){
         $this->locations = Location::all();
@@ -74,6 +79,12 @@ class ClosingStockManager extends Component
                 ];
             })->toArray();
 
+            $this->totals = [
+                'opening' => collect($this->items)->sum('opening_stock'),
+                'used' => 0,
+                'closing' => collect($this->items)->sum('closing_stock'),
+            ];
+
             if(count($this->items) == 0){
                 session()->flash('warning', 'No manual stock items found!');
                 $this->dispatch('flash');
@@ -84,27 +95,58 @@ class ClosingStockManager extends Component
     {
         [$index, $field] = explode('.', $key);
 
-        if ($field === 'closing_stock') {
-
-            $opening = $this->items[$index]['opening_stock'];
-            $closing = (float) $value;
-            if($value == ''){
-                $closing = 0;
-            }
-            if( $value < 0){
-                $this->items[$index]['closing_stock'] = 0;
-                $closing = 0;
-            }
-
-            if ($closing > $opening) {
-                $this->addError("items.$index.closing_stock", "Cannot exceed opening");
-                return;
-            }
-
-            $this->resetErrorBag("items.$index.closing_stock");
-
-            $this->items[$index]['used'] = max(0, $opening - $closing);
+        if ($field !== 'closing_stock') {
+            return;
         }
+
+        $opening = (float) $this->items[$index]['opening_stock'];
+
+        $oldClosing = (float) ($this->items[$index]['closing_stock'] ?? 0);
+
+        $closing = (float) ($value ?: 0);
+
+        if ($closing < 0) {
+
+            $closing = 0;
+
+            $this->items[$index]['closing_stock'] = 0;
+        }
+
+        if ($closing > $opening) {
+
+            $this->addError(
+                "items.$index.closing_stock",
+                "Cannot exceed opening stock"
+            );
+
+            return;
+        }
+
+        $this->resetErrorBag("items.$index.closing_stock");
+
+        $used = max(0, $opening - $closing);
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE ROW
+        |--------------------------------------------------------------------------
+        */
+
+        $previousUsed = (float) $this->items[$index]['used'];
+
+        $this->items[$index]['used'] = $used;
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE TOTALS INCREMENTALLY
+        |--------------------------------------------------------------------------
+        */
+
+        $this->totals['closing']
+            += ($closing - $oldClosing);
+
+        $this->totals['used']
+            += ($used - $previousUsed);
     }
 
     public function getIsClosedTodayProperty()
@@ -114,20 +156,6 @@ class ClosingStockManager extends Component
             ->exists();
     }
 
-    public function getTotalsProperty()
-    {
-        $closing = 0;
-        foreach($this->items as $item){
-            if($item['closing_stock'] != ''){
-                $closing += $item['closing_stock'];
-            }
-        }
-        return [
-            'opening' => collect($this->items)->sum('opening_stock'),
-            'used' => collect($this->items)->sum('used'),
-            'closing' => collect($this->items)->sum('closing_stock'),
-        ];
-    }
 
     public function save()
     {
@@ -146,7 +174,7 @@ class ClosingStockManager extends Component
         session()->flash('success', 'Closing stock saved successfully');
         $this->dispatch('flash');
 
-        $this->reset(['items','locationId']); // reset fresh
+        $this->reset(['items','locationId','totals']); // reset fresh
     }
 
     public function render()

@@ -36,7 +36,7 @@
 
                         <tbody>
                             @foreach ($items as $index => $item)
-                                <tr>
+                                <tr wire:key="closing-item-{{ $item['item_id'] }}">
                                     <td class="text-start fw-semibold">
                                         {{ $item['name'] }}
                                     </td>
@@ -49,7 +49,7 @@
 
                                     <td>
                                         <input type="number" min="0"
-                                            wire:model.live.debounce.300="items.{{ $index }}.closing_stock"
+                                            wire:model.lazy="items.{{ $index }}.closing_stock"
                                             class="form-control text-center @error("items.$index.closing_stock") is-invalid @enderror">
 
                                         @error("items.$index.closing_stock")
