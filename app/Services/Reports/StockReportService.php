@@ -46,6 +46,14 @@ class StockReportService
                     $c->where('department_id', $departmentId)
                 );
             })
+            ->when($locationId, function ($q) use ($locationId) {
+
+                $q->whereHas('locationItems', function ($locationQuery) use ($locationId) {
+
+                    $locationQuery
+                        ->where('location_id', $locationId);
+                });
+            })
 
             ->get();
 
