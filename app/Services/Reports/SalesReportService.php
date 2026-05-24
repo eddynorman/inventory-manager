@@ -557,10 +557,17 @@ class SalesReportService
 
     public function paymentSummary(array $filters = [])
     {
-        $from = Carbon::parse($filters['from_date']);
-        $to = Carbon::parse($filters['to_date']);
+        $from = Carbon::parse($filters['from_date'])->startOfDay();
+        $to = Carbon::parse($filters['to_date'])->endOfDay();
 
         return SalePayment::query()
+
+            ->join(
+                'sales',
+                'sale_payments.sale_id',
+                '=',
+                'sales.id'
+            )
 
             ->join(
                 'payment_methods',
@@ -569,7 +576,7 @@ class SalesReportService
                 'payment_methods.id'
             )
 
-            ->whereBetween('sale_payments.created_at', [$from, $to])
+            ->whereBetween('sales.created_at', [$from, $to])
 
             ->selectRaw('
                 payment_methods.id,
@@ -587,7 +594,6 @@ class SalesReportService
 
             ->get();
     }
-
     public function departmentSalesSummary(array $filters = [])
     {
         $from = Carbon::parse($filters['from_date']);
