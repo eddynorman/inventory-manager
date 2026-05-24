@@ -65,6 +65,7 @@ class SaleManager extends Component
         $this->sale['served_by'] = [];
         $this->sale['items'] = [];
         $this->sale['paid'] = 0;
+        $this->sale['total'] = 0;
         $this->sale['balance'] = 0;
         $this->users = User::all()->toArray();
         $this->selectedMethodId = $this->paymentMethods[0]['id'] ?? null;

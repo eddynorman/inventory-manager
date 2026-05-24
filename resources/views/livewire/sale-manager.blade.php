@@ -1,4 +1,41 @@
 <div>
+<div x-data="{
+    sale: @entangle('sale').live,
+    payments: @entangle('payments').live,
+    locationIds: @entangle('locationIds').live,
+    selectedMethodId: @entangle('selectedMethodId').live,
+    paymentAmount: @entangle('paymentAmount').live,
+    selected_user_id: '',
+    selected_location_id: '',
+    highlightedIndex: @entangle('highlightedIndex'),
+
+    // 🧮 Basic Math handled by Alpine for instant feedback
+    get totals() {
+        let items = this.sale.items || [];
+        let total = items.reduce((acc, item) => acc + (parseFloat(item.total) || 0), 0);
+        let paid = (this.payments || []).reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
+
+        // We also sync these back to the entangled 'sale' object
+        // so the backend SaleManager.php is aware of the current state
+        this.sale.total = total;
+        this.sale.paid = paid;
+        this.sale.balance = total - paid;
+
+        return { total, paid, balance: total - paid };
+    },
+
+    // Logic to update row totals locally
+    updateItem(item) {
+        let unit = (item.units || []).find(u => u.id == item.selected_unit_id);
+        if (unit) {
+            item.selling_price = unit.selling_price;
+            item.total = (item.quantity || 0) * unit.selling_price;
+        }
+
+        // Update payment amount to match current balance
+        this.paymentAmount = this.totals.balance;
+    }
+}" x-cloak>
     @include('layouts.flash')
 
     @if($showIndex)
@@ -26,6 +63,7 @@
                                 </button>
                             </div>
                         </div>
+
                         @if (auth()->user()->canAccess('sales.create') || auth()->user()->canAccess('sales.edit'))
                             <div class="card-body">
                                 <!-- 🔹 LOCATION + SEARCH -->
@@ -34,7 +72,9 @@
                                         <!-- Locations -->
                                         <div class="row align-items-center">
                                             <div class="col-md-4">
-                                                <select name="location-select" id="location-select" class="form-select form-select-lg" wire:model='selected_id' wire:change="selectLocation($event.target.value)">
+                                                <select class="form-select form-select-lg"
+                                                    x-model="selected_location_id"
+                                                    @change="if($el.value) { $wire.selectLocation($el.value); selected_location_id = ''; }">
                                                     <option value="">Select Location...</option>
                                                     @foreach ($locations as $location)
                                                         <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
@@ -42,19 +82,16 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-8">
-                                                <div class="form-control">
-                                                    @forelse ($selectedLocations as $location)
-                                                        <span class="badge bg-primary d-inline-block align-items-center px-3 py-2">
-                                                            {{ $location['name'] }}
-                                                            <button type="button"
-                                                                class="btn-close btn-close-white ms-1"
-                                                                style="font-size:12px;"
-                                                                wire:click.stop="removeLocation({{ $location['id'] }})">
-                                                            </button>
+                                                <div class="form-control d-flex flex-wrap gap-2">
+                                                    <template x-for="loc in $wire.selectedLocations" :key="loc.id">
+                                                        <span class="badge bg-primary d-inline-flex align-items-center px-3 py-2">
+                                                            <span x-text="loc.name"></span>
+                                                            <button type="button" class="btn-close btn-close-white ms-2" style="font-size:10px;" @click="$wire.removeLocation(loc.id)"></button>
                                                         </span>
-                                                    @empty
+                                                    </template>
+                                                    <template x-if="locationIds.length === 0">
                                                         <span class="text-secondary">Selected locations appear here!</span>
-                                                    @endforelse
+                                                    </template>
                                                 </div>
                                             </div>
                                             @error('locationIds')
@@ -73,28 +110,24 @@
                                                 id="search-input"
                                                 class="form-control form-control-lg"
                                                 wire:model.live.debounce.300ms="search"
-                                                wire:keydown.arrow-down.prevent="moveDown"
-                                                wire:keydown.arrow-up.prevent="moveUp"
-                                                wire:keydown.enter.prevent="selectHighlighted"
-                                                wire:keydown.escape="$set('searchItems', [])"
-                                                placeholder="🔍 Search Products by name...">
+                                                @keydown.arrow-down.prevent="highlightedIndex = Math.min(highlightedIndex + 1, $wire.searchItems.length - 1)"
+                                                @keydown.arrow-up.prevent="highlightedIndex = Math.max(highlightedIndex - 1, 0)"
+                                                @keydown.enter.prevent="if($wire.searchItems[highlightedIndex]) { $wire.selectItem(highlightedIndex); highlightedIndex = 0; }"
+                                                placeholder="🔍 Search Products by name..."
+                                            >
 
-                                            @if(!empty($searchItems))
-                                                <div class="dropdown-menu show w-100 mt-1 shadow border-0">
-                                                    @foreach ($searchItems as $index => $item)
-                                                        <button
-                                                            class="dropdown-item d-flex justify-content-between
-                                                                {{ $highlightedIndex === $index ? 'active bg-primary text-white' : '' }}"
-                                                            wire:click="selectItem({{ $index }})">
-
-                                                            <span>{{ $item['name'] }}</span>
-                                                            <small>Stock: {{ $item['stock'] }}</small>
-                                                        </button>
-                                                    @endforeach
-                                                </div>
-                                            @endif
+                                            <div class="dropdown-menu show w-100 mt-1 shadow border-0" x-show="$wire.searchItems.length > 0" style="z-index: 1000;">
+                                                <template x-for="(item, index) in $wire.searchItems" :key="index">
+                                                    <button type="button"
+                                                        class="dropdown-item d-flex justify-content-between align-items-center"
+                                                        :class="highlightedIndex === index ? 'active bg-primary text-white' : ''"
+                                                        @click="$wire.selectItem(index)">
+                                                        <span x-text="item.name"></span>
+                                                        <small :class="highlightedIndex === index ? 'text-white' : 'text-muted'" x-text="'Stock: ' + item.stock"></small>
+                                                    </button>
+                                                </template>
+                                            </div>
                                         </div>
-
                                         <table class="table table-bordered table-striped table-hover mb-0 align-middle">
                                             <thead class="table-light">
                                                 <tr>
@@ -109,23 +142,20 @@
                                             </thead>
 
                                             <tbody>
-                                                @forelse ($sale['items'] ?? [] as $index => $item)
+                                                <template x-for="(item, index) in sale.items" :key="index">
                                                     <tr>
-                                                        <td>{{ $item['name'] }}</td>
+                                                        <td x-text="item.name"></td>
                                                         <td>
-                                                            @if ($item['type'] == 'service' )
-                                                                Non Stock
-                                                            @else
-                                                                {{ $item['stock'] }}
-                                                            @endif
+                                                            <span x-text="item.type === 'service' ? 'Non Stock' : item.stock"></span>
                                                         </td>
 
                                                         <td>
                                                             <select class="form-select form-select-md"
-                                                                wire:model.live="sale.items.{{$index}}.selected_unit_id">
-                                                                @foreach ($item['units'] as $unit)
-                                                                    <option value="{{ $unit['id'] }}">{{ $unit['name'] }}</option>
-                                                                @endforeach
+                                                                x-model="item.selected_unit_id"
+                                                                @change="updateItem(item)">
+                                                                <template x-for="unit in item.units">
+                                                                    <option :value="unit.id" x-text="unit.name"></option>
+                                                                </template>
                                                             </select>
                                                         </td>
 
@@ -134,55 +164,39 @@
                                                                 <!-- MINUS -->
                                                                 <button type="button"
                                                                     class="btn btn-outline-secondary btn-sm px-2"
-                                                                    wire:click="decreaseQty({{ $index }})">
+                                                                    @click="if(item.quantity > 1) { item.quantity--; updateItem(item); }">
                                                                     −
                                                                 </button>
                                                                 <!-- INPUT -->
                                                                 <input type="number"
-                                                                    class="form-control text-center fw-bold qty-input @error("sale.items.$index.quantity") is-invalid @enderror "
-                                                                    style="width:70px; @error("sale.items.$index.quantity") width: 100px; @enderror"
-                                                                    data-index="{{ $index }}"
-                                                                    max="{{ $item['stock'] }}"
-                                                                    min="1"
-                                                                    wire:model.live.debounce.500ms="sale.items.{{$index}}.quantity">
+                                                                    class="form-control text-center fw-bold qty-input"
+                                                                    style="width:70px;"
+                                                                    x-model.number="item.quantity"
+                                                                    @input="updateItem(item)">
 
                                                                 <!-- PLUS -->
                                                                 <button type="button"
                                                                     class="btn btn-outline-secondary btn-sm px-2"
-                                                                    wire:click="increaseQty({{ $index }})">
+                                                                    @click="item.quantity++; updateItem(item);">
                                                                     +
                                                                 </button>
 
                                                             </div>
-                                                            @error("sale.items.$index.quantity")
-                                                                <small class="text-danger">{{ $message }}</small>
-                                                            @enderror
                                                         </td>
 
-                                                        <td>{{ number_format($item['selling_price']) }}</td>
-                                                        <td class="fw-bold">{{ number_format($item['total']) }}</td>
+                                                        <td x-text="new Intl.NumberFormat().format(item.selling_price)"></td>
+                                                        <td class="fw-bold" x-text="new Intl.NumberFormat().format(item.total)"></td>
+                                                        <td><button type="button" class="btn btn-outline-danger btn-sm" @click="$wire.removeItem(index)">✕</button></td>
+                                                    </tr>
+                                                </template>
 
-                                                        <td>
-                                                            <button class="btn btn-outline-danger btn-sm"
-                                                                wire:click="removeItem({{ $index }})">
-                                                                ✕
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="7" class="text-center text-muted py-4">
-                                                            No items added <br>
-                                                            @error('sale.items')
-                                                                <small class="text-danger">Add Items First</small>
-                                                            @enderror
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
+                                                <tr x-show="sale.items.length === 0">
+                                                    <td colspan="7" class="text-center text-muted py-4">
+                                                        No items added
+                                                    </td>
+                                                </tr>
                                             </tbody>
-
                                         </table>
-
                                     </div>
                                 </div>
                             </div>
@@ -202,17 +216,17 @@
 
                                 <div class="d-flex justify-content-between">
                                     <span>Total</span>
-                                    <strong>{{ number_format($sale['total'] ?? 0) }}</strong>
+                                    <strong x-text="new Intl.NumberFormat().format(totals.total)"></strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between text-success">
                                     <span>Paid</span>
-                                    <strong>{{ number_format($sale['paid'] ?? 0) }}</strong>
+                                    <strong x-text="new Intl.NumberFormat().format(totals.paid)"></strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between text-danger">
                                     <span>Balance</span>
-                                    <strong>{{ number_format($sale['balance'] ?? 0) }}</strong>
+                                    <strong x-text="new Intl.NumberFormat().format(totals.balance)"></strong>
                                 </div>
 
                             </div>
@@ -225,22 +239,19 @@
                                 <h6 class="fw-bold mb-2">Served By</h6>
 
                                 <div class="mb-2">
-                                    @forelse ($servers as $server)
-                                        <span class="badge bg-dark align-items-center px-3 py-2 mb-2">
-                                            {{ $server['name'] }}
-                                            <button type="button"
-                                                class="btn-close btn-close-white ms-1"
-                                                style="font-size:10px;"
-                                                wire:click="removeUser({{ $server['id'] }})">
-                                            </button>
+                                    <template x-for="server in $wire.servers" :key="server.id">
+                                        <span class="badge bg-dark d-inline-flex align-items-center px-3 py-2 mb-2 me-1">
+                                            <span x-text="server.name"></span>
+                                            <button type="button" class="btn-close btn-close-white ms-2" style="font-size:10px;" @click="$wire.removeUser(server.id)"></button>
                                         </span>
-                                    @empty
+                                    </template>
+                                    <template x-if="sale.served_by.length === 0">
                                         <small class="text-muted">No user selected</small>
-                                    @endforelse
+                                    </template>
                                 </div>
 
-                                <select class="form-select"
-                                    wire:change="selectUser($event.target.value)" wire:model='selected_user_id'>
+                                <select class="form-select" x-model="selected_user_id"
+                                    @change="if($el.value) { $wire.selectUser($el.value); selected_user_id = ''; }">
                                     <option value="">Select user</option>
                                     @foreach ($users as $user)
                                         <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
@@ -265,16 +276,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($payments as $payment)
+                                            <template x-for="p in payments">
                                                 <tr>
-                                                    <td>{{ number_format($payment['amount'],2) }}</td>
-                                                    <td>{{ $payment['method']['name']}}</td>
+                                                    <td x-text="new Intl.NumberFormat().format(p.amount)"></td>
+                                                    <td x-text="p.method.name"></td>
                                                 </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="2"><small class="text-danger">No Payment Added!</small></td>
-                                                </tr>
-                                            @endforelse
+                                            </template>
+                                            <tr x-show="payments.length === 0">
+                                                <td colspan="2"><small class="text-danger">No Payment Added!</small></td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -284,15 +294,16 @@
                                 <input type="number"
                                     class="form-control mb-2"
                                     placeholder="Amount"
-                                    wire:model.live.debounce.300ms="paymentAmount"
-                                    {{ ($sale['balance'] ?? 0) == 0?'disabled':'' }}
-                                    >
+                                    x-model.number="paymentAmount"
+                                    :disabled="sale.balance <= 0"
+                                >
                                 <div class="w-100 row">
                                     <div class="col-md-10">
                                         <select class="form-select"
-                                            wire:model="selectedMethodId">
-                                            @foreach ($paymentMethods as $method)
-                                                <option value="{{ $method['id'] }}">{{ $method['name'] }}</option>
+                                            x-model="selectedMethodId">
+                                            <option value="">Method...</option>
+                                            @foreach ($paymentMethods as $index => $method)
+                                                <option value="{{ $method['id'] }}" @if ($index == 0) selected @endif>{{ $method['name'] }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -302,30 +313,25 @@
                                     </div>
                                 </div>
 
-                                <button class="btn btn-dark w-100" wire:click='addPayment'>
+                                <button type="button" class="btn btn-dark w-100" @click="$wire.addPayment()">
                                     Add Payment
                                 </button>
-
                             </div>
                         </div>
 
                         <!-- 🔹 ACTIONS -->
                         <div class="d-grid gap-2">
-                            @if (count($sale['items']) > 0)
-                                <button class="btn btn-success btn-lg"
-                                    wire:click="checkValidity">
-                                    Save Sale
-                                </button>
-                            @endif
-
-                            <button class="btn btn-outline-secondary">
-                                Cancel
+                            <button class="btn btn-success btn-lg"
+                                x-show="sale.items && sale.items.length > 0"
+                                @click="$wire.checkValidity()">
+                                Save Sale
                             </button>
+
+                            <button class="btn btn-outline-secondary" @click="location.reload()">Cancel</button>
                         </div>
 
                     </div>
                 @endif
-            </div>
         </div>
     @endif
 
