@@ -306,9 +306,8 @@ class SaleManager extends Component
         $this->search = '';
         $this->searchItems = [];
         $this->highlightedIndex = 0;
-
         $this->calculateTotal();
-        $this->checkValidity();
+        $this->dispatch('stock-errors-updated', errors: $this->getErrorBag()->toArray());
         // 🔥 focus this row (Will properly be 0 for new items, or the matching index for existing items)
         $this->dispatch('focus-qty', index: $foundIndex);
     }
@@ -317,7 +316,6 @@ class SaleManager extends Component
         $this->resetErrorBag();
         array_splice($this->sale['items'],$index,1);
         $this->calculateTotal();
-        $this->checkAllStock();
         $this->dispatch('stock-errors-updated', errors: $this->getErrorBag()->toArray());
     }
 
