@@ -23,125 +23,416 @@
     </div>
 
     <!-- Create/Edit page -->
-    @if ($showCreatePage)
-        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-                style="background: rgba(0,0,0,0.5); z-index:2100;"
-                wire:click="$set('showCreatePage', false)">
-            <div id="create-edit-page" class="card shadow-lg w-100 p-0 " style="max-width: 800px;" wire:click.stop>
+   @if ($showCreatePage)
+
+        <div
+            class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            wire:click="$set('showCreatePage', false)">
+
+            <div
+                class="card shadow-lg w-100 p-0"
+                style="max-width: 900px;"
+                wire:click.stop
+
+                x-data="transferManager()"
+            >
+
+                {{-- HEADER --}}
                 <div class="card-header d-flex bg-primary align-items-center justify-content-between">
-                    <h2 class=" text-white">
+
+                    <h2 class="text-white">
                         Create Transfer
                     </h2>
-                    <button type="button" class="btn-close btn-close-white btn-xxl" wire:click="$set('showCreatePage', false)"></button>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white btn-xxl"
+                        wire:click="$set('showCreatePage', false)">
+                    </button>
+
                 </div>
-                <div class="card-body" style="max-height:70vh; overflow-y:auto;">
-                    <div class="row mb-3">
+
+                {{-- BODY --}}
+                <div
+                    class="card-body"
+                    style="max-height:70vh; overflow-y:auto;"
+                >
+
+                    {{-- TOP --}}
+                    <div class="row mb-4">
+
+                        {{-- SOURCE --}}
                         <div class="col-md-6">
-                            <label for="location" class="form-label">Source</label>
-                            <select wire:model.live='locationId' name="location" id="location" class="form-select">
-                                <option value="{{ null }}">--Select Location--</option>
-                                @foreach ($locations as $location )
-                                    <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
+
+                            <label class="form-label fw-bold">
+                                Source
+                            </label>
+
+                            <select
+                                wire:model.live="locationId"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    --Select Location--
+                                </option>
+
+                                @foreach ($locations as $location)
+
+                                    <option value="{{ $location['id'] }}">
+
+                                        {{ $location['name'] }}
+
+                                    </option>
+
                                 @endforeach
+
                             </select>
+
                             @error('locationId')
-                                <div class="error small text-danger">{{ $message }}</div>
+
+                                <small class="text-danger">
+
+                                    {{ $message }}
+
+                                </small>
+
                             @enderror
+
                         </div>
+
+                        {{-- ISSUE --}}
                         <div class="col-md-6">
-                            <label for="issue-id" class="form-label">Select Issue</label>
-                            <select wire:model.live='selectedIssue' name="destination" id="issue-id" class="form-select">
-                                <option value="{{ null }}">--Select Issue--</option>
-                                @foreach ($issues as $issue )
-                                    <option value="{{ $issue['id'] }}">#{{str_pad($issue['id'],5,'0',STR_PAD_LEFT)}} From: {{ $issue['from_location']['name'] }}</option>
+
+                            <label class="form-label fw-bold">
+                                Select Issue
+                            </label>
+
+                            <select
+                                wire:model.live="selectedIssue"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    --Select Issue--
+                                </option>
+
+                                @foreach ($issues as $issue)
+
+                                    <option value="{{ $issue['id'] }}">
+
+                                        #{{ str_pad($issue['id'],5,'0',STR_PAD_LEFT) }}
+                                        From:
+                                        {{ $issue['from_location']['name'] }}
+
+                                    </option>
+
                                 @endforeach
+
                             </select>
-                            @error('selectedIssue')
-                                <div class="error small text-danger">{{ $message }}</div>
-                            @enderror
+
                         </div>
+
                     </div>
 
-                    @if(count($transferItems) > 0)
-                        <form action="" method="post" wire:submit.prevent="save">
-                            <table class="table table-bordered table-striped table-responsive">
+                    {{-- TABLE --}}
+                    <template x-if="items.length > 0">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-bordered align-middle">
+
                                 <thead class="table-dark">
+
                                     <tr>
-                                        <th>ITEM NAME</th>
-                                        <th>REQ QUANTITY</th>
-                                        <th>REQ UNIT</th>
-                                        <th>QUANTITY</th>
-                                        <th>UNIT</th>
-                                        <th>ACTIONS</th>
+
+                                        <th>Item</th>
+
+                                        <th>Requested Qty</th>
+
+                                        <th>Requested Unit</th>
+
+                                        <th width="180">
+                                            Quantity
+                                        </th>
+
+                                        <th width="220">
+                                            Unit
+                                        </th>
+
+                                        <th width="80"></th>
+
                                     </tr>
+
                                 </thead>
+
                                 <tbody>
-                                    @foreach ($transferItems as $index => $item)
-                                    <tr wire:key="item-{{ $item['item_id'] }}">
-                                        <td>{{ $item['name'] }}</td>
-                                        <td>{{ $item['requested_quantity'] }}</td>
-                                        <td>{{ $item['requested_unit'] }}</td>
-                                        <td style="width:120px;">
-                                            <input type="number" name="quantity" wire:model.live.debounce.500ms="transferItems.{{ $index }}.quantity" class="form-control @error("transferItems.$index.quantity") is-invalid @enderror" min="1" >
-                                            @error("transferItems.$index.quantity")
-                                                <small class="text-danger text-small">{{ $message }}</small>
-                                            @enderror
-                                        </td>
-                                        <td>
-                                            <select class="form-select"
-                                                    wire:model.live="transferItems.{{ $index }}.selected_unit_id">
-                                                @foreach($item['units'] as $unit)
-                                                    <option value="{{ $unit['id'] }}">
-                                                        {{ $unit['name'] }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error("transferItems.$index.selected_unit_id")
-                                                <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </td>
 
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                wire:click="removeItem({{ $item['item_id'] }})">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                    @if (count($transferItems) == 0)
-                                    <tr>
-                                        <td class="text-danger" colspan="5">No Items Added</td>
-                                    </tr>
-                                    @endif
-                                    @if ($errors->has('transferItems') || $errors->has('transferItems.*.*'))
+                                    <template
+                                        x-for="(item, index) in items"
+                                        :key="item.item_id"
+                                    >
+
                                         <tr>
-                                            <td colspan="5" class="text-danger small">
-                                                {{ $errors->first('transferItems') ?? $errors->first('transferItems.*.*') }}
+
+                                            {{-- ITEM --}}
+                                            <td>
+
+                                                <div
+                                                    class="fw-semibold"
+                                                    x-text="item.name">
+                                                </div>
+
                                             </td>
+
+                                            {{-- REQUESTED --}}
+                                            <td>
+
+                                                <span
+                                                    x-text="item.requested_quantity">
+                                                </span>
+
+                                            </td>
+
+                                            {{-- REQUESTED UNIT --}}
+                                            <td>
+
+                                                <span
+                                                    x-text="item.requested_unit">
+                                                </span>
+
+                                            </td>
+
+                                            {{-- QUANTITY --}}
+                                            <td>
+
+                                                <div class="d-flex gap-1">
+
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-outline-secondary btn-sm"
+
+                                                        @click="
+                                                            if(item.quantity > 1){
+                                                                item.quantity--;
+                                                                updateItem();
+                                                            }
+                                                        "
+                                                    >
+
+                                                        -
+
+                                                    </button>
+
+                                                    <input
+                                                        type="number"
+
+                                                        min="1"
+
+                                                        class="form-control text-center"
+
+                                                        x-model.number="item.quantity"
+
+                                                        @input="updateItem()"
+
+                                                        :class="
+                                                            errors[
+                                                                'transferItems.' +
+                                                                index +
+                                                                '.quantity'
+                                                            ]
+                                                            ? 'is-invalid'
+                                                            : ''
+                                                        "
+                                                    >
+
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-outline-secondary btn-sm"
+
+                                                        @click="
+                                                            item.quantity++;
+                                                            updateItem();
+                                                        "
+                                                    >
+
+                                                        +
+
+                                                    </button>
+
+                                                </div>
+
+                                                {{-- ERROR --}}
+                                                <template
+                                                    x-if="
+                                                        errors[
+                                                            'transferItems.' +
+                                                            index +
+                                                            '.quantity'
+                                                        ]
+                                                    "
+                                                >
+
+                                                    <small
+                                                        class="text-danger d-block mt-1 fw-bold"
+
+                                                        x-text="
+                                                            errors[
+                                                                'transferItems.' +
+                                                                index +
+                                                                '.quantity'
+                                                            ][0]
+                                                        "
+                                                    >
+                                                    </small>
+
+                                                </template>
+
+                                            </td>
+
+                                            {{-- UNIT --}}
+                                            <td>
+
+                                                <select
+                                                    class="form-select"
+
+                                                    x-model="item.selected_unit_id"
+
+                                                    @change="updateItem()"
+                                                >
+
+                                                    <template
+                                                        x-for="unit in item.units"
+                                                        :key="unit.id"
+                                                    >
+
+                                                        <option
+                                                            :value="unit.id"
+
+                                                            x-text="unit.name">
+                                                        </option>
+
+                                                    </template>
+
+                                                </select>
+
+                                            </td>
+
+                                            {{-- REMOVE --}}
+                                            <td>
+
+                                                <button
+                                                    type="button"
+
+                                                    class="btn btn-danger btn-sm"
+
+                                                    @click="removeItem(index)"
+                                                >
+
+                                                    <i class="fa fa-trash"></i>
+
+                                                </button>
+
+                                            </td>
+
                                         </tr>
-                                    @endif
+
+                                    </template>
+
                                 </tbody>
+
                             </table>
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea name="description" id="description" wire:model.defer='description' class="form-control"></textarea>
-                            </div>
-                        </form>
-                    @endif
+
+                        </div>
+
+                    </template>
+
+                    {{-- EMPTY --}}
+                    <template x-if="items.length === 0">
+
+                        <div class="alert alert-warning mb-0">
+
+                            No transfer items loaded
+
+                        </div>
+
+                    </template>
+
+                    {{-- DESCRIPTION --}}
+                    <div class="mt-4">
+
+                        <label class="form-label fw-bold">
+
+                            Description
+
+                        </label>
+
+                        <textarea
+                            rows="3"
+
+                            class="form-control"
+
+                            wire:model.defer="description"
+                        ></textarea>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
-                    <button type="button" class="btn btn-secondary" wire:click="$set('showCreatePage', false)">Close</button>
-                    @if (count($transferItems) > 0 && $user_id != $current_user_id)
+
+                    <button
+                        type="button"
+
+                        class="btn btn-secondary"
+
+                        wire:click="$set('showCreatePage', false)"
+                    >
+
+                        Close
+
+                    </button>
+
+                    @if ($user_id != $current_user_id && count($transferItems) > 0)
+
                         @if (auth()->user()->canAccess('issues.reject'))
-                            <button type="button" class="btn btn-danger" wire:click="$set('showRejectIssue', true)">Reject</button>
+
+                            <button
+                                type="button"
+
+                                class="btn btn-danger"
+
+                                wire:click="$set('showRejectIssue', true)"
+                            >
+
+                                Reject
+
+                            </button>
+
                         @endif
-                        <button type="button" class="btn btn-primary" wire:click="save">Save</button>
+
+                        <button
+                            type="button"
+
+                            class="btn btn-primary"
+
+                            wire:click="save"
+                        >
+
+                            Save
+
+                        </button>
+
                     @endif
 
                 </div>
+
             </div>
+
         </div>
+
     @endif
 
     @if ($showViewTransfer)
@@ -234,4 +525,60 @@
             </div>
         </div>
     @endif
+
+    <script>
+
+        document.addEventListener('alpine:init', () => {
+
+            Alpine.data('transferManager', () => ({
+
+                items: @entangle('transferItems').live,
+
+                errors: {},
+
+                init() {
+
+                    window.addEventListener(
+                        'transfer-errors-updated',
+                        (e) => {
+
+                            this.errors =
+                                e.detail.errors || {};
+                        }
+                    );
+                },
+
+                updateItem() {
+
+                    this.errors = {};
+
+                    this.syncItems();
+                },
+
+                removeItem(index) {
+
+                    const item = this.items[index];
+
+                    if (!item) {
+                        return;
+                    }
+
+                    this.items.splice(index, 1);
+
+                    this.syncItems();
+
+                    this.$wire.removeItem(item.item_id);
+                },
+
+                syncItems() {
+
+                    this.$wire.set(
+                        'transferItems',
+                        this.items
+                    );
+                }
+            }));
+        });
+
+    </script>
 </div>
