@@ -21,141 +21,384 @@
         </div>
     </div>
 
-    <!-- Create/Edit page -->
+    {{-- CREATE ISSUE --}}
     @if ($showCreatePage)
-        <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
-                style="background: rgba(0,0,0,0.5); z-index:2100;"
-                wire:click="$set('showCreatePage', false)">
-            <div id="create-edit-page" class="card shadow-lg w-100 p-0 " style="max-width: 800px;" wire:click.stop>
+
+        <div
+            class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100"
+            style="background: rgba(0,0,0,0.5); z-index:2100;"
+            wire:click="$set('showCreatePage', false)">
+
+            <div
+                class="card shadow-lg w-100 p-0"
+                style="max-width: 900px;"
+                wire:click.stop
+
+                x-data="issueManager()">
+
+                {{-- HEADER --}}
                 <div class="card-header d-flex bg-primary align-items-center justify-content-between">
-                    <h2 class=" text-white">
+
+                    <h2 class="text-white mb-0">
                         Create Issue
                     </h2>
-                    <button type="button" class="btn-close btn-close-white btn-xxl" wire:click="$set('showCreatePage', false)"></button>
+
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white"
+                        wire:click="$set('showCreatePage', false)"
+                    ></button>
+
                 </div>
-                <div class="card-body" style="max-height:70vh; overflow-y:auto;">
+
+                {{-- BODY --}}
+                <div
+                    class="card-body"
+                    style="max-height:70vh; overflow-y:auto;">
+
                     <div class="row">
+
+                        {{-- SEARCH --}}
                         <div class="mb-3 col-md-6 position-relative">
-                            <label class="form-label">Items</label>
 
-                            <input type="text"
+                            <label class="form-label">
+                                Items
+                            </label>
+
+                            <input
+                                type="text"
                                 class="form-control"
-                                wire:model.live="search"
-                                placeholder="Search items to add...">
+                                placeholder="Search items to add..."
+                                autocomplete="off"
 
-                            @if(!empty($searchItems))
-                                <div class="position-absolute w-100"
-                                    style="z-index: 2100; max-height: 250px; overflow-y: auto;">
+                                x-model="search"
 
-                                    <ul class="list-group shadow">
-                                        @foreach ($searchItems as $item)
-                                            <li class="list-group-item list-group-item-action"
-                                                style="cursor: pointer;"
-                                                wire:click="addItem({{ $item['item_id'] }})">
-                                                {{ $item['name'] }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                                wire:model.live.debounce.300ms="search"
+                            >
 
-                                </div>
-                            @endif
+                            {{-- SEARCH RESULTS --}}
+                            <div
+                                class="dropdown-menu show w-100 mt-1 shadow border-0"
+                                x-show="searchItems.length > 0"
+                                x-transition
+                                style="
+                                    z-index: 3000;
+                                    max-height: 250px;
+                                    overflow-y: auto;
+                                "
+                            >
+
+                                <template
+                                    x-for="(item, index) in searchItems"
+                                    :key="item.item_id"
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="dropdown-item py-2"
+
+                                        @click="addItem(index)"
+                                    >
+
+                                        <div class="fw-semibold">
+                                            <span x-text="item.name"></span>
+                                        </div>
+
+                                    </button>
+
+                                </template>
+
+                            </div>
+
                         </div>
+
+                        {{-- SOURCE --}}
                         <div class="col-md-3">
-                            <label for="location" class="form-label">Source</label>
-                            <select wire:model.live='locationId' name="location" id="location" class="form-select">
-                                <option value="{{ null }}">--Select Location--</option>
-                                @foreach ($locations as $location )
-                                    <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
+
+                            <label class="form-label">
+                                Source
+                            </label>
+
+                            <select
+                                wire:model.live="locationId"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    --Select Location--
+                                </option>
+
+                                @foreach ($locations as $location)
+
+                                    <option value="{{ $location['id'] }}">
+                                        {{ $location['name'] }}
+                                    </option>
+
                                 @endforeach
+
                             </select>
+
                             @error('locationId')
-                                <div class="error small text-danger">{{ $message }}</div>
+                                <small class="text-danger">
+                                    {{ $message }}
+                                </small>
                             @enderror
+
                         </div>
+
+                        {{-- DESTINATION --}}
                         <div class="col-md-3">
-                            <label for="destination" class="form-label">Destination</label>
-                            <select wire:model.live='destinationId' name="destination" id="destination" class="form-select">
-                                <option value="{{ null }}">--Select Destination--</option>
-                                @foreach ($locations as $location )
-                                    <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
+
+                            <label class="form-label">
+                                Destination
+                            </label>
+
+                            <select
+                                wire:model.live="destinationId"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    --Select Destination--
+                                </option>
+
+                                @foreach ($locations as $location)
+
+                                    <option value="{{ $location['id'] }}">
+                                        {{ $location['name'] }}
+                                    </option>
+
                                 @endforeach
+
                             </select>
+
                             @error('destinationId')
-                                <div class="error small text-danger">{{ $message }}</div>
+                                <small class="text-danger">
+                                    {{ $message }}
+                                </small>
                             @enderror
+
                         </div>
+
                     </div>
 
-                    <form action="" method="post" wire:submit.prevent="save">
-                        <table class="table table-bordered table-striped table-responsive">
+                    {{-- TABLE --}}
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered align-middle">
+
                             <thead class="table-dark">
+
                                 <tr>
-                                    <th>ITEM NAME</th>
-                                    <th>STOCK</th>
-                                    <th>QUANTITY</th>
-                                    <th>UNIT</th>
-                                    <th>ACTIONS</th>
+
+                                    <th>ITEM</th>
+
+                                    <th width="120">
+                                        STOCK
+                                    </th>
+
+                                    <th width="140">
+                                        QUANTITY
+                                    </th>
+
+                                    <th width="180">
+                                        UNIT
+                                    </th>
+
+                                    <th width="70">
+                                        ACTION
+                                    </th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
-                                @foreach ($issueItems as $index => $item)
-                                <tr>
-                                    <td>{{ $item['name'] }}</td>
-                                    <td>{{ $item['stock'] }}</td>
-                                    <td style="width:120px;">
-                                        <input type="number" name="quantity" wire:model.live.debounce.500ms="issueItems.{{ $index }}.quantity" class="form-control @error("issueItems.$index.quantity") is-invalid @enderror" min="1" >
-                                        @error("issueItems.$index.quantity")
-                                            <small class="text-danger text-small">{{ $message }}</small>
-                                        @enderror
-                                    </td>
-                                    <td>
-                                        <select class="form-select"
-                                                wire:model.live="issueItems.{{ $index }}.selected_unit_id">
-                                            @foreach($item['units'] as $unit)
-                                                <option value="{{ $unit['id'] }}">
-                                                    {{ $unit['name'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error("issueItems.$index.selected_unit_id")
-                                            <div class="text-danger small">{{ $message }}</div>
-                                        @enderror
+
+                                <template
+                                    x-for="(item, index) in items"
+                                    :key="item.item_id"
+                                >
+
+                                    <tr>
+
+                                        {{-- NAME --}}
+                                        <td>
+
+                                            <span
+                                                class="fw-semibold"
+                                                x-text="item.name"
+                                            ></span>
+
+                                        </td>
+
+                                        {{-- STOCK --}}
+                                        <td>
+
+                                            <span
+                                                x-text="Number(item.stock).toFixed(2)"
+                                            ></span>
+
+                                        </td>
+
+                                        {{-- QUANTITY --}}
+                                        <td style="width:140px;">
+
+                                            <input
+                                                type="number"
+
+                                                min="1"
+
+                                                class="form-control"
+
+                                                x-model.number="item.quantity"
+
+                                                @input="updateItem()"
+
+                                                :class="
+                                                    errors['issueItems.' + index + '.quantity']
+                                                        ? 'is-invalid'
+                                                        : ''
+                                                "
+                                            >
+
+                                            {{-- ERROR --}}
+                                            <template
+                                                x-if="errors['issueItems.' + index + '.quantity']"
+                                            >
+
+                                                <small
+                                                    class="text-danger d-block mt-1 fw-bold"
+
+                                                    x-text="
+                                                        errors['issueItems.' + index + '.quantity'][0]
+                                                    "
+                                                ></small>
+
+                                            </template>
+
+                                        </td>
+
+                                        {{-- UNIT --}}
+                                        <td>
+
+                                            <select
+                                                class="form-select"
+
+                                                x-model="item.selected_unit_id"
+
+                                                @change="updateItem()"
+
+                                                :class="
+                                                    errors['issueItems.' + index + '.quantity']
+                                                        ? 'is-invalid'
+                                                        : ''
+                                                ">
+
+                                                <template
+                                                    x-for="unit in item.units"
+                                                    :key="unit.id">
+
+                                                    <option
+                                                        :value="unit.id"
+
+                                                        x-text="unit.name"
+                                                    ></option>
+
+                                                </template>
+
+                                            </select>
+
+                                        </td>
+
+                                        {{-- REMOVE --}}
+                                        <td>
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-danger"
+
+                                                @click="removeItem(index)"
+                                            >
+
+                                                <i class="fa fa-trash"></i>
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                </template>
+
+                                {{-- EMPTY --}}
+                                <tr x-show="items.length === 0">
+
+                                    <td
+                                        colspan="5"
+                                        class="text-danger"
+                                    >
+
+                                        No Items Added
+
                                     </td>
 
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                            wire:click="removeItem({{ $item['item_id'] }})">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </td>
                                 </tr>
-                                @endforeach
-                                @if (count($issueItems) == 0)
-                                <tr>
-                                    <td class="text-danger" colspan="5">No Items Added</td>
-                                </tr>
-                                @endif
-                                @if ($errors->has('issueItems') || $errors->has('issueItems.*.*'))
-                                    <tr>
-                                        <td colspan="5" class="text-danger small">
-                                            {{ $errors->first('issueItems') ?? $errors->first('issueItems.*.*') }}
-                                        </td>
-                                    </tr>
-                                @endif
+
                             </tbody>
+
                         </table>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea name="description" id="description" wire:model.defer='description' class="form-control"></textarea>
-                        </div>
-                    </form>
+
+                    </div>
+
+                    {{-- DESCRIPTION --}}
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea
+                            rows="3"
+                            class="form-control"
+                            wire:model.defer="description"
+                        ></textarea>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
                 <div class="card-footer d-flex justify-content-end gap-2 bg-light">
-                    <button type="button" class="btn btn-secondary" wire:click="$set('showCreatePage', false)">Close</button>
-                    <button type="button" class="btn btn-primary" wire:click="save">Save</button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+
+                        wire:click="$set('showCreatePage', false)"
+                    >
+
+                        Close
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+
+                        wire:click="save"
+                    >
+
+                        Save
+
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
+
     @endif
 
     @if ($showViewIssue)
@@ -256,4 +499,174 @@
             </div>
         </div>
     @endif
+
+    <script>
+
+        document.addEventListener('alpine:init', () => {
+
+            Alpine.data('issueManager', () => ({
+
+                /*
+                |--------------------------------------------------------------------------
+                | DATA
+                |--------------------------------------------------------------------------
+                */
+
+                items: @entangle('issueItems').live,
+
+                search: '',
+
+                errors: {},
+
+                /*
+                |--------------------------------------------------------------------------
+                | INIT
+                |--------------------------------------------------------------------------
+                */
+
+                init() {
+
+                    window.addEventListener('issue-errors-updated', (e) => {
+
+                        this.errors = e.detail.errors || {};
+                    });
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | SEARCH ITEMS
+                |--------------------------------------------------------------------------
+                */
+
+                get searchItems() {
+
+                    return this.$wire.searchItems || [];
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | ADD ITEM
+                |--------------------------------------------------------------------------
+                */
+
+                addItem(index) {
+
+                    const item = this.searchItems[index];
+
+                    if (!item) {
+
+                        this.clearSearch();
+
+                        return;
+                    }
+
+                    const existingIndex = this.items.findIndex(
+                        existing => existing.item_id === item.item_id
+                    );
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | EXISTS
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if (existingIndex !== -1) {
+
+                        this.items[existingIndex].quantity =
+                            Number(this.items[existingIndex].quantity || 0) + 1;
+
+                        this.syncItems();
+
+                        this.clearSearch();
+
+                        return;
+                    }
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | ADD TO TOP
+                    |--------------------------------------------------------------------------
+                    */
+
+                    this.items.unshift({
+
+                        item_id: item.item_id,
+
+                        name: item.name,
+
+                        stock: item.stock,
+
+                        quantity: 1,
+
+                        selected_unit_id: item.selected_unit_id,
+
+                        units: item.units,
+                    });
+
+                    this.syncItems();
+
+                    this.clearSearch();
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | REMOVE
+                |--------------------------------------------------------------------------
+                */
+
+                removeItem(index) {
+
+                    this.items.splice(index, 1);
+
+                    this.syncItems();
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE ITEM
+                |--------------------------------------------------------------------------
+                */
+
+                updateItem() {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | CLEAR OLD ERRORS
+                    |--------------------------------------------------------------------------
+                    */
+
+                    this.errors = {};
+
+                    this.syncItems();
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | CLEAR SEARCH
+                |--------------------------------------------------------------------------
+                */
+
+                clearSearch() {
+
+                    this.search = '';
+
+                    this.$wire.set('search', '');
+
+                    this.$wire.set('searchItems', []);
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | SYNC
+                |--------------------------------------------------------------------------
+                */
+
+                syncItems() {
+
+                    this.$wire.set('issueItems', this.items);
+                }
+            }));
+        });
+
+    </script>
 </div>
