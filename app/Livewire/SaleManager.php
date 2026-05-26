@@ -318,6 +318,7 @@ class SaleManager extends Component
         array_splice($this->sale['items'],$index,1);
         $this->calculateTotal();
         $this->checkAllStock();
+        $this->dispatch('stock-errors-updated', errors: $this->getErrorBag()->toArray());
     }
 
     public function increaseQty($index)
