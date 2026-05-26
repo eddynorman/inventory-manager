@@ -217,6 +217,8 @@ class SaleManager extends Component
 
     public function selectItem(int $index)
     {
+        $this->resetErrorBag();
+
         $item = $this->searchItems[$index];
 
         $foundIndex = null;
@@ -241,7 +243,7 @@ class SaleManager extends Component
 
                     $foundIndex = $i;
                     if($sale_item['type'] == 'item'){
-                        $this->checkStock($i,$this->sale['items'][$i]['quantity'],$item['item_id'],'item');
+                        $this->checkStock($i, $this->sale['items'][$i]['quantity'], $item['item_id'], 'item');
                     }
                     break;
                 }
@@ -254,9 +256,16 @@ class SaleManager extends Component
                 $item['selling_price'] = $item['units'][0]['selling_price'];
                 $item['total'] = $item['selling_price'];
 
-                $this->sale['items'][] = $item;
+                // 🌟 Add to the TOP of the array
+                array_unshift($this->sale['items'], $item);
 
-                $foundIndex = count($this->sale['items']) - 1;
+                // Since it's at the top, its index is now 0
+                $foundIndex = 0;
+
+                // Optional: check stock for this brand new item if required
+                if($item['type'] == 'item'){
+                    $this->checkStock($foundIndex, $item['quantity'], $item['item_id'], 'item');
+                }
             }
 
         } else {
@@ -269,7 +278,7 @@ class SaleManager extends Component
                         $this->sale['items'][$i]['quantity'] * $sale_item['selling_price'];
 
                     $foundIndex = $i;
-                    $this->checkStock($i,$this->sale['items'][$i]['quantity'],$item['kit_id'],'kit');
+                    $this->checkStock($i, $this->sale['items'][$i]['quantity'], $item['kit_id'], 'kit');
                     break;
                 }
             }
@@ -282,9 +291,14 @@ class SaleManager extends Component
                 $item['selected_unit_id'] = 0;
                 $item['total'] = $item['selling_price'];
 
-                $this->sale['items'][] = $item;
+                // 🌟 Add to the TOP of the array
+                array_unshift($this->sale['items'], $item);
 
-                $foundIndex = count($this->sale['items']) - 1;
+                // Since it's at the top, its index is now 0
+                $foundIndex = 0;
+
+                // Optional: check stock for this brand new kit if required
+                $this->checkStock($foundIndex, $item['quantity'], $item['kit_id'], 'kit');
             }
         }
 
@@ -294,12 +308,9 @@ class SaleManager extends Component
         $this->highlightedIndex = 0;
 
         $this->calculateTotal();
-
-        // 🔥 focus this row
+        $this->checkValidity();
+        // 🔥 focus this row (Will properly be 0 for new items, or the matching index for existing items)
         $this->dispatch('focus-qty', index: $foundIndex);
-
-        // 🔥 return cursor to search
-        //$this->dispatch('focus-search');
     }
 
     public function removeItem(int $index){
@@ -525,16 +536,25 @@ class SaleManager extends Component
         return $allIsWell;
     }
 
-    public function checkValidity(){
+    public function checkValidity()
+    {
+        // Clear old errors before validating
+        $this->resetErrorBag();
+
         $hasError = !$this->checkAllStock();
-        if(count($this->locationIds) == 0){
+
+        if (count($this->locationIds) == 0) {
             $hasError = true;
-            session()->flash('error','Select at least one location!');
+            session()->flash('error', 'Select at least one location!');
             $this->dispatch('flash');
         }
-        if($hasError){
+
+        if ($hasError) {
+            // 🔥 Dispatch the errors cleanly to Alpine.js
+            $this->dispatch('stock-errors-updated', errors: $this->getErrorBag()->toArray());
             return;
         }
+
         $this->validate($this->service->rules());
         $this->showConfirmSale = true;
     }

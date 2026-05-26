@@ -8,6 +8,14 @@
     selected_user_id: '',
     selected_location_id: '',
     highlightedIndex: @entangle('highlightedIndex'),
+    errors: {},
+
+    init() {
+        // 🌟 Seamlessly bind Livewire event payloads right to your local error array
+        window.addEventListener('stock-errors-updated', (e) => {
+            this.errors = e.detail.errors || {};
+        });
+    },
 
     // 🧮 Basic Math handled by Alpine for instant feedback
     get totals() {
@@ -15,8 +23,7 @@
         let total = items.reduce((acc, item) => acc + (parseFloat(item.total) || 0), 0);
         let paid = (this.payments || []).reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
 
-        // We also sync these back to the entangled 'sale' object
-        // so the backend SaleManager.php is aware of the current state
+        // Syncing these back to the entangled 'sale' object
         this.sale.total = total;
         this.sale.paid = paid;
         this.sale.balance = total - paid;
@@ -26,6 +33,9 @@
 
     // Logic to update row totals locally
     updateItem(item) {
+        // Clear errors for this item row as soon as a user starts changing it
+        this.errors = {};
+
         let unit = (item.units || []).find(u => u.id == item.selected_unit_id);
         if (unit) {
             item.selling_price = unit.selling_price;
@@ -34,6 +44,10 @@
 
         // Update payment amount to match current balance
         this.paymentAmount = this.totals.balance;
+
+        // 🌟 FIX: Instead of calling a missing method, we force-trigger
+        // a sync of the entangled 'sale' object back to Livewire's backend.
+        this.sale = { ...this.sale };
     }
 }" x-cloak>
     @include('layouts.flash')
@@ -142,7 +156,7 @@
                                             </thead>
 
                                             <tbody>
-                                                <template x-for="(item, index) in sale.items" :key="index">
+                                                <template x-for="(item, index) in sale.items" :key="item.type + '-' + (item.item_id || item.kit_id)">
                                                     <tr>
                                                         <td x-text="item.name"></td>
                                                         <td>
@@ -159,28 +173,35 @@
                                                             </select>
                                                         </td>
 
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-1">
-                                                                <!-- MINUS -->
-                                                                <button type="button"
-                                                                    class="btn btn-outline-secondary btn-sm px-2"
-                                                                    @click="if(item.quantity > 1) { item.quantity--; updateItem(item); }">
-                                                                    −
-                                                                </button>
-                                                                <!-- INPUT -->
-                                                                <input type="number"
-                                                                    class="form-control text-center fw-bold qty-input"
-                                                                    style="width:70px;"
-                                                                    x-model.number="item.quantity"
-                                                                    @input="updateItem(item)">
+                                                        <td style="max-width: 170px;">
+                                                            <div>
+                                                                <div class="d-flex align-items-center gap-1">
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary btn-sm px-2"
+                                                                        @click="if(item.quantity > 1) { item.quantity--; updateItem(item); }">
+                                                                        −
+                                                                    </button>
 
-                                                                <!-- PLUS -->
-                                                                <button type="button"
-                                                                    class="btn btn-outline-secondary btn-sm px-2"
-                                                                    @click="item.quantity++; updateItem(item);">
-                                                                    +
-                                                                </button>
+                                                                    <input type="number"
+                                                                        class="form-control text-center fw-bold qty-input"
+                                                                        style="width:fit-content; max-width: 80px;"
+                                                                        x-model.number="item.quantity"
+                                                                        @input="updateItem(item)"
+                                                                        :class="errors['sale.items.' + index + '.quantity'] ? 'is-invalid' : ''">
 
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-secondary btn-sm px-2"
+                                                                        @click="item.quantity++; updateItem(item);">
+                                                                        +
+                                                                    </button>
+                                                                </div>
+
+                                                                {{-- 🌟 Bulletproof Error Display --}}
+                                                                <template x-if="errors['sale.items.' + index + '.quantity']">
+                                                                    <small class="text-danger d-block mt-1 fw-bold"
+                                                                        x-text="errors['sale.items.' + index + '.quantity'][0]">
+                                                                    </small>
+                                                                </template>
                                                             </div>
                                                         </td>
 
