@@ -314,6 +314,7 @@ class SaleManager extends Component
     }
 
     public function removeItem(int $index){
+        $this->resetErrorBag();
         array_splice($this->sale['items'],$index,1);
         $this->calculateTotal();
         $this->checkAllStock();
