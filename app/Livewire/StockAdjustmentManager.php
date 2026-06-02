@@ -208,8 +208,28 @@ class StockAdjustmentManager extends Component
         $this->validateAdjustments();
 
         if ($this->getErrorBag()->isNotEmpty()) {
+
+            $errors = [];
+
+            foreach (
+                $this->getErrorBag()->toArray()
+                as $field => $messages
+            ) {
+                $errors[$field] = $messages[0];
+            }
+
+            $this->dispatch(
+                'stock-adjustment-errors',
+                errors: $errors
+            );
+
             return;
         }
+
+        $this->dispatch(
+            'stock-adjustment-errors',
+            errors: []
+        );
 
         $this->validated_data = $this->validate(
             $this->service->rules()

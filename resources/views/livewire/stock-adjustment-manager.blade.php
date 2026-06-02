@@ -212,22 +212,33 @@
 
                                             <input
                                                 type="number"
-
                                                 step="any"
-
                                                 class="form-control"
-
                                                 x-model.number="item.adjustment_qty"
+
+                                                :class="
+                                                    errors['adjustment_items.' + index + '.adjustment_qty']
+                                                        ? 'is-invalid'
+                                                        : ''
+                                                "
                                             >
 
-                                            <template x-if="newStock(item) < 0">
-
+                                            <template
+                                                x-if="
+                                                    errors['adjustment_items.' + index + '.adjustment_qty']
+                                                "
+                                            >
                                                 <small class="text-danger">
-
-                                                    Cannot go below zero
-
+                                                    <span
+                                                        x-text="
+                                                            errors[
+                                                                'adjustment_items.' +
+                                                                index +
+                                                                '.adjustment_qty'
+                                                            ]
+                                                        "
+                                                    ></span>
                                                 </small>
-
                                             </template>
 
                                         </td>
@@ -259,11 +270,34 @@
 
                                             <input
                                                 type="text"
-
                                                 class="form-control"
 
                                                 x-model="item.reason"
+
+                                                :class="
+                                                    errors['adjustment_items.' + index + '.reason']
+                                                        ? 'is-invalid'
+                                                        : ''
+                                                "
                                             >
+
+                                            <template
+                                                x-if="
+                                                    errors['adjustment_items.' + index + '.reason']
+                                                "
+                                            >
+                                                <small class="text-danger">
+                                                    <span
+                                                        x-text="
+                                                            errors[
+                                                                'adjustment_items.' +
+                                                                index +
+                                                                '.reason'
+                                                            ]
+                                                        "
+                                                    ></span>
+                                                </small>
+                                            </template>
 
                                         </td>
 
@@ -531,6 +565,19 @@
                 items: @entangle('adjustment_items').live,
 
                 search: '',
+                errors: {},
+
+                init() {
+
+                    window.addEventListener(
+                        'stock-adjustment-errors',
+                        (event) => {
+
+                            this.errors = event.detail.errors || {};
+                        }
+                    );
+                },
+
 
                 // Getter to safely read search items directly from Livewire dynamically
                 get searchItems() {
