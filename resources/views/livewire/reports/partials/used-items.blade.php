@@ -208,47 +208,34 @@
                     </thead>
 
                     <tbody>
-
                         @foreach($items as $row)
-
                             <tr>
-
                                 <td class="fw-semibold">
-                                    {{ $row->item_name }}
+                                    {{ $row['item_name'] }}
                                 </td>
 
                                 <td>
-
-                                    @if($row->source == 'Kit Consumption')
-
+                                    @if($row['source'] == 'Kit Consumption')
                                         <span class="badge bg-primary">
                                             Kit Consumption
                                         </span>
-
                                     @else
-
                                         <span class="badge bg-warning text-dark">
                                             Operational Usage
                                         </span>
-
                                     @endif
-
                                 </td>
 
                                 <td class="text-end">
-                                    {{ number_format($row->total_quantity) }}
+                                    {{ number_format($row['total_quantity']) }}
                                 </td>
 
                                 <td class="text-end text-danger fw-bold">
-                                    {{ number_format($row->total_cost,2) }}
+                                    {{ number_format($row['total_cost'], 2) }}
                                 </td>
-
                             </tr>
-
                         @endforeach
-
                     </tbody>
-
                     <tfoot class="table-light">
 
                         <tr class="fw-bold">

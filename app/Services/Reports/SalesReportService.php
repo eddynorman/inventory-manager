@@ -227,74 +227,23 @@ class SalesReportService
         | KIT ITEM CONSUMPTION
         |--------------------------------------------------------------------------
         */
-
         $kitUsage = SaleItemKitItem::query()
-
-            ->join(
-                'sale_item_kits',
-                'sale_item_kit_items.sale_item_kit_id',
-                '=',
-                'sale_item_kits.id'
-            )
-
-            ->join(
-                'sales',
-                'sale_item_kits.sale_id',
-                '=',
-                'sales.id'
-            )
-
-            ->join(
-                'items',
-                'sale_item_kit_items.item_id',
-                '=',
-                'items.id'
-            )
-
-            ->join(
-                'categories',
-                'items.category_id',
-                '=',
-                'categories.id'
-            )
-
-            ->join(
-                'departments',
-                'categories.department_id',
-                '=',
-                'departments.id'
-            )
-
-            ->whereBetween(
-                'sales.created_at',
-                [$from, $to]
-            )
-
+            ->join('sale_item_kits', 'sale_item_kit_items.sale_item_kit_id', '=', 'sale_item_kits.id')
+            ->join('sales', 'sale_item_kits.sale_id', '=', 'sales.id')
+            ->join('items', 'sale_item_kit_items.item_id', '=', 'items.id')
+            ->join('categories', 'items.category_id', '=', 'categories.id')
+            ->join('departments', 'categories.department_id', '=', 'departments.id')
+            ->whereBetween('sales.created_at', [$from, $to])
             ->selectRaw('
                 departments.id as department_id,
                 departments.name as department_name,
-
                 items.id as item_id,
                 items.name as item_name,
-
-                SUM(
-                    sale_item_kit_items.quantity
-                ) as total_quantity,
-
-                SUM(
-                    sale_item_kit_items.cost_at_sale
-                ) as total_cost,
-
+                SUM(sale_item_kit_items.quantity) as total_quantity,
+                SUM(sale_item_kit_items.cost_at_sale) as total_cost,
                 "Kit Consumption" as source
             ')
-
-            ->groupBy(
-                'departments.id',
-                'departments.name',
-                'items.id',
-                'items.name'
-            )
-
+            ->groupBy('departments.id', 'departments.name', 'items.id', 'items.name')
             ->get();
 
         /*
@@ -302,133 +251,67 @@ class SalesReportService
         | OPERATIONAL / MANUAL USED ITEMS
         |--------------------------------------------------------------------------
         */
-
         $manualUsage = UsedItems::query()
-
-            ->join(
-                'closing_stock_sessions',
-                'used_items.closing_stock_session_id',
-                '=',
-                'closing_stock_sessions.id'
-            )
-
-            ->join(
-                'items',
-                'used_items.item_id',
-                '=',
-                'items.id'
-            )
-
-            ->join(
-                'categories',
-                'items.category_id',
-                '=',
-                'categories.id'
-            )
-
-            ->join(
-                'departments',
-                'categories.department_id',
-                '=',
-                'departments.id'
-            )
-
-            ->whereBetween(
-                'closing_stock_sessions.created_at',
-                [$from, $to]
-            )
-
+            ->join('closing_stock_sessions', 'used_items.closing_stock_session_id', '=', 'closing_stock_sessions.id')
+            ->join('items', 'used_items.item_id', '=', 'items.id')
+            ->join('categories', 'items.category_id', '=', 'categories.id')
+            ->join('departments', 'categories.department_id', '=', 'departments.id')
+            ->whereBetween('closing_stock_sessions.created_at', [$from, $to])
             ->selectRaw('
                 departments.id as department_id,
                 departments.name as department_name,
-
                 items.id as item_id,
                 items.name as item_name,
-
-                SUM(
-                    used_items.quantity
-                ) as total_quantity,
-
-                SUM(
-                    used_items.total_cost
-                ) as total_cost,
-
+                SUM(used_items.quantity) as total_quantity,
+                SUM(used_items.total_cost) as total_cost,
                 "Operational Usage" as source
             ')
-
-            ->groupBy(
-                'departments.id',
-                'departments.name',
-                'items.id',
-                'items.name'
-            )
-
+            ->groupBy('departments.id', 'departments.name', 'items.id', 'items.name')
             ->get();
 
         /*
         |--------------------------------------------------------------------------
-        | NORMALIZE DATA
+        | NORMALIZE DATA AS ARRAYS (Prevents Object Identity Splitting)
         |--------------------------------------------------------------------------
         */
-
-        $kitUsage = $kitUsage->map(function ($row) {
-
-            return (object)[
-
-                'department_id' => $row->department_id,
-
+        $normalizedKit = $kitUsage->map(function ($row) {
+            return [
+                'department_id'   => $row->department_id,
                 'department_name' => $row->department_name,
-
-                'item_id' => $row->item_id,
-
-                'item_name' => $row->item_name,
-
-                'total_quantity' => (float) $row->total_quantity,
-
-                'total_cost' => (float) $row->total_cost,
-
-                'source' => $row->source,
+                'item_id'         => $row->item_id,
+                'item_name'       => $row->item_name,
+                'total_quantity'  => (float) $row->total_quantity,
+                'total_cost'      => (float) $row->total_cost,
+                'source'          => $row->source,
             ];
-        });
+        })->toArray();
 
-        $manualUsage = $manualUsage->map(function ($row) {
-
-            return (object)[
-
-                'department_id' => $row->department_id,
-
+        $normalizedManual = $manualUsage->map(function ($row) {
+            return [
+                'department_id'   => $row->department_id,
                 'department_name' => $row->department_name,
-
-                'item_id' => $row->item_id,
-
-                'item_name' => $row->item_name,
-
-                'total_quantity' => (float) $row->total_quantity,
-
-                'total_cost' => (float) $row->total_cost,
-
-                'source' => $row->source,
+                'item_id'         => $row->item_id,
+                'item_name'       => $row->item_name,
+                'total_quantity'  => (float) $row->total_quantity,
+                'total_cost'      => (float) $row->total_cost,
+                'source'          => $row->source,
             ];
-        });
+        })->toArray();
 
         /*
         |--------------------------------------------------------------------------
-        | MERGE & SORT
+        | MERGE & SORT VIA BASE ARRAYS
         |--------------------------------------------------------------------------
         */
+        // Merging base arrays guarantees no key preservation overlaps or object dropouts
+        $merged = array_merge($normalizedKit, $normalizedManual);
 
-        return collect()
-
-            ->concat($kitUsage)
-
-            ->concat($manualUsage)
-
+        return collect($merged)
             ->sortBy([
                 ['department_name', 'asc'],
                 ['source', 'asc'],
                 ['item_name', 'asc']
             ])
-
             ->values();
     }
 
@@ -437,11 +320,10 @@ class SalesReportService
         $report = $this->usedItemsReport($filters);
 
         return (object)[
-
+            // Laravel's sum() works perfectly with array keys here
             'quantity' => $report->sum('total_quantity'),
 
-            'cost' => $report->sum('total_cost'),
-
+            'cost'     => $report->sum('total_cost'),
         ];
     }
 
