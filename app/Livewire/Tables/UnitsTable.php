@@ -101,12 +101,18 @@ final class UnitsTable extends PowerGridComponent
     }
     public function header(): array
     {
-        return [
-            Button::add('bulk-delete')
+        $buttons = [];
+
+        if (Auth::user()?->canAccess('units.delete')) {
+            $buttons[] = Button::add('bulk-delete')
                 ->class('btn btn-danger')
                 ->slot('Bulk Delete')
-                ->dispatch('bulkDelete.' . $this->tableName, ['table' => $this->tableName]),
-        ];
+                ->dispatch('bulkDelete.' . $this->tableName, [
+                    'table' => $this->tableName,
+                ]);
+        }
+
+        return $buttons;
     }
 
     public function filters(): array
