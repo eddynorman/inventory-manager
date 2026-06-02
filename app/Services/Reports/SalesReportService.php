@@ -584,27 +584,20 @@ class SalesReportService
         */
 
         $usedItems = $this->usedItemsReport($filters)
-
             ->groupBy('department_id')
-
             ->map(function ($rows) {
+                // Get the first row as an array
+                $firstRow = $rows->first();
 
                 return (object)[
-
-                    'department_id' =>
-                        $rows->first()->department_id,
-
-                    'department_name' =>
-                        $rows->first()->department_name,
-
-                    'total_sales' => 0,
-
-                    'total_cost' =>
-                        $rows->sum('total_cost'),
+                    'department_id'   => $firstRow['department_id'],
+                    'department_name' => $firstRow['department_name'],
+                    'total_sales'     => 0,
+                    // Laravel's sum() helper automatically digs into the array keys here
+                    'total_cost'      => $rows->sum('total_cost'),
                 ];
             })
-
-            ->values();
+        ->values();
 
         /*
         |--------------------------------------------------------------------------
