@@ -12,6 +12,7 @@ use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\Facades\Rule;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use Illuminate\Support\Facades\Auth;
 
 final class UnitsTable extends PowerGridComponent
 {
@@ -32,12 +33,18 @@ final class UnitsTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return Unit::where('is_active', true);
+        return Unit::query()
+            ->with('item')
+            ->where('is_active', true);
     }
 
     public function relationSearch(): array
     {
-        return [];
+        return [
+            'item' => [
+                'name',
+            ],
+        ];
     }
 
     public function fields(): PowerGridFields
@@ -108,12 +115,6 @@ final class UnitsTable extends PowerGridComponent
         ];
     }
 
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert('.$rowId.')');
-    }
-
     public function actions(Unit $row): array
     {
         return [
@@ -131,10 +132,21 @@ final class UnitsTable extends PowerGridComponent
 
     public function actionRules($row): array
     {
-       return [
-            // Hide button delete for smallest units
+        return [
+
+            // Hide edit button if user lacks permission
+            Rule::button('edit')
+                ->when(fn () => ! Auth::user()?->canAccess('units.edit'))
+                ->hide(),
+
+            // Hide delete button if user lacks permission
             Rule::button('delete')
-                ->when(fn($row) => $row->is_smallest_unit === 1)
+                ->when(fn () => ! Auth::user()?->canAccess('units.delete'))
+                ->hide(),
+
+            // Hide delete button for smallest units
+            Rule::button('delete')
+                ->when(fn ($row) => $row->is_smallest_unit)
                 ->hide(),
         ];
     }
