@@ -117,6 +117,7 @@ class UnitManager extends Component
             $this->selectedItemId = $unit->item_id;
             $this->selectedItemName = $unit->item->name;
             $this->search = $unit->item->name;
+            $this->items = null;
         }
 
         $this->showModal = true;
