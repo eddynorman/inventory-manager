@@ -563,7 +563,7 @@
                 <button type="button"
                         class="btn btn-success"
                         wire:click="saveOrder">
-                    Save Purchase
+                    Save Order
                 </button>
 
             </div>
@@ -583,7 +583,7 @@
                     </div>
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('showViewOrder', false)"></button>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-height:70vh; overflow-y:auto;">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div><strong>Total:</strong> {{ number_format($view_order['grand_total'] ?? 0,2) }}</div>
@@ -646,7 +646,7 @@
                     </div>
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('showViewPurchase', false)"></button>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-height:70vh; overflow-y:auto;">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div><strong>Grand Total:</strong> {{ number_format($view_purchase['grand_total'] ?? 0,2) }}</div>
@@ -737,7 +737,7 @@
             <div class="card shadow-lg w-100" style="max-width: 600px; height: auto; padding:0px; border-width:0px" wire:click.stop>
                 <!-- Header -->
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0">Enter Fund Amount</h5>
+                    <h5 class="mb-0">Enter Payment Amount</h5>
                     <button type="button" class="btn-close btn-close-white" wire:click="$set('showOrderPaymentForm', false)"></button>
                 </div>
                 <div class="card-body">
