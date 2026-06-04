@@ -87,7 +87,7 @@ final class BankingTable extends PowerGridComponent
             Column::make('Bank account', 'bank_name','bank_accounts.bank_name')
                 ->sortable()
                 ->searchable(),
-            Column::make('Amount', 'amount')
+            Column::make('Amount', 'amount_formatted','amount')
                 ->sortable()
                 ->searchable(),
 
