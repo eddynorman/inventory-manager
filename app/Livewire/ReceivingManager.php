@@ -76,11 +76,23 @@ class ReceivingManager extends Component
             $this->receiving['grand_total'] = 0;
             $available = [];
             if($this->type == 'order'){
+                if(Auth::id() == $this->source['created_by']){
+                    session()->flash('error','You are not allowed to receive this order!');
+                    $this->dispatch('flash');
+                    $this->reset('type','location_id','selected_source_id');
+                    return;
+                }
                 foreach ($this->source['items'] as $key => $it) {
                     $this->source['items'][$key]['unit_price'] = $it['actual_unit_price'];
                     unset($this->source['items'][$key]['actual_unit_price']);
                 }
             }else{
+                if(Auth::id() == $this->source['purchased_by_id']){
+                    session()->flash('error','You are not allowed to receive this purchase!');
+                    $this->dispatch('flash');
+                    $this->reset('type','location_id','selected_source_id');
+                    return;
+                }
                 foreach ($this->source['items'] as $key => $it) {
                     $this->source['items'][$key]['unit_price'] = $it['actual_unit_price'];
                     $this->source['items'][$key]['total'] = $it['actual_total'];
@@ -209,6 +221,7 @@ class ReceivingManager extends Component
 
     public function create(): void
     {
+
         $this->purchases = $this->receivingService->loadUnreceivedPurchases()->toArray();
         foreach ($this->purchases as $i => $p) {
             $this->purchases[$i]['department_name'] = $this->receivingService->loadDepartmentName($p['id'],$this->type);
