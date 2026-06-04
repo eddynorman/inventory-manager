@@ -26,7 +26,7 @@ class AssetItemTemplateExport implements
             'department',
             'initial_quantity',
             'initial_unit_cost',
-            'initial_purchase_date (YYYY-MM-DD)',
+            'initial_purchase_date (YYYY/MM/DD)',
         ];
     }
 
