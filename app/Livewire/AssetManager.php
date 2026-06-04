@@ -173,14 +173,23 @@ class AssetManager extends Component
             'purchaseItems.purchase',
             'damagedItems'
         ])->findOrFail($id);
-
+        $damaged = 0;
+        $purchase = 0;
+        foreach($this->viewItem->damagedItems as $it){
+            $damaged += $it->quantity;
+        }
+        foreach($this->viewItem->purchaseItems as $it){
+            $purchase += $it->quantity;
+        }
+        $this->viewItem->damaged_quantity = $damaged;
+        $this->viewItem->purchased_quantity = $purchase;
         $this->showViewModal = true;
     }
     public function recordPurchase(AssetService $service)
     {
         $data  = $this->validate($service->purchaseRules(),$this->purchaseMessages());
         try {
-            $service->recordPurchase($data);
+            $service->recordPurchase($data['purchaseItems']);
             $this->reset('purchaseItems', 'showPurchaseModal');
             $this->refreshTable();
             session()->flash('success','Purchase saved successfully.');

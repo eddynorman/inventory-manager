@@ -113,22 +113,24 @@
                 <div class="card-body" style="max-height:70vh; overflow-y:auto;">
                     <div class="bg-white">
                         {{-- SEARCH --}}
-                        <input type="text"
-                            class="form-control mb-2 w-75"
-                            placeholder="Search item..."
-                            wire:model.debounce.500ms="searchItem">
+                        <div class="position-relative mb-4 w-50">
+                            <input type="text"
+                                class="form-control mb-2"
+                                placeholder="Search item..."
+                                wire:model.live="searchItem">
 
-                        {{-- RESULTS --}}
-                        @if($searchResults)
-                            <div class="border rounded mb-3">
-                                @foreach($searchResults as $item)
-                                    <div class="p-2 hover:bg-gray-100 cursor-pointer"
-                                        wire:click="addItem({{ $item->id }})">
-                                        {{ $item->name }}
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
+                            {{-- RESULTS --}}
+                            @if($searchResults)
+                                <div class="dropdown-menu show w-100 mt-1 shadow border-0">
+                                    @foreach($searchResults as $item)
+                                        <div class="p-2 hover:bg-gray-100 cursor-pointer dropdown-item"
+                                            wire:click="addItem({{ $item->id }})">
+                                            {{ $item->name }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
 
                         {{-- TABLE --}}
                         <table class="table table-sm">

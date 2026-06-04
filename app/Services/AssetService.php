@@ -128,7 +128,6 @@ class AssetService
                 ) / ($item->current_quantity + $qty);
 
                 $item->update([
-                    'purchased_quantity' => $item->purchased_quantity + $qty,
                     'current_quantity' => $item->current_quantity + $qty,
                     'average_unit_cost' => $newAvg,
                 ]);
