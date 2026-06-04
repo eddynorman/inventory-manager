@@ -472,15 +472,17 @@ class RequisitionManager extends Component
     public function fund(){
         $this->fundErrorMessage = '';
         $this->showFundAmountError = false;
-        if($this->fund_amount <= 0){
+        if($this->fund_amount < 0){
             $this->fundErrorMessage = "Amount should be greater than zero!";
             $this->showFundAmountError = true;
-        }else if($this->fund_amount < $this->cost){
-            $this->fundErrorMessage = "Amount should be equal to or greater than requisition cost!";
-            $this->showFundAmountError = true;
-        }else if($this->fund_amount >= $this->cost){
+        }
+        // else if($this->fund_amount < $this->cost){
+        //     $this->fundErrorMessage = "Amount should be equal to or greater than requisition cost!";
+        //     $this->showFundAmountError = true;
+        // } $this->fund_amount >= $this->cost
+        else if($this->fund_amount >= 0){
             try {
-                $this->showFundAmountError = true;
+                $this->showFundAmountError = false;
                 $this->showFundAmountEntryModal = false;
                 $this->requisitionService -> fund($this->reqId,Auth::id(),$this->fund_amount,$this->funded_to_id);
                 $this->showViewPage = false;
