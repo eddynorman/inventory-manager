@@ -609,7 +609,7 @@ class SaleService
             })
             ->filter(function ($kit) {
 
-                return $kit['stock'] > 0;
+                return $kit['stock'] >= 0;
             })
             ->values();
 
