@@ -183,7 +183,7 @@ class SaleService
                 }
             }
             if($found == false){
-                $original_item = Item::find($saleItem['item_id']);
+                $original_item = Item::find($currentItem->item_id);
                 if($original_item->is_stock_item == true){
                     $batchService = new StockBatchService();
                     $stockMovementService = new StockMovementService();
